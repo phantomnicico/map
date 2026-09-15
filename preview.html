@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Daraloo Smart Atlas</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:tahoma;background:#f4f6f8}
+.app{display:grid;grid-template-columns:340px 1fr;height:100vh}
+.side{background:#10243e;color:white;padding:18px;overflow:auto}
+.card{background:white;color:#222;border-radius:12px;padding:14px;margin:12px 0;box-shadow:0 3px 12px #0002}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat div{background:#eef3f8;padding:10px;text-align:center;border-radius:8px}
+.stat b{display:block;font-size:20px}
+#map{height:100vh;width:100%}
+.main{position:relative}
+.kpis{position:absolute;z-index:999;top:15px;left:15px;right:15px;display:flex;gap:10px;flex-wrap:wrap}
+.kpi{background:white;padding:12px;border-radius:12px;box-shadow:0 3px 15px #0003}
+.kpi b{font-size:20px}
+.legend{position:absolute;z-index:999;bottom:20px;left:20px;background:white;padding:12px;border-radius:10px}
+@media(max-width:900px){.app{display:block}.side{height:35vh}.main{height:65vh}#map{height:65vh}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+<h2>اطلس هوشمند درآلو</h2>
+<div class="card"><h3>جستجو</h3><input style="width:100%;padding:8px" placeholder="نام عارضه..."></div>
+<div class="card"><h3>شاخص‌های کلیدی</h3>
+<div class="stat"><div><b>24</b>روستا</div><div><b>3200</b>خانوار</div><div><b>650</b>هکتار تملک</div><div><b>18</b>پروژه</div></div>
+</div>
+<div class="card"><h3>لایه‌ها</h3>
+<label><input type="checkbox" checked> معدن</label><br>
+<label><input type="checkbox" checked> روستاها</label><br>
+<label><input type="checkbox" checked> تملکات</label><br>
+<label><input type="checkbox" checked> محیط زیست</label>
+</div>
+<div class="card"><h3>وضعیت</h3>
+<p>پیشرفت تملک: 70%</p><p>ریسک اجتماعی: متوسط</p></div>
+</aside>
+<main class="main">
+<div id="map"></div>
+<div class="kpis">
+<div class="kpi">مساحت منطقه<br><b>1250 ha</b></div>
+<div class="kpi">نقاط مطالعاتی<br><b>86</b></div>
+</div>
+<div class="legend">🔴 معدن<br>🔵 روستا<br>🟢 تملک</div>
+</main>
+</div>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+let map=L.map('map').setView([29.05,57.07],11);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+
+let polygon=L.polygon([
+[29.10,57.00],[29.14,57.08],[29.10,57.15],[29.02,57.17],[28.97,57.10],[28.99,57.02]
+],{color:'red',fillColor:'orange',fillOpacity:.35}).addTo(map);
+
+polygon.bindPopup('<h3>محدوده معدن مس درآلو</h3><p>مساحت: 1250 هکتار</p><p>وضعیت: فعال</p>');
+
+L.marker([29.12,57.06]).addTo(map).bindPopup('روستای نمونه - 450 خانوار');
+L.marker([29.04,57.12]).addTo(map).bindPopup('روستای نمونه دوم');
+map.fitBounds(polygon.getBounds());
+</script>
+</body>
+</html>
