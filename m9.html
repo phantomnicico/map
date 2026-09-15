@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daraloo GIS - Base Map Test</title>
+
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/ol@v10.6.1/ol.css">
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin:0; width:100%; height:100%; font-family:Tahoma,Arial,sans-serif; }
+    #map { width:100%; height:100vh; }
+
+    .panel {
+      position:absolute; z-index:1000; top:18px; right:18px;
+      background:rgba(255,255,255,.96); padding:14px 16px;
+      border-radius:10px; box-shadow:0 3px 16px rgba(0,0,0,.22);
+      min-width:250px;
+    }
+    .panel h3 { margin:0 0 8px; font-size:16px; }
+    .panel p { margin:5px 0; font-size:12px; line-height:1.7; }
+    .status { margin-top:8px; padding:7px 9px; border-radius:6px; background:#f2f2f2; }
+    .legend {
+      position:absolute; z-index:1000; bottom:20px; right:18px;
+      background:rgba(255,255,255,.96); padding:10px 13px;
+      border-radius:8px; box-shadow:0 3px 12px rgba(0,0,0,.18);
+      font-size:12px;
+    }
+    .legend-row { display:flex; align-items:center; gap:8px; }
+    .swatch { width:28px; height:15px; border:3px solid #d71920;
+              background:rgba(255,140,0,.30); border-radius:3px; }
+    .popup {
+      position:absolute; z-index:1100; display:none; min-width:260px;
+      background:white; padding:14px; border-radius:9px;
+      box-shadow:0 4px 18px rgba(0,0,0,.25); pointer-events:none;
+    }
+    .popup h4 { margin:0 0 8px; }
+  </style>
+</head>
+
+<body>
+<div id="map"></div>
+
+<div class="panel">
+  <h3>سامانه GIS منطقه درآلو</h3>
+  <p>Base Map: <b id="baseName">در حال بارگذاری...</b></p>
+  <div class="status" id="status">در حال اتصال به سرویس نقشه...</div>
+</div>
+
+<div class="legend">
+  <div class="legend-row">
+    <span class="swatch"></span>
+    <span>محدوده فرضی</span>
+  </div>
+</div>
+
+<div id="popup" class="popup"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/ol@v10.6.1/dist/ol.js"></script>
+<script>
+  const {
+    Map, View,
+    layer: { Tile, Vector },
+    source: { XYZ, Vector: VectorSource },
+    geom: { Polygon },
+    Feature,
+    style: { Style, Stroke, Fill }
+  } = ol;
+
+  const center = ol.proj.fromLonLat([57.07, 29.05]);
+
+  // ---------- Base maps ----------
+  // 1) Esri World Street Map
+  const esriLayer = new Tile({
+    source: new XYZ({
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+      attributions: 'Tiles © Esri'
+    }),
+    visible: true
+  });
+
+  // 2) CARTO Voyager as a second fallback
+  const cartoLayer = new Tile({
+    source: new XYZ({
+      url: 'https://{a-c}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+      attributions: '&copy; CARTO'
+    }),
+    visible: false
+  });
+
+  // ---------- Polygon ----------
+  const areaData = {
+    id: 1,
+    name: 'محدوده فرضی درآلو',
+    type: 'محدوده مطالعاتی',
+    area: 'تقریباً 25 کیلومتر مربع',
+    status: 'آزمایشی',
+    description: 'این محدوده صرفاً برای تست اولیه سامانه GIS ایجاد شده است.'
+  };
+
+  const coords = [
+    [57.00, 29.10],
+    [57.08, 29.14],
+    [57.15, 29.10],
+    [57.17, 29.02],
+    [57.10, 28.97],
+    [57.02, 28.99],
+    [57.00, 29.10]
+  ].map(c => ol.proj.fromLonLat(c));
+
+  const feature = new Feature({
+    geometry: new Polygon([coords]),
+    data: areaData
+  });
+
+  feature.setStyle(new Style({
+    stroke: new Stroke({ color:'#d71920', width:4 }),
+    fill: new Fill({ color:'rgba(255,140,0,0.30)' })
+  }));
+
+  const vectorLayer = new Vector({
+    source: new VectorSource({ features:[feature] })
+  });
+
+  // ---------- Map ----------
+  const map = new Map({
+    target:'map',
+    layers:[esriLayer, cartoLayer, vectorLayer],
+    view:new View({ center, zoom:11 })
+  });
+
+  map.getView().fit(feature.getGeometry().getExtent(), {
+    padding:[100,100,100,100],
+    duration:700
+  });
+
+  // ---------- Click ----------
+  const popup = document.getElementById('popup');
+
+  map.on('singleclick', evt => {
+    const selected = map.forEachFeatureAtPixel(evt.pixel, f => f);
+    if (!selected) {
+      popup.style.display = 'none';
+      return;
+    }
+
+    const d = selected.get('data');
+    popup.innerHTML = `
+      <h4>${d.name}</h4>
+      <div><b>شناسه:</b> ${d.id}</div>
+      <div><b>نوع:</b> ${d.type}</div>
+      <div><b>مساحت:</b> ${d.area}</div>
+      <div><b>وضعیت:</b> ${d.status}</div>
+      <hr>
+      <div>${d.description}</div>
+    `;
+
+    popup.style.left = (evt.pixel[0] + 15) + 'px';
+    popup.style.top = (evt.pixel[1] + 15) + 'px';
+    popup.style.display = 'block';
+  });
+
+  map.on('pointermove', evt => {
+    map.getTargetElement().style.cursor =
+      map.hasFeatureAtPixel(evt.pixel) ? 'pointer' : '';
+  });
+
+  // ---------- Base-map connectivity test ----------
+  const status = document.getElementById('status');
+  const baseName = document.getElementById('baseName');
+
+  function setStatus(text) {
+    status.textContent = text;
+  }
+
+  // Test one real tile. If Esri is unreachable, switch to CARTO.
+  const testTile = new Image();
+  let finished = false;
+
+  const useEsri = () => {
+    if (finished) return;
+    finished = true;
+    esriLayer.setVisible(true);
+    cartoLayer.setVisible(false);
+    baseName.textContent = 'Esri World Street Map';
+    setStatus('نقشه با موفقیت بارگذاری شد.');
+  };
+
+  const useCarto = () => {
+    if (finished) return;
+    finished = true;
+    esriLayer.setVisible(false);
+    cartoLayer.setVisible(true);
+    baseName.textContent = 'CARTO Voyager';
+    setStatus('Esri در دسترس نبود؛ به CARTO تغییر داده شد.');
+  };
+
+  testTile.onload = useEsri;
+  testTile.onerror = useCarto;
+  testTile.src =
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/8/98/186.png?' +
+    Date.now();
+
+  setTimeout(useCarto, 5000);
+</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>نمایش محدوده فرضی</title>
+
+    <!-- Leaflet -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+    // ایجاد نقشه
+    const map = L.map('map').setView([29.05, 57.07], 12);
+
+    // نقشه OpenStreetMap
+    L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }
+    ).addTo(map);
+
+
+    // مختصات محدوده فرضی
+    const polygonCoordinates = [
+        [29.10, 57.00],
+        [29.14, 57.08],
+        [29.10, 57.15],
+        [29.02, 57.17],
+        [28.97, 57.10],
+        [28.99, 57.02]
+    ];
+
+
+    // ایجاد Polygon
+    const polygon = L.polygon(
+        polygonCoordinates,
+        {
+            color: '#d62828',
+            weight: 3,
+            fillColor: '#f77f00',
+            fillOpacity: 0.35
+        }
+    ).addTo(map);
+
+
+    // اطلاعات هنگام کلیک
+    polygon.bindPopup(`
+        <div style="text-align:right">
+            <h3>محدوده فرضی</h3>
+            <p>این Polygon صرفاً برای تست سیستم GIS ایجاد شده است.</p>
+        </div>
+    `);
+
+
+    // تنظیم نقشه روی محدوده
+    map.fitBounds(polygon.getBounds());
+
+</script>
+
+</body>
+</html>

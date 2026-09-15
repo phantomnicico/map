@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Daraloo GIS - MeMaps</title>
+
+
+    <!-- =====================================================
+         Leaflet CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+
+    <!-- =====================================================
+         STYLE
+    ====================================================== -->
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html,
+        body {
+
+            margin: 0;
+            padding: 0;
+
+            width: 100%;
+            height: 100%;
+
+            font-family:
+                Tahoma,
+                Arial,
+                sans-serif;
+
+        }
+
+
+        #map {
+
+            width: 100%;
+            height: 100vh;
+
+        }
+
+
+        /* ================================================
+           پنل اطلاعات
+        ================================================= */
+
+        .top-panel {
+
+            position: absolute;
+
+            top: 20px;
+            right: 20px;
+
+            z-index: 1000;
+
+            width: 290px;
+
+            background: rgba(255,255,255,0.96);
+
+            padding: 18px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 4px 20px
+                rgba(0,0,0,0.20);
+
+        }
+
+
+        .top-panel h2 {
+
+            margin:
+                0 0 10px 0;
+
+            font-size: 18px;
+
+        }
+
+
+        .top-panel p {
+
+            margin: 6px 0;
+
+            font-size: 13px;
+
+            line-height: 1.8;
+
+        }
+
+
+        /* ================================================
+           وضعیت اتصال
+        ================================================= */
+
+        .status {
+
+            margin-top: 12px;
+
+            padding: 8px;
+
+            border-radius: 7px;
+
+            background: #eeeeee;
+
+            font-size: 12px;
+
+        }
+
+
+        /* ================================================
+           Legend
+        ================================================= */
+
+        .legend {
+
+            position: absolute;
+
+            right: 20px;
+            bottom: 25px;
+
+            z-index: 1000;
+
+            background:
+                rgba(255,255,255,0.96);
+
+            padding: 12px 15px;
+
+            border-radius: 9px;
+
+            box-shadow:
+                0 3px 15px
+                rgba(0,0,0,0.18);
+
+            font-size: 12px;
+
+        }
+
+
+        .legend-row {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+        }
+
+
+        .legend-box {
+
+            width: 30px;
+
+            height: 16px;
+
+            border: 3px solid #d71920;
+
+            background:
+                rgba(255,140,0,0.30);
+
+            border-radius: 3px;
+
+        }
+
+
+        /* ================================================
+           Popup
+        ================================================= */
+
+        .popup-content {
+
+            min-width: 230px;
+
+            line-height: 1.9;
+
+            text-align: right;
+
+        }
+
+
+        .popup-title {
+
+            font-size: 17px;
+
+            font-weight: bold;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        .popup-row {
+
+            margin: 3px 0;
+
+        }
+
+
+        /* ================================================
+           دکمه تست
+        ================================================= */
+
+        .test-button {
+
+            margin-top: 10px;
+
+            width: 100%;
+
+            border: none;
+
+            padding: 9px;
+
+            border-radius: 7px;
+
+            background: #333;
+
+            color: white;
+
+            cursor: pointer;
+
+            font-family: inherit;
+
+        }
+
+
+        .test-button:hover {
+
+            background: #111;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     MAP
+====================================================== -->
+
+<div id="map"></div>
+
+
+<!-- =====================================================
+     PANEL
+====================================================== -->
+
+<div class="top-panel">
+
+    <h2>
+        سامانه GIS منطقه درآلو
+    </h2>
+
+    <p>
+        <strong>Base Map:</strong>
+        MeMaps
+    </p>
+
+    <p>
+        <strong>Layer:</strong>
+        محدوده فرضی
+    </p>
+
+    <p>
+        <strong>کتابخانه:</strong>
+        Leaflet
+    </p>
+
+    <div
+        id="status"
+        class="status"
+    >
+        در حال بارگذاری نقشه...
+    </div>
+
+    <button
+        class="test-button"
+        onclick="zoomToArea()"
+    >
+        نمایش کامل محدوده
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     LEGEND
+====================================================== -->
+
+<div class="legend">
+
+    <div class="legend-row">
+
+        <div class="legend-box"></div>
+
+        <span>
+            محدوده فرضی درآلو
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     LEAFLET JS
+====================================================== -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+<script>
+
+    /*
+    ========================================================
+    1. API KEY
+
+    کلید واقعی MeMaps خودت را اینجا قرار بده.
+
+    مثال:
+
+    const MEMAPS_KEY =
+        "mm_xxxxxxxxxxxxxxxxx";
+
+    کلید واقعی را برای من ارسال نکن.
+    ========================================================
+    */
+
+
+    const MEMAPS_KEY =
+        "mm_2c3e22c6a9d65a2b74e3c9e4c42dd77ed9d25d085d8b04ba";
+
+
+    /*
+    ========================================================
+    2. ایجاد نقشه
+    ========================================================
+    */
+
+
+    const map = L.map(
+        'map',
+        {
+
+            zoomControl: true,
+
+            attributionControl: true
+
+        }
+    );
+
+
+    /*
+    ========================================================
+    3. مرکز اولیه
+    ========================================================
+    */
+
+
+    map.setView(
+
+        [29.05, 57.07],
+
+        11
+
+    );
+
+
+    /*
+    ========================================================
+    4. MeMaps Tile Layer
+    ========================================================
+    */
+
+
+    const memapsUrl =
+
+        'https://memaps.ir/hot/{z}/{x}/{y}.png'
+        +
+        '?key='
+        +
+        encodeURIComponent(
+            MEMAPS_KEY
+        );
+
+
+    const memapsLayer =
+
+        L.tileLayer(
+
+            memapsUrl,
+
+            {
+
+                maxZoom: 18,
+
+                minZoom: 3,
+
+                attribution:
+                    '© MeMaps'
+
+            }
+
+        );
+
+
+    memapsLayer.addTo(map);
+
+
+    /*
+    ========================================================
+    5. اطلاعات محدوده
+
+    فعلاً دستی است.
+
+    بعداً همین Object از PostGIS/API خواهد آمد.
+    ========================================================
+    */
+
+
+    const areaData = {
+
+        id: 1,
+
+        name:
+            "محدوده فرضی درآلو",
+
+        type:
+            "محدوده مطالعاتی",
+
+        area:
+            "تقریباً 25 کیلومتر مربع",
+
+        status:
+            "آزمایشی",
+
+        description:
+            "این محدوده صرفاً برای تست اولیه سامانه GIS ایجاد شده است.",
+
+        source:
+            "Test Data"
+
+    };
+
+
+    /*
+    ========================================================
+    6. Polygon
+    ========================================================
+    */
+
+
+    const polygonCoordinates = [
+
+        [29.10, 57.00],
+
+        [29.14, 57.08],
+
+        [29.10, 57.15],
+
+        [29.02, 57.17],
+
+        [28.97, 57.10],
+
+        [28.99, 57.02]
+
+    ];
+
+
+    /*
+    ========================================================
+    7. ایجاد Polygon
+    ========================================================
+    */
+
+
+    const polygon =
+
+        L.polygon(
+
+            polygonCoordinates,
+
+            {
+
+                color:
+                    '#d71920',
+
+                weight:
+                    4,
+
+                opacity:
+                    1,
+
+                fillColor:
+                    '#ff8c00',
+
+                fillOpacity:
+                    0.30
+
+            }
+
+        );
+
+
+    polygon.addTo(map);
+
+
+    /*
+    ========================================================
+    8. Popup
+    ========================================================
+    */
+
+
+    polygon.bindPopup(
+
+        `
+
+        <div class="popup-content">
+
+            <div class="popup-title">
+
+                ${areaData.name}
+
+            </div>
+
+
+            <div class="popup-row">
+
+                <strong>
+                    شناسه:
+                </strong>
+
+                ${areaData.id}
+
+            </div>
+
+
+            <div class="popup-row">
+
+                <strong>
+                    نوع:
+                </strong>
+
+                ${areaData.type}
+
+            </div>
+
+
+            <div class="popup-row">
+
+                <strong>
+                    مساحت:
+                </strong>
+
+                ${areaData.area}
+
+            </div>
+
+
+            <div class="popup-row">
+
+                <strong>
+                    وضعیت:
+                </strong>
+
+                ${areaData.status}
+
+            </div>
+
+
+            <hr>
+
+
+            <div>
+
+                ${areaData.description}
+
+            </div>
+
+
+        </div>
+
+        `
+
+    );
+
+
+    /*
+    ========================================================
+    9. Hover Effect
+    ========================================================
+    */
+
+
+    polygon.on(
+
+        'mouseover',
+
+        function() {
+
+            polygon.setStyle({
+
+                weight: 6,
+
+                fillOpacity: 0.45
+
+            });
+
+        }
+
+    );
+
+
+    polygon.on(
+
+        'mouseout',
+
+        function() {
+
+            polygon.setStyle({
+
+                weight: 4,
+
+                fillOpacity: 0.30
+
+            });
+
+        }
+
+    );
+
+
+    /*
+    ========================================================
+    10. Zoom روی Polygon
+    ========================================================
+    */
+
+
+    function zoomToArea() {
+
+        map.fitBounds(
+
+            polygon.getBounds(),
+
+            {
+
+                padding:
+                    [60, 60],
+
+                maxZoom:
+                    13
+
+            }
+
+        );
+
+    }
+
+
+    zoomToArea();
+
+
+    /*
+    ========================================================
+    11. وضعیت اولیه
+    ========================================================
+    */
+
+
+    const status =
+        document.getElementById(
+            'status'
+        );
+
+
+    status.innerHTML =
+        'نقشه در حال دریافت Tile از MeMaps است...';
+
+
+    /*
+    ========================================================
+    12. تشخیص خطای Tile
+    ========================================================
+    */
+
+
+    memapsLayer.on(
+
+        'tileerror',
+
+        function(event) {
+
+            console.error(
+                'MeMaps Tile Error:',
+                event
+            );
+
+
+            status.innerHTML =
+
+                '❌ دریافت نقشه از MeMaps با خطا مواجه شد. ' +
+                'کلید API و دسترسی شبکه را بررسی کنید.';
+
+        }
+
+    );
+
+
+    /*
+    ========================================================
+    13. تشخیص موفقیت Tile
+    ========================================================
+    */
+
+
+    memapsLayer.on(
+
+        'tileload',
+
+        function() {
+
+            status.innerHTML =
+
+                '✅ نقشه MeMaps با موفقیت در حال بارگذاری است.';
+
+        }
+
+    );
+
+
+    /*
+    ========================================================
+    14. کلیک روی نقشه
+    ========================================================
+    */
+
+
+    map.on(
+
+        'click',
+
+        function(event) {
+
+            console.log(
+
+                'Map clicked:',
+
+                event.latlng
+
+            );
+
+        }
+
+    );
+
+
+</script>
+
+</body>
+
+</html>

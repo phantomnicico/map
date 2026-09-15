@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Daraloo GIS - OpenLayers Test</title>
+
+    <!-- OpenLayers CSS -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/ol@v10.6.1/ol.css"
+    />
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: Tahoma, Arial, sans-serif;
+        }
+
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+
+        .title {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+
+            background: white;
+            padding: 12px 18px;
+            border-radius: 8px;
+
+            box-shadow: 0 3px 12px rgba(0,0,0,.2);
+
+            font-weight: bold;
+        }
+
+        .info {
+            position: absolute;
+            bottom: 25px;
+            right: 20px;
+            z-index: 1000;
+
+            background: white;
+            padding: 15px;
+
+            border-radius: 8px;
+
+            box-shadow: 0 3px 12px rgba(0,0,0,.2);
+
+            min-width: 220px;
+
+            display: none;
+        }
+
+        .info h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="title">
+    سامانه GIS منطقه درآلو
+</div>
+
+<div id="map"></div>
+
+<div id="info" class="info">
+    <h3>محدوده انتخاب‌شده</h3>
+
+    <div id="infoContent"></div>
+</div>
+
+
+<!-- OpenLayers JS -->
+<script src="https://cdn.jsdelivr.net/npm/ol@v10.6.1/dist/ol.js"></script>
+
+<script>
+
+    /*
+    ==========================================================
+    1. اطلاعات محدوده فرضی
+    ==========================================================
+    */
+
+    const areaData = {
+
+        id: 1,
+
+        name: "محدوده فرضی درآلو",
+
+        type: "محدوده مطالعاتی",
+
+        area: "تقریباً 25 کیلومتر مربع",
+
+        status: "آزمایشی",
+
+        description:
+            "این محدوده صرفاً برای تست سامانه GIS ایجاد شده است."
+
+    };
+
+
+    /*
+    ==========================================================
+    2. مختصات Polygon
+       
+    توجه:
+    OpenLayers از EPSG:3857 برای نمایش Web Map استفاده می‌کند.
+    بنابراین مختصات طول/عرض جغرافیایی را transform می‌کنیم.
+    ==========================================================
+    */
+
+    const polygonCoordinates = [
+
+        [57.00, 29.10],
+        [57.08, 29.14],
+        [57.15, 29.10],
+        [57.17, 29.02],
+        [57.10, 28.97],
+        [57.02, 28.99],
+        [57.00, 29.10]
+
+    ];
+
+
+    /*
+    تبدیل مختصات WGS84 به Web Mercator
+    */
+
+    const transformedCoordinates =
+        polygonCoordinates.map(
+            coordinate =>
+                ol.proj.fromLonLat(coordinate)
+        );
+
+
+    /*
+    ==========================================================
+    3. ایجاد Polygon
+    ==========================================================
+    */
+
+    const polygon =
+        new ol.geom.Polygon([
+            transformedCoordinates
+        ]);
+
+
+    /*
+    ==========================================================
+    4. Style
+    ==========================================================
+    */
+
+    const polygonStyle =
+        new ol.style.Style({
+
+            stroke: new ol.style.Stroke({
+
+                color: '#d62828',
+
+                width: 4
+
+            }),
+
+            fill: new ol.style.Fill({
+
+                color: 'rgba(255,140,0,0.35)'
+
+            })
+
+        });
+
+
+    /*
+    ==========================================================
+    5. Feature
+    ==========================================================
+    */
+
+    const polygonFeature =
+        new ol.Feature({
+
+            geometry: polygon,
+
+            data: areaData
+
+        });
+
+
+    polygonFeature.setStyle(
+        polygonStyle
+    );
+
+
+    /*
+    ==========================================================
+    6. Vector Layer
+    ==========================================================
+    */
+
+    const vectorSource =
+        new ol.source.Vector({
+
+            features: [
+                polygonFeature
+            ]
+
+        });
+
+
+    const vectorLayer =
+        new ol.layer.Vector({
+
+            source: vectorSource
+
+        });
+
+
+    /*
+    ==========================================================
+    7. OpenStreetMap Layer
+    ==========================================================
+    */
+
+    const osmLayer =
+        new ol.layer.Tile({
+
+            source:
+                new ol.source.OSM()
+
+        });
+
+
+    /*
+    ==========================================================
+    8. ایجاد Map
+    ==========================================================
+    */
+
+    const map =
+        new ol.Map({
+
+            target: 'map',
+
+            layers: [
+
+                osmLayer,
+
+                vectorLayer
+
+            ],
+
+            view:
+                new ol.View({
+
+                    center:
+                        ol.proj.fromLonLat([
+                            57.07,
+                            29.05
+                        ]),
+
+                    zoom: 11
+
+                })
+
+        });
+
+
+    /*
+    ==========================================================
+    9. Zoom روی Polygon
+    ==========================================================
+    */
+
+    map.getView().fit(
+        polygon.getExtent(),
+        {
+
+            padding: [
+                80,
+                80,
+                80,
+                80
+            ],
+
+            duration: 1000
+
+        }
+    );
+
+
+    /*
+    ==========================================================
+    10. Click روی Polygon
+    ==========================================================
+    */
+
+    map.on(
+        'singleclick',
+        function(event) {
+
+            const feature =
+                map.forEachFeatureAtPixel(
+                    event.pixel,
+                    function(feature) {
+
+                        return feature;
+
+                    }
+                );
+
+
+            if (!feature) {
+
+                document
+                    .getElementById('info')
+                    .style.display = 'none';
+
+                return;
+
+            }
+
+
+            const data =
+                feature.get('data');
+
+
+            document
+                .getElementById('infoContent')
+                .innerHTML = `
+
+                    <p>
+                        <strong>نام:</strong>
+                        ${data.name}
+                    </p>
+
+                    <p>
+                        <strong>شناسه:</strong>
+                        ${data.id}
+                    </p>
+
+                    <p>
+                        <strong>نوع:</strong>
+                        ${data.type}
+                    </p>
+
+                    <p>
+                        <strong>مساحت:</strong>
+                        ${data.area}
+                    </p>
+
+                    <p>
+                        <strong>وضعیت:</strong>
+                        ${data.status}
+                    </p>
+
+                    <p>
+                        ${data.description}
+                    </p>
+
+                `;
+
+
+            document
+                .getElementById('info')
+                .style.display = 'block';
+
+        }
+    );
+
+
+    /*
+    ==========================================================
+    11. تغییر Cursor هنگام قرار گرفتن روی Polygon
+    ==========================================================
+    */
+
+    map.on(
+        'pointermove',
+        function(event) {
+
+            const hit =
+                map.hasFeatureAtPixel(
+                    event.pixel
+                );
+
+            map.getTargetElement()
+                .style.cursor =
+                hit ? 'pointer' : '';
+
+        }
+    );
+
+</script>
+
+</body>
+</html>

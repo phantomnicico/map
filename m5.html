@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Daraloo GIS Test</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/ol@v10.6.1/ol.css"
+    >
+
+    <style>
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            font-family: Tahoma, Arial, sans-serif;
+        }
+
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+
+        .title {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+
+            background: white;
+            padding: 12px 20px;
+
+            border-radius: 8px;
+
+            box-shadow: 0 3px 15px rgba(0,0,0,.2);
+
+            font-weight: bold;
+        }
+
+        .info {
+            position: absolute;
+            bottom: 25px;
+            right: 20px;
+            z-index: 1000;
+
+            width: 260px;
+
+            background: white;
+            padding: 18px;
+
+            border-radius: 8px;
+
+            box-shadow: 0 3px 15px rgba(0,0,0,.2);
+
+            display: none;
+        }
+
+        .info h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="title">
+    سامانه GIS منطقه درآلو
+</div>
+
+<div id="map"></div>
+
+<div id="info">
+    <h3>محدوده انتخاب‌شده</h3>
+
+    <div id="infoContent"></div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/ol@v10.6.1/dist/ol.js"></script>
+
+<script>
+
+    /*
+    =====================================================
+    اطلاعات محدوده
+    =====================================================
+    */
+
+    const areaData = {
+
+        id: 1,
+
+        name: "محدوده فرضی درآلو",
+
+        type: "محدوده مطالعاتی",
+
+        area: "25 km²",
+
+        status: "آزمایشی",
+
+        description:
+            "این محدوده صرفاً برای تست سامانه ایجاد شده است."
+
+    };
+
+
+    /*
+    =====================================================
+    مختصات Polygon
+    =====================================================
+    */
+
+    const coordinates = [
+
+        [57.00, 29.10],
+        [57.08, 29.14],
+        [57.15, 29.10],
+        [57.17, 29.02],
+        [57.10, 28.97],
+        [57.02, 28.99],
+        [57.00, 29.10]
+
+    ];
+
+
+    /*
+    تبدیل مختصات
+    */
+
+    const polygonCoordinates =
+        coordinates.map(
+            c => ol.proj.fromLonLat(c)
+        );
+
+
+    /*
+    =====================================================
+    Polygon
+    =====================================================
+    */
+
+    const polygon =
+        new ol.geom.Polygon([
+            polygonCoordinates
+        ]);
+
+
+    /*
+    =====================================================
+    Feature
+    =====================================================
+    */
+
+    const feature =
+        new ol.Feature({
+
+            geometry: polygon,
+
+            data: areaData
+
+        });
+
+
+    /*
+    =====================================================
+    Style
+    =====================================================
+    */
+
+    feature.setStyle(
+
+        new ol.style.Style({
+
+            stroke:
+                new ol.style.Stroke({
+
+                    color: '#e00000',
+
+                    width: 4
+
+                }),
+
+            fill:
+                new ol.style.Fill({
+
+                    color: 'rgba(255,120,0,0.35)'
+
+                })
+
+        })
+
+    );
+
+
+    /*
+    =====================================================
+    Vector Layer
+    =====================================================
+    */
+
+    const vectorLayer =
+        new ol.layer.Vector({
+
+            source:
+                new ol.source.Vector({
+
+                    features: [
+                        feature
+                    ]
+
+                })
+
+        });
+
+
+    /*
+    =====================================================
+    ArcGIS Base Map
+    =====================================================
+    */
+
+    const baseLayer =
+        new ol.layer.Tile({
+
+            source:
+                new ol.source.XYZ({
+
+                    url:
+                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+
+                    attributions:
+                    'Tiles © Esri'
+
+                })
+
+        });
+
+
+    /*
+    =====================================================
+    Map
+    =====================================================
+    */
+
+    const map =
+        new ol.Map({
+
+            target: 'map',
+
+            layers: [
+
+                baseLayer,
+
+                vectorLayer
+
+            ],
+
+            view:
+                new ol.View({
+
+                    center:
+                        ol.proj.fromLonLat([
+                            57.07,
+                            29.05
+                        ]),
+
+                    zoom: 11
+
+                })
+
+        });
+
+
+    /*
+    =====================================================
+    Zoom روی محدوده
+    =====================================================
+    */
+
+    map.getView().fit(
+
+        polygon.getExtent(),
+
+        {
+
+            padding: [
+                80,
+                80,
+                80,
+                80
+            ],
+
+            duration: 1000
+
+        }
+
+    );
+
+
+    /*
+    =====================================================
+    Click روی Polygon
+    =====================================================
+    */
+
+    map.on(
+        'singleclick',
+        function(event) {
+
+            const selectedFeature =
+                map.forEachFeatureAtPixel(
+
+                    event.pixel,
+
+                    function(feature) {
+
+                        return feature;
+
+                    }
+
+                );
+
+
+            if (!selectedFeature) {
+
+                document
+                    .getElementById('info')
+                    .style.display = 'none';
+
+                return;
+
+            }
+
+
+            const data =
+                selectedFeature.get('data');
+
+
+            document
+                .getElementById('infoContent')
+                .innerHTML = `
+
+                    <p>
+                        <b>نام:</b>
+                        ${data.name}
+                    </p>
+
+                    <p>
+                        <b>شناسه:</b>
+                        ${data.id}
+                    </p>
+
+                    <p>
+                        <b>نوع:</b>
+                        ${data.type}
+                    </p>
+
+                    <p>
+                        <b>مساحت:</b>
+                        ${data.area}
+                    </p>
+
+                    <p>
+                        <b>وضعیت:</b>
+                        ${data.status}
+                    </p>
+
+                    <p>
+                        ${data.description}
+                    </p>
+
+                `;
+
+
+            document
+                .getElementById('info')
+                .style.display = 'block';
+
+        }
+    );
+
+
+    /*
+    =====================================================
+    Cursor
+    =====================================================
+    */
+
+    map.on(
+        'pointermove',
+        function(event) {
+
+            const hit =
+                map.hasFeatureAtPixel(
+                    event.pixel
+                );
+
+            map.getTargetElement()
+                .style.cursor =
+                hit ? 'pointer' : '';
+
+        }
+    );
+
+</script>
+
+</body>
+</html>

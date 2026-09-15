@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daraloo GIS - MeMaps Test</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+html,body,#map{margin:0;width:100%;height:100%;font-family:Tahoma,Arial,sans-serif}
+#map{height:100vh}
+.panel{position:absolute;z-index:1000;top:18px;right:18px;background:#fff;padding:14px 18px;border-radius:10px;box-shadow:0 3px 15px rgba(0,0,0,.22);min-width:250px}
+.panel h3{margin:0 0 8px;font-size:16px}.panel p{margin:5px 0;font-size:12px;line-height:1.8}
+.legend{position:absolute;z-index:1000;bottom:20px;right:18px;background:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 3px 12px rgba(0,0,0,.18);font-size:12px}
+.swatch{display:inline-block;width:28px;height:14px;border:3px solid #d71920;background:rgba(255,140,0,.3);vertical-align:middle;margin-left:7px}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="panel">
+  <h3>سامانه GIS منطقه درآلو</h3>
+  <p>نقشه پایه: <b>MeMaps</b></p>
+  <p>محدوده فرضی: فعال</p>
+</div>
+<div class="legend"><span class="swatch"></span> محدوده فرضی</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map = L.map('map', {zoomControl:true}).setView([29.05,57.07],11);
+
+/*
+ MeMaps طبق مستندات رسمی خود، برای tile های /hot، /ret،
+ /dark و /dark-retina کلید API می‌خواهد.
+ این نسخه با کلیدی که در اختیار شماست کار می‌کند.
+ اگر کلید ندارید، مقدار زیر را خالی بگذارید و صفحه رسمی MeMaps
+ را در تب دیگری باز کنید؛ tile عمومی بدون کلید توسط سرویس رد می‌شود.
+*/
+const MEMAPS_KEY = "mm_2c3e22c6a9d65a2b74e3c9e4c42dd77ed9d25d085d8b04ba";
+
+const tileUrl = MEMAPS_KEY
+  ? `https://memaps.ir/hot/{z}/{x}/{y}.png?key=${encodeURIComponent(MEMAPS_KEY)}`
+  : `https://memaps.ir/hot/{z}/{x}/{y}.png`;
+
+L.tileLayer(tileUrl,{
+  maxZoom:18,
+  attribution:'© می‌مپس'
+}).addTo(map);
+
+const areaData = {
+  id:1,
+  name:"محدوده فرضی درآلو",
+  type:"محدوده مطالعاتی",
+  area:"تقریباً 25 کیلومتر مربع",
+  status:"آزمایشی",
+  description:"این Polygon صرفاً برای تست اولیه سامانه GIS ایجاد شده است."
+};
+
+const polygon = L.polygon([
+  [29.10,57.00],
+  [29.14,57.08],
+  [29.10,57.15],
+  [29.02,57.17],
+  [28.97,57.10],
+  [28.99,57.02]
+],{
+  color:'#d71920',
+  weight:4,
+  fillColor:'#ff8c00',
+  fillOpacity:.30
+}).addTo(map);
+
+polygon.bindPopup(`
+<div style="min-width:220px;line-height:1.9">
+<b style="font-size:16px">${areaData.name}</b><hr>
+<strong>شناسه:</strong> ${areaData.id}<br>
+<strong>نوع:</strong> ${areaData.type}<br>
+<strong>مساحت:</strong> ${areaData.area}<br>
+<strong>وضعیت:</strong> ${areaData.status}<hr>
+${areaData.description}
+</div>
+`);
+
+polygon.on('mouseover',()=>polygon.setStyle({weight:6,fillOpacity:.45}));
+polygon.on('mouseout',()=>polygon.setStyle({weight:4,fillOpacity:.30}));
+map.fitBounds(polygon.getBounds(),{padding:[60,60]});
+</script>
+</body>
+</html>

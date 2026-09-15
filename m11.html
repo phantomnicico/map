@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Daraloo Regional Map</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Tahoma, Arial, sans-serif;
+      background: #f4f4f4;
+    }
+
+    #map {
+      width: 100%;
+      height: 100vh;
+    }
+
+    .panel {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 1000;
+      background: white;
+      padding: 15px 18px;
+      border-radius: 10px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.2);
+      width: 300px;
+      line-height: 1.8;
+    }
+
+    .panel h3 {
+      margin: 0 0 8px;
+    }
+
+    #status {
+      margin-top: 8px;
+      padding: 8px;
+      background: #f1f1f1;
+      border-radius: 6px;
+      font-size: 13px;
+      direction: rtl;
+    }
+
+    .ok {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<div class="panel">
+  <h3>مجتمع مس درآلو</h3>
+
+  <div>
+    نقشه آزمایشی منطقه‌ای
+  </div>
+
+  <div id="status">
+    در حال اتصال به سرویس نقشه...
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+  // =========================================================
+  // 1. کلید MeMaps خودت را اینجا قرار بده
+  // =========================================================
+
+  const MEMAPS_KEY = "mm_2c3e22c6a9d65a2b74e3c9e4c42dd77ed9d25d085d8b04ba";
+
+
+  // =========================================================
+  // 2. مختصات مرکز منطقه آزمایشی
+  // =========================================================
+
+  const center = [29.05, 57.07];
+
+
+  // =========================================================
+  // 3. ساخت نقشه
+  // =========================================================
+
+  const map = L.map("map", {
+    center: center,
+    zoom: 11,
+    zoomControl: true
+  });
+
+
+  // =========================================================
+  // 4. آدرس Tile مِی‌مپ
+  // =========================================================
+
+  const tileUrl =
+    "https://memaps.ir/hot/{z}/{x}/{y}.png?key=" +
+    encodeURIComponent(MEMAPS_KEY);
+
+
+  // =========================================================
+  // 5. اضافه کردن Tile Layer
+  // =========================================================
+
+  const memaps = L.tileLayer(tileUrl, {
+
+    maxZoom: 19,
+
+    attribution:
+      '&copy; MeMaps / OpenStreetMap contributors',
+
+    crossOrigin: true
+
+  });
+
+
+  // =========================================================
+  // 6. بررسی وضعیت Tile
+  // =========================================================
+
+  let loadedTiles = 0;
+  let failedTiles = 0;
+
+  memaps.on("tileload", function () {
+
+    loadedTiles++;
+
+    const status = document.getElementById("status");
+
+    status.innerHTML =
+      "✓ نقشه با موفقیت در حال بارگذاری است";
+
+    status.className = "ok";
+
+  });
+
+
+  memaps.on("tileerror", function (event) {
+
+    failedTiles++;
+
+    console.error("MeMaps Tile Error:", event);
+
+    const status = document.getElementById("status");
+
+    status.innerHTML =
+      "✕ خطا در دریافت نقشه<br>" +
+      "کد خطا را در Console مرورگر بررسی کنید.";
+
+    status.className = "error";
+
+  });
+
+
+  memaps.addTo(map);
+
+
+  // =========================================================
+  // 7. Polygon آزمایشی
+  // =========================================================
+
+  const daralooArea = [
+
+    [29.085, 57.015],
+
+    [29.115, 57.060],
+
+    [29.105, 57.125],
+
+    [29.055, 57.145],
+
+    [29.015, 57.110],
+
+    [29.020, 57.045],
+
+    [29.050, 57.010]
+
+  ];
+
+
+  // =========================================================
+  // 8. ایجاد Polygon
+  // =========================================================
+
+  const polygon = L.polygon(
+
+    daralooArea,
+
+    {
+      color: "#d35400",
+
+      weight: 3,
+
+      fillColor: "#f39c12",
+
+      fillOpacity: 0.35
+    }
+
+  ).addTo(map);
+
+
+  // =========================================================
+  // 9. Popup
+  // =========================================================
+
+  polygon.bindPopup(`
+
+    <div style="font-family:Tahoma; min-width:220px">
+
+      <h3 style="margin-top:0">
+        منطقه مطالعاتی درآلو
+      </h3>
+
+      <hr>
+
+      <b>نوع:</b>
+      محدوده مطالعاتی
+
+      <br><br>
+
+      <b>وضعیت:</b>
+      آزمایشی
+
+      <br><br>
+
+      <b>مساحت:</b>
+      در نسخه واقعی از GIS محاسبه می‌شود.
+
+    </div>
+
+  `);
+
+
+  // =========================================================
+  // 10. Hover
+  // =========================================================
+
+  polygon.on("mouseover", function () {
+
+    polygon.setStyle({
+
+      weight: 4,
+
+      fillOpacity: 0.55
+
+    });
+
+  });
+
+
+  polygon.on("mouseout", function () {
+
+    polygon.setStyle({
+
+      weight: 3,
+
+      fillOpacity: 0.35
+
+    });
+
+  });
+
+
+  // =========================================================
+  // 11. Zoom روی محدوده
+  // =========================================================
+
+  map.fitBounds(polygon.getBounds(), {
+
+    padding: [30, 30]
+
+  });
+
+
+</script>
+
+</body>
+</html>

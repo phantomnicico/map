@@ -1,0 +1,235 @@
+```html
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>اطلس تعاملی منطقه درآلو</title>
+
+    <!-- Leaflet CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: Tahoma, Arial, sans-serif;
+        }
+
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+
+        .info-box {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+
+            background: rgba(255, 255, 255, 0.95);
+            padding: 16px 20px;
+            border-radius: 12px;
+
+            box-shadow: 0 5px 20px rgba(0,0,0,0.18);
+
+            min-width: 260px;
+        }
+
+        .info-box h2 {
+            margin: 0 0 8px;
+            font-size: 18px;
+        }
+
+        .info-box p {
+            margin: 5px 0;
+            color: #444;
+            font-size: 14px;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 25px;
+            right: 20px;
+            z-index: 1000;
+
+            background: white;
+            padding: 12px 16px;
+            border-radius: 10px;
+
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px 0;
+            font-size: 13px;
+        }
+
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="map"></div>
+
+    <!-- اطلاعات -->
+    <div class="info-box">
+        <h2>اطلس منطقه‌ای درآلو</h2>
+        <p>محدوده نمونه روی نقشه مشخص شده است.</p>
+        <p>برای مشاهده اطلاعات، روی محدوده کلیک کنید.</p>
+    </div>
+
+    <!-- راهنما -->
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background:#e74c3c;"></div>
+            محدوده مطالعاتی
+        </div>
+
+        <div class="legend-item">
+            <div class="legend-color" style="background:#3498db;"></div>
+            نقطه نمونه
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+
+    <script>
+
+        // ----------------------------------------
+        // ایجاد نقشه
+        // ----------------------------------------
+
+        const map = L.map('map').setView(
+            [29.05, 57.05],
+            11
+        );
+
+
+        // ----------------------------------------
+        // OpenStreetMap
+        // ----------------------------------------
+
+        L.tileLayer(
+            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            {
+                maxZoom: 19,
+                attribution:
+                    '&copy; OpenStreetMap contributors'
+            }
+        ).addTo(map);
+
+
+        // ----------------------------------------
+        // محدوده نمونه
+        // ----------------------------------------
+
+        const studyArea = [
+            [29.10, 57.00],
+            [29.13, 57.08],
+            [29.08, 57.15],
+            [29.00, 57.17],
+            [28.96, 57.10],
+            [28.98, 57.02],
+            [29.04, 56.98]
+        ];
+
+
+        // ----------------------------------------
+        // نمایش محدوده
+        // ----------------------------------------
+
+        const polygon = L.polygon(
+            studyArea,
+            {
+                color: '#c0392b',
+                weight: 3,
+
+                fillColor: '#e74c3c',
+                fillOpacity: 0.35
+            }
+        ).addTo(map);
+
+
+        // ----------------------------------------
+        // Popup
+        // ----------------------------------------
+
+        polygon.bindPopup(`
+            <div style="text-align:right; direction:rtl;">
+                <h3>محدوده مطالعاتی درآلو</h3>
+
+                <p>
+                    <strong>نوع:</strong>
+                    محدوده نمونه
+                </p>
+
+                <p>
+                    <strong>وضعیت:</strong>
+                    فعال
+                </p>
+
+                <p>
+                    <strong>اطلاعات:</strong>
+                    محدوده آزمایشی پروژه
+                </p>
+            </div>
+        `);
+
+
+        // ----------------------------------------
+        // Zoom روی محدوده
+        // ----------------------------------------
+
+        map.fitBounds(
+            polygon.getBounds(),
+            {
+                padding: [40, 40]
+            }
+        );
+
+
+        // ----------------------------------------
+        // یک نقطه نمونه
+        // ----------------------------------------
+
+        const marker = L.marker(
+            [29.05, 57.07]
+        ).addTo(map);
+
+
+        marker.bindPopup(`
+            <div style="text-align:right; direction:rtl;">
+                <strong>نقطه نمونه</strong>
+                <br>
+                موقعیت آزمایشی
+            </div>
+        `);
+
+    </script>
+
+</body>
+</html>
+```
