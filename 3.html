@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Daraloo Smart GIS Atlas Village Demo</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:tahoma,Arial;background:#eef2f5}
+#app{display:flex;height:100vh}
+.sidebar{width:360px;background:#10243e;color:white;padding:18px;overflow:auto}
+.main{flex:1;position:relative}
+#map{height:100%;width:100%}
+
+.card{background:white;color:#222;border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 3px 12px #0003}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat div{background:#edf3f8;padding:10px;text-align:center;border-radius:8px}
+.stat b{display:block;font-size:22px}
+
+.layer{padding:8px;border-bottom:1px solid #ddd}
+
+.top{position:absolute;z-index:1000;top:15px;left:15px;right:15px;display:flex;gap:10px;flex-wrap:wrap}
+.kpi{background:white;padding:12px 18px;border-radius:12px;box-shadow:0 3px 12px #0003}
+
+.legend{position:absolute;z-index:1000;bottom:20px;left:20px;background:white;padding:12px;border-radius:10px}
+
+.villagePopup{font-family:tahoma;min-width:300px}
+.villagePopup h3{margin-top:0;color:#0d47a1}
+.villagePopup img{width:100%;height:130px;object-fit:cover;border-radius:8px}
+.villagePopup iframe{width:100%;height:120px;border:1px solid #ddd;border-radius:8px;margin-top:8px}
+.villagePopup a{
+display:block;
+background:#1565c0;
+color:white;
+padding:8px;
+text-align:center;
+border-radius:8px;
+text-decoration:none;
+margin-top:8px
+}
+
+@media(max-width:900px){
+#app{display:block}
+.sidebar{width:100%;height:40%}
+.main{height:60%}
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<aside class="sidebar">
+
+<h2>اطلس هوشمند درآلو</h2>
+
+<div class="card">
+<h3>داشبورد اجتماعی</h3>
+<div class="stat">
+<div><b>24</b>روستا</div>
+<div><b>3200</b>خانوار</div>
+<div><b>12800</b>جمعیت</div>
+<div><b>86</b>نقطه</div>
+</div>
+</div>
+
+
+<div class="card">
+<h3>لایه‌ها</h3>
+<div class="layer"><input checked type="checkbox"> روستاها</div>
+<div class="layer"><input checked type="checkbox"> معدن</div>
+<div class="layer"><input checked type="checkbox"> تملکات</div>
+<div class="layer"><input checked type="checkbox"> زیرساخت</div>
+</div>
+
+<div class="card">
+<h3>فیلتر</h3>
+<select style="width:100%;padding:8px">
+<option>همه روستاها</option>
+<option>بالای 500 نفر</option>
+<option>نزدیک معدن</option>
+<option>دارای پروژه اجتماعی</option>
+</select>
+</div>
+
+</aside>
+
+
+<main class="main">
+
+<div id="map"></div>
+
+<div class="top">
+<div class="kpi">روستاهای ثبت شده<br><b>24</b></div>
+<div class="kpi">پروژه اجتماعی<br><b>18</b></div>
+<div class="kpi">فاصله متوسط<br><b>12 km</b></div>
+</div>
+
+<div class="legend">
+🔴 معدن<br>
+🔵 روستاها<br>
+🟢 تملک
+</div>
+
+</main>
+
+</div>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+const map=L.map('map').setView([29.05,57.07],11);
+
+L.tileLayer(
+'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+{maxZoom:19}
+).addTo(map);
+
+
+// معدن
+
+L.polygon([
+[29.10,57.00],
+[29.14,57.08],
+[29.10,57.15],
+[29.02,57.17],
+[28.97,57.10],
+[28.99,57.02]
+],
+{
+color:'red',
+fillColor:'orange',
+fillOpacity:.35
+})
+.addTo(map)
+.bindPopup('<b>محدوده معدن مس درآلو</b><br>مساحت:1250 هکتار');
+
+
+// روستاها
+
+const villages=[
+["روستای درآلو",29.12,57.06,540,160,8],
+["روستای چشمه علی",29.08,57.02,820,240,12],
+["روستای باغ بالا",29.04,57.12,350,95,6],
+["روستای کوهستان",29.15,57.14,670,190,15],
+["روستای سرچشمه",29.01,57.09,420,120,9],
+["روستای گلستان",29.07,57.18,980,300,18],
+["روستای امید",29.00,57.03,260,70,5],
+["روستای نوآباد",29.13,57.16,760,210,20]
+];
+
+
+villages.forEach(v=>{
+
+const popup=`
+
+<div class="villagePopup">
+
+<h3>${v[0]}</h3>
+
+<img src="https://picsum.photos/400/200">
+
+<hr>
+
+<b>جمعیت:</b> ${v[3]} نفر<br>
+<b>تعداد خانوار:</b> ${v[4]} خانوار<br>
+<b>فاصله تا معدن:</b> ${v[5]} کیلومتر<br>
+<b>وضعیت:</b> فعال<br>
+<b>دسترسی:</b> جاده آسفالته<br>
+<b>پروژه اجتماعی:</b> دارد
+
+<h4>پیش نمایش پروژه روستا</h4>
+
+<iframe src="https://example.com"></iframe>
+
+<a href="https://example.com/project/${v[0]}" target="_blank">
+مشاهده صفحه کامل پروژه
+</a>
+
+</div>
+
+`;
+
+
+L.circleMarker([v[1],v[2]],{
+radius:9,
+color:'blue',
+fillColor:'#2196f3',
+fillOpacity:.9
+})
+.addTo(map)
+.bindPopup(popup);
+
+
+});
+
+
+</script>
+
+</body>
+</html>
