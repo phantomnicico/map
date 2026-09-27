@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#101318">
+
+```
+<title>DARALOO SMART ATLAS | اطلس هوشمند درآلو</title>
+
+<link rel="stylesheet" href="file/dashboard.css">
+
+<!-- کتابخانه نقشه -->
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+>
+
+<!-- کتابخانه نمودار -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+```
+
+</head>
+
+<body>
+
+<div class="app">
+
+```
+<!-- =========================
+     SIDEBAR
+========================== -->
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-header">
+        <div class="logo">D</div>
+
+        <div class="logo-text">
+            <div class="logo-title">اطلس هوشمند درآلو</div>
+            <div class="logo-subtitle">DARALOO SMART ATLAS</div>
+        </div>
+    </div>
+
+    <div class="sidebar-content">
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">مدیریت و تحلیل</div>
+
+            <nav class="sidebar-menu">
+
+                <a class="sidebar-link active"
+                   data-page="dashboard">
+                    <span class="sidebar-icon">▦</span>
+                    <span class="sidebar-label">داشبورد مدیریتی</span>
+                </a>
+
+                <a class="sidebar-link"
+                   data-page="map">
+                    <span class="sidebar-icon">⌖</span>
+                    <span class="sidebar-label">نقشه تعاملی GIS</span>
+                </a>
+
+                <a class="sidebar-link"
+                   data-page="villages">
+                    <span class="sidebar-icon">⌂</span>
+                    <span class="sidebar-label">بانک اطلاعات روستاها</span>
+                    <span class="sidebar-badge" id="villageCount">۰</span>
+                </a>
+
+                <a class="sidebar-link"
+                   data-page="nomads">
+                    <span class="sidebar-icon">♧</span>
+                    <span class="sidebar-label">اطلاعات عشایر</span>
+                    <span class="sidebar-badge" id="nomadCount">۰</span>
+                </a>
+
+                <a class="sidebar-link"
+                   data-page="districts">
+                    <span class="sidebar-icon">▤</span>
+                    <span class="sidebar-label">دهستان‌ها</span>
+                </a>
+
+            </nav>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">اطلاعات منطقه‌ای</div>
+
+            <nav class="sidebar-menu">
+
+                <a class="sidebar-link" data-page="population">
+                    <span class="sidebar-icon">♙</span>
+                    <span class="sidebar-label">جمعیت و خانوار</span>
+                </a>
+
+                <a class="sidebar-link" data-page="infrastructure">
+                    <span class="sidebar-icon">⌘</span>
+                    <span class="sidebar-label">زیرساخت و لجستیک</span>
+                </a>
+
+                <a class="sidebar-link" data-page="social">
+                    <span class="sidebar-icon">♧</span>
+                    <span class="sidebar-label">شاخص‌های اجتماعی</span>
+                </a>
+
+                <a class="sidebar-link" data-page="economy">
+                    <span class="sidebar-icon">◈</span>
+                    <span class="sidebar-label">اقتصاد و معیشت</span>
+                </a>
+
+                <a class="sidebar-link" data-page="environment">
+                    <span class="sidebar-icon">♧</span>
+                    <span class="sidebar-label">محیط زیست</span>
+                </a>
+
+                <a class="sidebar-link" data-page="geology">
+                    <span class="sidebar-icon">◇</span>
+                    <span class="sidebar-label">زمین‌شناسی و اراضی</span>
+                </a>
+
+            </nav>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">مسئولیت‌های اجتماعی</div>
+
+            <nav class="sidebar-menu">
+
+                <a class="sidebar-link" data-page="projects">
+                    <span class="sidebar-icon">▣</span>
+                    <span class="sidebar-label">پروژه‌های اجتماعی</span>
+                    <span class="sidebar-badge" id="projectCount">۰</span>
+                </a>
+
+                <a class="sidebar-link" data-page="priorities">
+                    <span class="sidebar-icon">⚑</span>
+                    <span class="sidebar-label">اولویت‌بندی مناطق</span>
+                </a>
+
+                <a class="sidebar-link" data-page="monitoring">
+                    <span class="sidebar-icon">◷</span>
+                    <span class="sidebar-label">پایش و ارزیابی</span>
+                </a>
+
+                <a class="sidebar-link" data-page="reports">
+                    <span class="sidebar-icon">▤</span>
+                    <span class="sidebar-label">گزارش‌ها</span>
+                </a>
+
+            </nav>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">سامانه</div>
+
+            <nav class="sidebar-menu">
+
+                <a class="sidebar-link" data-page="settings">
+                    <span class="sidebar-icon">⚙</span>
+                    <span class="sidebar-label">تنظیمات و اتصال</span>
+                </a>
+
+            </nav>
+        </div>
+
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="sidebar-user">
+            <div class="user-avatar">م</div>
+            <div class="user-info">
+                <div class="user-name">مدیریت سامانه</div>
+                <div class="user-role">پنل مدیریتی</div>
+            </div>
+        </div>
+    </div>
+
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+
+<!-- =========================
+     MAIN
+========================== -->
+
+<main class="main">
+
+    <!-- HEADER -->
+
+    <header class="topbar">
+
+        <div class="topbar-right">
+
+            <button class="icon-button mobile-menu-button"
+                    id="mobileMenuButton"
+                    aria-label="باز کردن منو">
+                ☰
+            </button>
+
+            <div class="page-heading">
+                <div class="page-title" id="currentPageTitle">
+                    داشبورد مدیریتی
+                </div>
+                <div class="page-breadcrumb">
+                    اطلس هوشمند مجتمع مس درآلو / مدیریت اطلاعات منطقه
+                </div>
+            </div>
+
+        </div>
+
+        <div class="topbar-left">
+
+            <div class="global-search">
+                <span class="global-search-icon">⌕</span>
+                <input
+                    type="search"
+                    id="globalSearch"
+                    placeholder="جستجو در سامانه..."
+                >
+            </div>
+
+            <div class="connection-status" id="connectionStatus">
+                <span class="connection-dot"></span>
+                <span id="connectionText">در انتظار اتصال</span>
+            </div>
+
+            <button class="icon-button notification-button"
+                    id="refreshButton"
+                    title="به‌روزرسانی اطلاعات">
+                ↻
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         CONTENT
+    ========================== -->
+
+    <div class="content">
+
+
+        <!-- =========================
+             DASHBOARD
+        ========================== -->
+
+        <section class="page active" id="page-dashboard">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">داشبورد مدیریتی</div>
+                    <div class="page-description">
+                        نمای کلی اطلاعات منطقه و عملکرد مسئولیت‌های اجتماعی
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" id="dashboardRefresh">
+                    ↻ به‌روزرسانی
+                </button>
+            </div>
+
+
+            <!-- KPI -->
+
+            <div class="dashboard-grid">
+
+                <div class="col-3">
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <span class="kpi-label">تعداد روستاها</span>
+                            <span class="kpi-icon orange">⌂</span>
+                        </div>
+                        <div class="kpi-value" id="kpiVillages">—</div>
+                        <div class="kpi-footer">روستاهای ثبت‌شده در سامانه</div>
+                        <div class="kpi-decoration"></div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <span class="kpi-label">جمعیت منطقه</span>
+                            <span class="kpi-icon blue">♙</span>
+                        </div>
+                        <div class="kpi-value" id="kpiPopulation">—</div>
+                        <div class="kpi-footer">مجموع جمعیت ثبت‌شده</div>
+                        <div class="kpi-decoration"></div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <span class="kpi-label">پروژه‌های اجتماعی</span>
+                            <span class="kpi-icon green">▣</span>
+                        </div>
+                        <div class="kpi-value" id="kpiProjects">—</div>
+                        <div class="kpi-footer">پروژه‌های ثبت‌شده</div>
+                        <div class="kpi-decoration"></div>
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <span class="kpi-label">گروه‌های عشایری</span>
+                            <span class="kpi-icon yellow">♧</span>
+                        </div>
+                        <div class="kpi-value" id="kpiNomads">—</div>
+                        <div class="kpi-footer">گروه‌های ثبت‌شده</div>
+                        <div class="kpi-decoration"></div>
+                    </div>
+                </div>
+
+
+                <!-- MAP PREVIEW -->
+
+                <div class="col-8">
+                    <div class="card">
+
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">موقعیت جغرافیایی منطقه</div>
+                                <div class="card-subtitle">
+                                    نمایش اطلاعات مکانی دریافت‌شده از سرور
+                                </div>
+                            </div>
+
+                            <button class="btn btn-secondary btn-sm"
+                                    data-page="map">
+                                مشاهده نقشه
+                            </button>
+                        </div>
+
+                        <div class="card-body" style="padding:10px">
+                            <div class="map-container" style="height:350px">
+                                <div id="dashboardMap" class="map"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- PROJECT STATUS -->
+
+                <div class="col-4">
+                    <div class="card">
+
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">وضعیت پروژه‌ها</div>
+                                <div class="card-subtitle">
+                                    بر اساس آخرین اطلاعات سرور
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="projectStatusChart"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- POPULATION CHART -->
+
+                <div class="col-6">
+                    <div class="card">
+
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">جمعیت روستاها</div>
+                                <div class="card-subtitle">
+                                    مقایسه جمعیت مناطق ثبت‌شده
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="populationChart"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- PRIORITY CHART -->
+
+                <div class="col-6">
+                    <div class="card">
+
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">شاخص‌های اولویت‌بندی</div>
+                                <div class="card-subtitle">
+                                    داده‌های ارزیابی مناطق
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="priorityChart"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- RECENT PROJECTS -->
+
+                <div class="col-12">
+                    <div class="card">
+
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">آخرین پروژه‌های اجتماعی</div>
+                                <div class="card-subtitle">
+                                    اطلاعات دریافتی از پایگاه داده
+                                </div>
+                            </div>
+
+                            <button class="btn btn-secondary btn-sm"
+                                    data-page="projects">
+                                مشاهده همه
+                            </button>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>عنوان پروژه</th>
+                                        <th>منطقه</th>
+                                        <th>حوزه</th>
+                                        <th>بودجه</th>
+                                        <th>وضعیت</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="recentProjectsTable">
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="empty-state">
+                                                <div class="empty-state-title">
+                                                    در انتظار دریافت اطلاعات
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             MAP
+        ========================== -->
+
+        <section class="page" id="page-map">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">نقشه تعاملی GIS</div>
+                    <div class="page-description">
+                        نمایش لایه‌های مکانی و اطلاعات جغرافیایی منطقه
+                    </div>
+                </div>
+
+                <div class="toolbar-group">
+                    <button class="btn btn-secondary" id="mapRefresh">
+                        ↻ به‌روزرسانی
+                    </button>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+
+                <div class="col-12">
+                    <div class="card">
+
+                        <div class="card-header">
+                            <div class="card-title">لایه‌های نقشه</div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="filter-bar">
+
+                                <div class="filter-item map-category-filter">
+
+    <span class="form-label">دسته‌های قابل نمایش روی نقشه</span>
+
+    <div class="map-checkbox-list">
+
+        <label class="map-checkbox-item">
+            <input
+                type="checkbox"
+                id="mapFilterVillage"
+                value="village"
+                checked
+            >
+
+            <span
+                class="map-checkbox-color"
+                style="background:#f28c28">
+            </span>
+
+            <span>روستاها</span>
+        </label>
+
+
+        <label class="map-checkbox-item">
+            <input
+                type="checkbox"
+                id="mapFilterNomad"
+                value="nomad"
+                checked
+            >
+
+            <span
+                class="map-checkbox-color"
+                style="background:#38bdf8">
+            </span>
+
+            <span>عشایر</span>
+        </label>
+
+
+        <label class="map-checkbox-item">
+            <input
+                type="checkbox"
+                id="mapFilterDistrict"
+                value="district"
+                checked
+            >
+
+            <span
+                class="map-checkbox-color"
+                style="background:#22c55e">
+            </span>
+
+            <span>دهستان‌ها</span>
+        </label>
+
+
+        <label class="map-checkbox-item">
+            <input
+                type="checkbox"
+                id="mapFilterCounty"
+                value="county"
+                checked
+            >
+
+            <span
+                class="map-checkbox-color"
+                style="background:#a855f7">
+            </span>
+
+            <span>شهرستان‌ها</span>
+        </label>
+
+    </div>
+</div>
+
+                                <label class="filter-item">
+                                    <span class="form-label">دهستان</span>
+                                    <select class="form-control" id="mapDistrictFilter">
+                                        <option value="all">همه دهستان‌ها</option>
+                                    </select>
+                                </label>
+
+                            </div>
+
+                            <div class="map-container">
+                                <div id="mainMap" class="map"></div>
+
+                                <div class="map-legend">
+
+    <div class="legend-title">
+        راهنمای نقشه
+    </div>
+
+
+    <div class="legend-item">
+        <span
+            class="legend-color"
+            style="background:#f28c28">
+        </span>
+
+        <span>روستاها</span>
+    </div>
+
+
+    <div class="legend-item">
+        <span
+            class="legend-color"
+            style="background:#38bdf8">
+        </span>
+
+        <span>عشایر</span>
+    </div>
+
+
+    <div class="legend-item">
+        <span
+            class="legend-color"
+            style="background:#22c55e">
+        </span>
+
+        <span>دهستان‌ها</span>
+    </div>
+
+
+    <div class="legend-item">
+        <span
+            class="legend-color"
+            style="background:#a855f7">
+        </span>
+
+        <span>شهرستان‌ها</span>
+    </div>
+
+</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             VILLAGES
+        ========================== -->
+
+        <section class="page" id="page-villages">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">بانک اطلاعات روستاها</div>
+                    <div class="page-description">
+                        مدیریت شناسنامه و اطلاعات روستاهای منطقه
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="addVillageButton">
+                    ＋ ثبت روستای جدید
+                </button>
+            </div>
+
+            <div class="dashboard-grid">
+
+                <div class="col-12">
+                    <div class="filter-bar">
+
+                        <div class="filter-search">
+                            <span class="filter-search-icon">⌕</span>
+                            <input class="form-control"
+                                   id="villageSearch"
+                                   placeholder="جستجوی نام روستا...">
+                        </div>
+
+                        <div class="filter-item">
+                            <select class="form-control" id="villageDistrictFilter">
+                                <option value="all">همه دهستان‌ها</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-secondary" id="villageReset">
+                            پاک‌سازی فیلترها
+                        </button>
+
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card">
+
+                        <div class="card-header">
+                            <div class="card-title">فهرست روستاها</div>
+                            <span class="badge badge-neutral" id="villageTableCount">
+                                ۰ مورد
+                            </span>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>نام روستا</th>
+                                        <th>دهستان</th>
+                                        <th>جمعیت</th>
+                                        <th>خانوار</th>
+                                        <th>وضعیت اطلاعات</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="villagesTable">
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="empty-state">
+                                                در انتظار دریافت اطلاعات از سرور
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             NOMADS
+        ========================== -->
+
+        <section class="page" id="page-nomads">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">اطلاعات عشایر</div>
+                    <div class="page-description">
+                        مدیریت اطلاعات گروه‌ها و مناطق عشایری
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="addNomadButton">
+                    ＋ ثبت گروه عشایری
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">فهرست گروه‌های عشایری</div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>نام گروه</th>
+                                <th>منطقه</th>
+                                <th>تعداد خانوار</th>
+                                <th>جمعیت</th>
+                                <th>مسیر کوچ</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="nomadsTable">
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        در انتظار دریافت اطلاعات از سرور
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             DISTRICTS
+        ========================== -->
+
+        <section class="page" id="page-districts">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">مدیریت دهستان‌ها</div>
+                    <div class="page-description">
+                        اطلاعات تقسیمات و محدوده‌های روستایی
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="addDistrictButton">
+                    ＋ ثبت دهستان
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">فهرست دهستان‌ها</div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>نام دهستان</th>
+                                <th>بخش</th>
+                                <th>تعداد روستا</th>
+                                <th>جمعیت</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="districtsTable">
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        در انتظار دریافت اطلاعات از سرور
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             POPULATION
+        ========================== -->
+
+        <section class="page" id="page-population">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">جمعیت و خانوار</div>
+                    <div class="page-description">
+                        تحلیل شاخص‌های جمعیتی مناطق پیرامونی
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+
+                <div class="col-4">
+                    <div class="kpi-card">
+                        <div class="kpi-label">جمعیت کل</div>
+                        <div class="kpi-value" id="populationTotal">—</div>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="kpi-card">
+                        <div class="kpi-label">تعداد خانوار</div>
+                        <div class="kpi-value" id="householdTotal">—</div>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="kpi-card">
+                        <div class="kpi-label">میانگین بعد خانوار</div>
+                        <div class="kpi-value" id="householdAverage">—</div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">توزیع جمعیت روستاها</div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="chart-container large">
+                                <canvas id="populationDetailChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             INFRASTRUCTURE
+        ========================== -->
+
+        <section class="page" id="page-infrastructure">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">زیرساخت و لجستیک</div>
+                    <div class="page-description">
+                        اطلاعات خدمات عمومی و دسترسی به زیرساخت‌ها
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">اطلاعات زیرساختی مناطق</div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>منطقه</th>
+                                <th>آب</th>
+                                <th>برق</th>
+                                <th>گاز</th>
+                                <th>راه دسترسی</th>
+                                <th>اینترنت</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="infrastructureTable">
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        در انتظار دریافت اطلاعات از سرور
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             SOCIAL
+        ========================== -->
+
+        <section class="page" id="page-social">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">شاخص‌های اجتماعی</div>
+                    <div class="page-description">
+                        اطلاعات آموزشی، فرهنگی، درمانی و اجتماعی مناطق
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">شاخص‌های اجتماعی مناطق</div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>منطقه</th>
+                                <th>مدرسه</th>
+                                <th>مرکز درمانی</th>
+                                <th>فضای فرهنگی</th>
+                                <th>فضای ورزشی</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="socialTable">
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        در انتظار دریافت اطلاعات از سرور
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             ECONOMY
+        ========================== -->
+
+        <section class="page" id="page-economy">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">اقتصاد و معیشت</div>
+                    <div class="page-description">
+                        اطلاعات اشتغال، فعالیت اقتصادی و معیشت منطقه
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">اطلاعات اقتصادی مناطق</div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>منطقه</th>
+                                <th>فعالیت غالب</th>
+                                <th>اشتغال</th>
+                                <th>کشاورزی</th>
+                                <th>دامداری</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="economyTable">
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        در انتظار دریافت اطلاعات از سرور
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             ENVIRONMENT
+        ========================== -->
+
+        <section class="page" id="page-environment">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">محیط زیست</div>
+                    <div class="page-description">
+                        اطلاعات محیط‌زیستی و منابع طبیعی منطقه
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">اطلاعات محیط‌زیستی مناطق</div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>منطقه</th>
+                                <th>منابع آب</th>
+                                <th>پوشش گیاهی</th>
+                                <th>مخاطرات</th>
+                                <th>وضعیت محیط‌زیست</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="environmentTable">
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        در انتظار دریافت اطلاعات از سرور
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             GEOLOGY
+        ========================== -->
+
+        <section class="page" id="page-geology">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">زمین‌شناسی و اراضی</div>
+                    <div class="page-description">
+                        اطلاعات زمین‌شناسی، محدوده‌ها و تملکات
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">لایه‌های زمین‌شناسی و اراضی</div>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>عنوان</th>
+                                        <th>نوع لایه</th>
+                                        <th>مساحت</th>
+                                        <th>منطقه</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="geologyTable">
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="empty-state">
+                                                در انتظار دریافت اطلاعات از سرور
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PROJECTS
+        ========================== -->
+
+        <section class="page" id="page-projects">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">پروژه‌های مسئولیت اجتماعی</div>
+                    <div class="page-description">
+                        ثبت، مدیریت و پایش پروژه‌های اجتماعی
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="addProjectButton">
+                    ＋ ثبت پروژه جدید
+                </button>
+            </div>
+
+            <div class="filter-bar">
+
+                <div class="filter-search">
+                    <span class="filter-search-icon">⌕</span>
+                    <input class="form-control"
+                           id="projectSearch"
+                           placeholder="جستجوی پروژه...">
+                </div>
+
+                <div class="filter-item">
+                    <select class="form-control" id="projectStatusFilter">
+                        <option value="all">تمام وضعیت‌ها</option>
+                        <option value="planned">برنامه‌ریزی‌شده</option>
+                        <option value="ongoing">در حال اجرا</option>
+                        <option value="completed">تکمیل‌شده</option>
+                        <option value="suspended">متوقف‌شده</option>
+                    </select>
+                </div>
+
+                <div class="filter-item">
+                    <select class="form-control" id="projectCategoryFilter">
+                        <option value="all">تمام حوزه‌ها</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">فهرست پروژه‌ها</div>
+                    <span class="badge badge-neutral" id="projectTableCount">
+                        ۰ مورد
+                    </span>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>عنوان پروژه</th>
+                                <th>منطقه</th>
+                                <th>حوزه</th>
+                                <th>بودجه</th>
+                                <th>درصد پیشرفت</th>
+                                <th>وضعیت</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="projectsTable">
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        در انتظار دریافت اطلاعات از سرور
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PRIORITIES
+        ========================== -->
+
+        <section class="page" id="page-priorities">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">اولویت‌بندی مناطق</div>
+                    <div class="page-description">
+                        تحلیل شاخص‌ها و ارزیابی نیازهای مناطق
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="calculatePriorityButton">
+                    محاسبه اولویت‌ها
+                </button>
+            </div>
+
+            <div class="dashboard-grid">
+
+                <div class="col-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">وزن شاخص‌ها</div>
+                        </div>
+
+                        <div class="card-body" id="priorityWeights">
+                            <div class="empty-state">
+                                در انتظار دریافت شاخص‌ها از سرور
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">نتایج اولویت‌بندی مناطق</div>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>رتبه</th>
+                                        <th>منطقه</th>
+                                        <th>امتیاز</th>
+                                        <th>سطح اولویت</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="priorityTable">
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="empty-state">
+                                                در انتظار دریافت نتایج
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             MONITORING
+        ========================== -->
+
+        <section class="page" id="page-monitoring">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">پایش و ارزیابی</div>
+                    <div class="page-description">
+                        بررسی عملکرد و پیشرفت پروژه‌های اجتماعی
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="addMonitoringButton">
+                    ＋ ثبت گزارش پایش
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">گزارش‌های پایش</div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>عنوان پروژه</th>
+                                <th>منطقه</th>
+                                <th>تاریخ پایش</th>
+                                <th>درصد پیشرفت</th>
+                                <th>وضعیت</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="monitoringTable">
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        در انتظار دریافت اطلاعات از سرور
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             REPORTS
+        ========================== -->
+
+        <section class="page" id="page-reports">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">گزارش‌ها</div>
+                    <div class="page-description">
+                        تهیه خروجی از اطلاعات ثبت‌شده در سامانه
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+
+                <div class="col-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-title">گزارش روستاها</div>
+                            <p class="page-description">
+                                خروجی اطلاعات جمعیتی و شناسنامه روستاها
+                            </p>
+                            <br>
+                            <button class="btn btn-primary btn-block"
+                                    id="exportVillagesButton">
+                                دریافت گزارش
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-title">گزارش پروژه‌ها</div>
+                            <p class="page-description">
+                                خروجی وضعیت و عملکرد پروژه‌های اجتماعی
+                            </p>
+                            <br>
+                            <button class="btn btn-primary btn-block"
+                                    id="exportProjectsButton">
+                                دریافت گزارش
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-title">گزارش جامع</div>
+                            <p class="page-description">
+                                دریافت اطلاعات تجمیعی سامانه
+                            </p>
+                            <br>
+                            <button class="btn btn-primary btn-block"
+                                    id="exportAllButton">
+                                دریافت گزارش
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             SETTINGS
+        ========================== -->
+
+        <section class="page" id="page-settings">
+
+            <div class="page-header">
+                <div>
+                    <div class="page-header-title">تنظیمات سامانه</div>
+                    <div class="page-description">
+                        وضعیت اتصال و اطلاعات سرویس
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">اتصال به سرور</div>
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    آدرس سرویس Google Apps Script
+                                </label>
+
+                                <input
+                                    type="url"
+                                    class="form-control"
+                                    id="gasUrlInput"
+                                    placeholder="https://script.google.com/macros/s/.../exec"
+                                >
+
+                                <div class="form-help">
+                                    آدرس Web App منتشرشده را وارد کنید.
+                                </div>
+                            </div>
+
+                            <br>
+
+                            <div class="toolbar-group">
+                                <button class="btn btn-primary"
+                                        id="saveGasUrlButton">
+                                    ذخیره آدرس
+                                </button>
+
+                                <button class="btn btn-secondary"
+                                        id="testConnectionButton">
+                                    آزمایش اتصال
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">وضعیت سرویس</div>
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="detail-grid">
+
+                                <div class="detail-item">
+                                    <div class="detail-label">وضعیت اتصال</div>
+                                    <div class="detail-value"
+                                         id="settingsConnectionStatus">
+                                        بررسی‌نشده
+                                    </div>
+                                </div>
+
+                                <div class="detail-item">
+                                    <div class="detail-label">آخرین دریافت</div>
+                                    <div class="detail-value"
+                                         id="lastSyncTime">
+                                        —
+                                    </div>
+                                </div>
+
+                                <div class="detail-item">
+                                    <div class="detail-label">نسخه API</div>
+                                    <div class="detail-value"
+                                         id="apiVersion">
+                                        —
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+```
+
+</div>
+
+<!-- =========================
+     MODAL
+========================== -->
+
+<div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" id="modal">
+
+```
+    <div class="modal-header">
+        <div class="modal-title" id="modalTitle">فرم اطلاعات</div>
+
+        <button class="icon-button" id="modalCloseButton"
+                aria-label="بستن">
+            ✕
+        </button>
+    </div>
+
+    <div class="modal-body" id="modalBody">
+    </div>
+
+    <div class="modal-footer" id="modalFooter">
+        <button class="btn btn-secondary" id="modalCancelButton">
+            انصراف
+        </button>
+
+        <button class="btn btn-primary" id="modalSaveButton">
+            ذخیره اطلاعات
+        </button>
+    </div>
+
+</div>
+```
+
+</div>
+
+<!-- =========================
+     LOADING
+========================== -->
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">در حال دریافت اطلاعات از سرور...</div>
+</div>
+
+<!-- =========================
+     TOAST
+========================== -->
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- =========================
+     CLIENT JAVASCRIPT
+========================== -->
+
+<script src="file/dashboard.js"></script>
+
+</body>
+</html>
