@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>فصل نهم:جمع‌بندی و پیشنهادهای اجرایی</title>
+
+<style>
+
+/* =========================================================
+   DARALOO SMART CSR SYSTEM
+   Soft UI / Neumorphism Theme
+========================================================= */
+
+:root {
+
+    /* ---------- Brand Colors ---------- */
+
+    --navy: #17324d;
+    --navy-light: #294c68;
+
+    --teal: #167d83;
+    --teal-light: #249da3;
+
+    --gold: #d7a94b;
+    --gold-light: #e5c16f;
+
+    --ink: #263746;
+    --muted: #647585;
+
+    /* ---------- Soft UI Surface ---------- */
+
+    --bg: #e8edf2;
+    --surface: #e8edf2;
+    --surface-light: #f2f5f8;
+
+    --white: #ffffff;
+
+    --line: rgba(255,255,255,.65);
+
+    /* ---------- Shadows ---------- */
+
+    --shadow-out:
+        12px 12px 24px rgba(163,177,198,.55),
+        -12px -12px 24px rgba(255,255,255,.95);
+
+    --shadow-soft:
+        7px 7px 16px rgba(163,177,198,.45),
+        -7px -7px 16px rgba(255,255,255,.9);
+
+    --shadow-small:
+        4px 4px 10px rgba(163,177,198,.40),
+        -4px -4px 10px rgba(255,255,255,.85);
+
+    --shadow-in:
+        inset 6px 6px 12px rgba(163,177,198,.42),
+        inset -6px -6px 12px rgba(255,255,255,.9);
+
+    /* ---------- Radius ---------- */
+
+    --radius-xl: 26px;
+    --radius-lg: 20px;
+    --radius-md: 15px;
+    --radius-sm: 11px;
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+
+    margin: 0;
+
+    background:
+        radial-gradient(
+            circle at 10% 10%,
+            rgba(255,255,255,.85),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 90% 90%,
+            rgba(22,125,131,.07),
+            transparent 30%
+        ),
+        var(--bg);
+
+    color: var(--ink);
+
+    font-family:
+        Tahoma,
+        Arial,
+        "Segoe UI",
+        sans-serif;
+
+    line-height: 2;
+}
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.page {
+
+    max-width: 1100px;
+
+    margin: 35px auto;
+
+    padding: 0 20px;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 38px 42px;
+
+    color: #fff;
+
+    border-radius: var(--radius-xl);
+
+    background:
+        linear-gradient(
+            145deg,
+            #17324d,
+            #216b75
+        );
+
+    box-shadow:
+        12px 12px 24px rgba(163,177,198,.45),
+        -10px -10px 24px rgba(255,255,255,.9);
+
+}
+
+
+/* Decorative futuristic glow */
+
+.hero::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 260px;
+    height: 260px;
+
+    top: -150px;
+    left: -80px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.16),
+            transparent 70%
+        );
+
+    pointer-events: none;
+}
+
+
+.hero::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 300px;
+    height: 300px;
+
+    bottom: -190px;
+    right: -120px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(215,169,75,.18),
+            transparent 70%
+        );
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.eyebrow {
+
+    position: relative;
+
+    color: var(--gold-light);
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    letter-spacing: .3px;
+
+}
+
+
+/* =========================================================
+   HERO TITLE
+========================================================= */
+
+.hero h1 {
+
+    position: relative;
+
+    font-size: 25px;
+
+    line-height: 1.7;
+
+    margin: 8px 0 10px;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   SUBTITLE
+========================================================= */
+
+.subtitle {
+
+    position: relative;
+
+    color: #e0edf0;
+
+    font-size: 14px;
+
+    opacity: .95;
+
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.content {
+
+    margin-top: 22px;
+
+    padding: 34px 40px;
+
+    border-radius: var(--radius-xl);
+
+    background: var(--surface);
+
+    box-shadow: var(--shadow-out);
+
+}
+
+
+/* =========================================================
+   HEADINGS
+========================================================= */
+
+h2 {
+
+    position: relative;
+
+    color: var(--navy);
+
+    font-size: 18px;
+
+    margin: 30px 0 12px;
+
+    padding-right: 15px;
+
+    line-height: 1.8;
+
+}
+
+
+h2::before {
+
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+
+    top: 5px;
+
+    width: 5px;
+
+    height: calc(100% - 10px);
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            180deg,
+            var(--gold-light),
+            var(--gold)
+        );
+
+    box-shadow:
+        2px 2px 5px rgba(163,177,198,.3),
+        -2px -2px 5px rgba(255,255,255,.8);
+
+}
+
+
+h3 {
+
+    font-size: 15px;
+
+    color: var(--teal);
+
+    margin: 18px 0 7px;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   TEXT
+========================================================= */
+
+p {
+
+    font-size: 13.5px;
+
+    text-align: justify;
+
+    margin: 8px 0 15px;
+
+    color: var(--ink);
+
+}
+
+
+/* =========================================================
+   LISTS
+========================================================= */
+
+ul,
+ol {
+
+    font-size: 13.5px;
+
+    padding-right: 25px;
+
+    margin: 7px 0 17px;
+
+}
+
+
+li {
+
+    margin: 5px 0;
+
+}
+
+
+/* =========================================================
+   CALLOUT
+========================================================= */
+
+.callout {
+
+    position: relative;
+
+    margin: 20px 0;
+
+    padding: 16px 20px;
+
+    border-radius: var(--radius-md);
+
+    background: var(--surface);
+
+    box-shadow: var(--shadow-soft);
+
+    border: none;
+
+    font-size: 13.5px;
+
+}
+
+
+/* Teal indicator */
+
+.callout::before {
+
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+
+    top: 15px;
+
+    bottom: 15px;
+
+    width: 4px;
+
+    border-radius: 10px;
+
+    background: var(--teal);
+
+}
+
+
+.callout strong {
+
+    color: var(--teal);
+
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 18px;
+
+    margin: 18px 0;
+
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card {
+
+    position: relative;
+
+    padding: 18px 20px;
+
+    border-radius: var(--radius-lg);
+
+    background: var(--surface);
+
+    border: none;
+
+    box-shadow: var(--shadow-soft);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+
+}
+
+
+/* Hover */
+
+.card:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        10px 10px 22px rgba(163,177,198,.48),
+        -10px -10px 22px rgba(255,255,255,.95);
+
+}
+
+
+.card h3 {
+
+    margin: 0 0 6px;
+
+}
+
+
+.card p {
+
+    margin: 0;
+
+    font-size: 12.5px;
+
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+table {
+
+    width: 100%;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+
+    margin: 16px 0 22px;
+
+    font-size: 12.5px;
+
+    overflow: hidden;
+
+    border-radius: var(--radius-md);
+
+    background: var(--surface);
+
+    box-shadow: var(--shadow-small);
+
+}
+
+
+/* Header */
+
+th {
+
+    background:
+        linear-gradient(
+            145deg,
+            #edf2f6,
+            #e1e7ed
+        );
+
+    color: var(--navy);
+
+    text-align: right;
+
+    font-weight: 700;
+
+}
+
+
+/* Cells */
+
+td,
+th {
+
+    padding: 11px 12px;
+
+    vertical-align: top;
+
+    border: none;
+
+    border-bottom:
+        1px solid
+        rgba(163,177,198,.18);
+
+}
+
+
+/* Last row */
+
+tr:last-child td {
+
+    border-bottom: none;
+
+}
+
+
+/* Hover */
+
+tbody tr {
+
+    transition: background .2s ease;
+
+}
+
+
+tbody tr:hover {
+
+    background:
+        rgba(255,255,255,.45);
+
+}
+
+
+/* =========================================================
+   FLOW
+========================================================= */
+
+.flow {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin: 18px 0;
+
+}
+
+
+/* =========================================================
+   FLOW STEP
+========================================================= */
+
+.step {
+
+    padding: 9px 14px;
+
+    font-size: 12px;
+
+    border-radius: var(--radius-sm);
+
+    background: var(--surface);
+
+    box-shadow: var(--shadow-small);
+
+    border: none;
+
+    color: var(--ink);
+
+}
+
+
+/* =========================================================
+   FLOW ARROW
+========================================================= */
+
+.arrow {
+
+    color: var(--teal);
+
+    font-weight: bold;
+
+    font-size: 16px;
+
+}
+
+
+/* =========================================================
+   PILL ROW
+========================================================= */
+
+.pillrow {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 14px;
+
+}
+
+
+/* =========================================================
+   PILL
+========================================================= */
+
+.pill {
+
+    background: var(--surface);
+
+    border: none;
+
+    border-radius: 30px;
+
+    padding: 5px 14px;
+
+    font-size: 11.5px;
+
+    color: #405363;
+
+    box-shadow: var(--shadow-small);
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer {
+
+    color: var(--muted);
+
+    text-align: center;
+
+    font-size: 11px;
+
+    padding: 20px 0 30px;
+
+}
+
+
+/* =========================================================
+   LINKS
+========================================================= */
+
+a {
+
+    color: var(--teal);
+
+    text-decoration: none;
+
+    transition: .2s ease;
+
+}
+
+
+a:hover {
+
+    color: var(--navy);
+
+}
+
+
+/* =========================================================
+   SELECTION
+========================================================= */
+
+::selection {
+
+    background: rgba(22,125,131,.18);
+
+    color: var(--navy);
+
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+
+    width: 9px;
+    height: 9px;
+
+}
+
+
+::-webkit-scrollbar-track {
+
+    background: var(--bg);
+
+}
+
+
+::-webkit-scrollbar-thumb {
+
+    background:
+        linear-gradient(
+            180deg,
+            #cbd4dd,
+            #aebbc8
+        );
+
+    border-radius: 20px;
+
+    box-shadow:
+        inset 2px 2px 4px rgba(255,255,255,.6);
+
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+
+    background:
+        linear-gradient(
+            180deg,
+            #aebbc8,
+            #98a8b7
+        );
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .page {
+
+        margin: 20px auto;
+
+        padding: 0 12px;
+
+    }
+
+
+    .hero {
+
+        padding: 26px 22px;
+
+        border-radius: 20px;
+
+    }
+
+
+    .hero h1 {
+
+        font-size: 21px;
+
+    }
+
+
+    .subtitle {
+
+        font-size: 12.5px;
+
+    }
+
+
+    .content {
+
+        padding: 24px 19px;
+
+        border-radius: 20px;
+
+    }
+
+
+    .grid {
+
+        grid-template-columns: 1fr;
+
+        gap: 14px;
+
+    }
+
+
+    table {
+
+        display: block;
+
+        overflow-x: auto;
+
+        white-space: normal;
+
+    }
+
+
+    h2 {
+
+        font-size: 17px;
+
+    }
+
+
+    p {
+
+        font-size: 13px;
+
+    }
+
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print {
+
+    body {
+
+        background: #fff;
+
+    }
+
+
+    .page {
+
+        margin: 0 auto;
+
+    }
+
+
+    .content {
+
+        box-shadow: none;
+
+        border:
+            1px solid
+            #dfe5ea;
+
+    }
+
+
+    .hero {
+
+        print-color-adjust: exact;
+
+        -webkit-print-color-adjust: exact;
+
+    }
+
+
+    .card {
+
+        box-shadow: none;
+
+        border:
+            1px solid
+            #dfe5ea;
+
+    }
+
+}
+
+
+</style>
+</head>
+<body>
+<div class="final-wrap" dir="rtl">
+
+  <!-- Header -->
+  <header class="final-hero">
+    <div class="final-kicker">DARALOO SMART CSR MANAGEMENT SYSTEM</div>
+    <div class="final-chapter">فصل نهم</div>
+    <h1>جمع‌بندی و پیشنهادهای اجرایی</h1>
+    <p>
+      نتایج مورد انتظار، پیش‌نیازهای آغاز کار، تصمیم‌های موردنیاز مدیریت،
+      پیشنهاد اجرای فاز نخست و سازوکار تصویب و پیگیری طرح
+    </p>
+    <div class="final-tags">
+      <span>جمع‌بندی طرح</span>
+      <span>تصمیم‌گیری مدیریتی</span>
+      <span>اجرای فاز نخست</span>
+      <span>نظام راهبری</span>
+    </div>
+  </header>
+
+  <!-- Introduction -->
+  <section class="final-section">
+    <h2>۱. مقدمه و جمع‌بندی طرح</h2>
+    <p>
+      طرح ایجاد سامانه هوشمند مدیریت راهبردی مسئولیت‌های اجتماعی
+      مجتمع مس درآلو، با هدف فراهم‌سازی یک بستر یکپارچه برای
+      گردآوری، سامان‌دهی، تحلیل و مدیریت اطلاعات مرتبط با جوامع
+      پیرامونی و پروژه‌های مسئولیت اجتماعی تدوین شده است.
+    </p>
+    <p>
+      رویکرد اصلی این طرح، ایجاد یک نظام اطلاعاتی و مدیریتی مبتنی
+      بر داده است که بتواند اطلاعات روستاها، دهستان‌ها، جمعیت و
+      خانوار، زیرساخت‌ها، جوامع عشایری، محیط‌زیست، محدوده‌های
+      معدنی و پروژه‌های مسئولیت اجتماعی را در یک ساختار منسجم
+      گردآوری کند.
+    </p>
+    <p>
+      در این چارچوب، اطلس هوشمند به‌عنوان هسته اطلاعاتی سامانه
+      در نظر گرفته می‌شود و سایر قابلیت‌ها، از جمله مدیریت چرخه
+      پروژه‌ها، تحلیل مکانی، کنترل تداخل پروژه‌های اجتماعی با
+      فعالیت‌های معدنی، پایش و ارزیابی، گزارش‌سازی مدیریتی و
+      پشتیبانی اطلاعاتی در شرایط بحرانی، بر اساس آن توسعه می‌یابند.
+    </p>
+
+    <div class="final-highlight">
+      <strong>محور اصلی طرح:</strong>
+      تبدیل اطلاعات پراکنده و غیرمتمرکز به یک بستر یکپارچه،
+      قابل اتکا و قابل استفاده برای تصمیم‌گیری، برنامه‌ریزی،
+      اولویت‌بندی و پایش فعالیت‌های مسئولیت اجتماعی مجتمع مس درآلو.
+    </div>
+  </section>
+
+  <!-- Expected results -->
+  <section class="final-section">
+    <h2>۲. نتایج و دستاوردهای مورد انتظار</h2>
+    <p>
+      اجرای مرحله‌ای سامانه می‌تواند زمینه تحقق مجموعه‌ای از
+      دستاوردهای اطلاعاتی، فنی، سازمانی و مدیریتی را فراهم کند.
+      مهم‌ترین نتایج مورد انتظار عبارت‌اند از:
+    </p>
+
+    <div class="final-grid">
+      <div class="final-card">
+        <span class="final-icon">01</span>
+        <h3>ایجاد اطلس هوشمند منطقه</h3>
+        <p>
+          تشکیل پایگاه اطلاعاتی یکپارچه از روستاها، دهستان‌ها،
+          جمعیت، خانوار، زیرساخت‌ها، خدمات، جوامع عشایری و
+          محدوده‌های جغرافیایی مرتبط با مجتمع.
+        </p>
+      </div>
+
+      <div class="final-card">
+        <span class="final-icon">02</span>
+        <h3>یکپارچه‌سازی اطلاعات معدن و جامعه</h3>
+        <p>
+          تجمیع اطلاعات محدوده معدن، پروژه‌های معدنی و پروژه‌های
+          مسئولیت اجتماعی برای فراهم کردن امکان تحلیل ارتباطات
+          و تداخل‌های مکانی و عملیاتی.
+        </p>
+      </div>
+
+      <div class="final-card">
+        <span class="final-icon">03</span>
+        <h3>بهبود فرآیند مدیریت پروژه‌ها</h3>
+        <p>
+          ایجاد بستر مشترک برای ثبت پیشنهادها، بررسی، امکان‌سنجی،
+          تصویب، اجرا، پایش و ارزیابی پروژه‌های مسئولیت اجتماعی.
+        </p>
+      </div>
+
+      <div class="final-card">
+        <span class="final-icon">04</span>
+        <h3>پشتیبانی از اولویت‌بندی</h3>
+        <p>
+          فراهم کردن اطلاعات موردنیاز برای بررسی نیازهای مناطق،
+          مقایسه درخواست‌ها و پشتیبانی از تصمیم‌گیری درباره
+          اولویت تخصیص منابع.
+        </p>
+      </div>
+
+      <div class="final-card">
+        <span class="final-icon">05</span>
+        <h3>افزایش شفافیت و قابلیت پیگیری</h3>
+        <p>
+          ثبت سوابق تصمیم‌ها، اطلاعات پروژه‌ها، وضعیت اجرا،
+          مستندات و نتایج پایش در یک ساختار قابل پیگیری.
+        </p>
+      </div>
+
+      <div class="final-card">
+        <span class="final-icon">06</span>
+        <h3>تقویت پایش و ارزیابی</h3>
+        <p>
+          ایجاد امکان سنجش پیشرفت پروژه‌ها، بررسی تحقق اهداف،
+          ثبت شاخص‌های عملکردی و ارزیابی نتایج اقدامات اجتماعی.
+        </p>
+      </div>
+
+      <div class="final-card">
+        <span class="final-icon">07</span>
+        <h3>پشتیبانی از تصمیم‌گیری مدیریتی</h3>
+        <p>
+          تولید داشبوردها و گزارش‌های مدیریتی برای دسترسی سریع‌تر
+          به اطلاعات و بررسی وضعیت پروژه‌ها و مناطق تحت پوشش.
+        </p>
+      </div>
+
+      <div class="final-card">
+        <span class="final-icon">08</span>
+        <h3>پشتیبانی اطلاعاتی در شرایط بحران</h3>
+        <p>
+          فراهم کردن امکان مشاهده اطلاعات ضروری مناطق، مسیرها،
+          پروژه‌ها و رخدادها برای پشتیبانی از فرآیندهای رسمی
+          مدیریت بحران.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Prerequisites -->
+  <section class="final-section">
+    <h2>۳. پیش‌نیازهای آغاز اجرای طرح</h2>
+    <p>
+      آغاز اجرای طرح مستلزم فراهم شدن مجموعه‌ای از پیش‌نیازهای
+      مدیریتی، سازمانی، اطلاعاتی و فنی است. توجه به این موارد
+      پیش از شروع توسعه، می‌تواند از دوباره‌کاری، افزایش هزینه
+      و تأخیر در اجرای پروژه جلوگیری کند.
+    </p>
+
+    <div class="final-table-wrap">
+      <table class="final-table">
+        <thead>
+          <tr>
+            <th>حوزه</th>
+            <th>پیش‌نیاز</th>
+            <th>اقدام موردنیاز</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>مدیریتی</td>
+            <td>تأیید اصل اجرای طرح</td>
+            <td>اخذ موافقت اولیه مدیریت و تعیین مرجع راهبری طرح</td>
+          </tr>
+          <tr>
+            <td>سازمانی</td>
+            <td>تعیین واحد متولی</td>
+            <td>تعیین واحد مسئولیت‌های اجتماعی به‌عنوان بهره‌بردار اصلی و مشخص کردن واحدهای همکار</td>
+          </tr>
+          <tr>
+            <td>اطلاعاتی</td>
+            <td>دسترسی به داده‌های موجود</td>
+            <td>شناسایی اطلاعات موجود در واحدهای اجتماعی، معدن، GIS، فناوری اطلاعات و سایر واحدهای مرتبط</td>
+          </tr>
+          <tr>
+            <td>داده‌ای</td>
+            <td>تعیین مالکیت و اعتبار داده‌ها</td>
+            <td>تعیین مسئول گردآوری، تأیید و به‌روزرسانی هر گروه از اطلاعات</td>
+          </tr>
+          <tr>
+            <td>فنی</td>
+            <td>بررسی زیرساخت‌های موجود</td>
+            <td>ارزیابی سرورها، شبکه، تجهیزات، نرم‌افزارها و امکانات میزبانی</td>
+          </tr>
+          <tr>
+            <td>مکانی</td>
+            <td>دسترسی به اطلاعات GIS</td>
+            <td>شناسایی لایه‌های مکانی موجود و بررسی کیفیت، فرمت و قابلیت استفاده از آن‌ها</td>
+          </tr>
+          <tr>
+            <td>مالی</td>
+            <td>تعیین منابع اولیه</td>
+            <td>تخصیص بودجه برای تحلیل، طراحی و اجرای فاز نخست</td>
+          </tr>
+          <tr>
+            <td>اجرایی</td>
+            <td>تعیین تیم اجرای طرح</td>
+            <td>مشخص کردن مسئول طرح، کارشناسان و نمایندگان واحدهای مشارکت‌کننده</td>
+          </tr>
+          <tr>
+            <td>امنیتی</td>
+            <td>تعیین الزامات حفاظت اطلاعات</td>
+            <td>تعیین سطح محرمانگی داده‌ها، سطوح دسترسی و الزامات پشتیبان‌گیری</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Management decisions -->
+  <section class="final-section">
+    <h2>۴. تصمیم‌های موردنیاز مدیریت</h2>
+    <p>
+      برای آغاز منظم و قابل کنترل طرح، لازم است مدیریت مجتمع
+      درباره چند موضوع کلیدی تصمیم‌گیری کند. این تصمیم‌ها
+      چارچوب اجرایی، سازمانی و مالی پروژه را مشخص خواهند کرد.
+    </p>
+
+    <div class="final-decision-list">
+      <div class="final-decision">
+        <div class="final-decision-number">۱</div>
+        <div>
+          <h3>تصویب اصل اجرای طرح</h3>
+          <p>
+            موافقت با ایجاد سامانه هوشمند مدیریت راهبردی مسئولیت‌های
+            اجتماعی به‌عنوان یک طرح توسعه‌ای و مدیریتی.
+          </p>
+        </div>
+      </div>
+
+      <div class="final-decision">
+        <div class="final-decision-number">۲</div>
+        <div>
+          <h3>تعیین حامی و مرجع راهبری</h3>
+          <p>
+            تعیین مقام یا کمیته مسئول راهبری، نظارت بر پیشرفت
+            و بررسی مسائل بین‌واحدی طرح.
+          </p>
+        </div>
+      </div>
+
+      <div class="final-decision">
+        <div class="final-decision-number">۳</div>
+        <div>
+          <h3>تعیین واحد بهره‌بردار اصلی</h3>
+          <p>
+            تعیین واحد مسئولیت‌های اجتماعی به‌عنوان بهره‌بردار
+            اصلی سامانه و مشخص کردن نقش سایر واحدها در تأمین
+            داده، تأیید اطلاعات و استفاده از قابلیت‌ها.
+          </p>
+        </div>
+      </div>
+
+      <div class="final-decision">
+        <div class="final-decision-number">۴</div>
+        <div>
+          <h3>تصویب اجرای فاز نخست</h3>
+          <p>
+            موافقت با آغاز فاز نخست با تمرکز بر شناخت وضع موجود،
+            گردآوری داده‌ها، طراحی ساختار اطلس و ایجاد هسته اولیه
+            سامانه.
+          </p>
+        </div>
+      </div>
+
+      <div class="final-decision">
+        <div class="final-decision-number">۵</div>
+        <div>
+          <h3>تخصیص منابع مالی و انسانی</h3>
+          <p>
+            تعیین اعتبار اولیه و معرفی کارشناسان موردنیاز برای
+            پیشبرد فعالیت‌های فاز نخست و همکاری واحدهای مرتبط.
+          </p>
+        </div>
+      </div>
+
+      <div class="final-decision">
+        <div class="final-decision-number">۶</div>
+        <div>
+          <h3>تعیین سیاست داده و دسترسی</h3>
+          <p>
+            تصویب چارچوب اولیه مالکیت داده، محرمانگی، دسترسی کاربران
+            و مسئولیت به‌روزرسانی اطلاعات.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Phase 1 -->
+  <section class="final-section">
+    <h2>۵. پیشنهاد اجرای فاز نخست</h2>
+    <p>
+      با توجه به ماهیت داده‌محور سامانه و وابستگی قابلیت‌های
+      بعدی به اطلاعات پایه، پیشنهاد می‌شود اجرای طرح با تمرکز
+      بر ایجاد اطلس هوشمند و سامان‌دهی داده‌های پایه آغاز شود.
+      این فاز باید به‌گونه‌ای طراحی شود که علاوه بر تولید
+      خروجی‌های ملموس، زمینه توسعه مرحله‌ای سایر بخش‌های سامانه
+      را نیز فراهم کند.
+    </p>
+
+    <div class="final-phase">
+      <div class="final-phase-header">
+        <div>
+          <span class="final-phase-label">پیشنهاد اجرایی</span>
+          <h3>فاز نخست: شناخت، طراحی و ایجاد هسته اطلس هوشمند</h3>
+        </div>
+        <div class="final-phase-duration">مرحله آغازین</div>
+      </div>
+
+      <div class="final-phase-body">
+        <h4>فعالیت‌های اصلی</h4>
+        <ul>
+          <li>بررسی وضع موجود اطلاعات، سامانه‌ها و فرآیندهای مرتبط با مسئولیت‌های اجتماعی</li>
+          <li>شناسایی منابع داده در واحدهای مختلف مجتمع</li>
+          <li>تهیه فهرست روستاها، دهستان‌ها و جوامع عشایری مشمول طرح</li>
+          <li>تدوین ساختار شناسنامه اطلاعاتی مناطق و جوامع هدف</li>
+          <li>شناسایی و گردآوری لایه‌های مکانی پایه</li>
+          <li>تعیین ساختار اولیه پایگاه داده و ارتباط آن با اطلاعات مکانی</li>
+          <li>طراحی نمونه اولیه اطلس و داشبورد مدیریتی</li>
+          <li>تعریف نقش کاربران و فرآیند تأیید و به‌روزرسانی داده‌ها</li>
+          <li>اجرای آزمایشی بر روی محدوده یا مجموعه‌ای منتخب از داده‌ها</li>
+        </ul>
+
+        <h4>خروجی‌های مورد انتظار</h4>
+        <div class="final-output-grid">
+          <div class="final-output">سند شناخت وضع موجود</div>
+          <div class="final-output">ساختار داده و شناسنامه‌ها</div>
+          <div class="final-output">پایگاه داده اولیه</div>
+          <div class="final-output">لایه‌های مکانی پایه</div>
+          <div class="final-output">نمونه اولیه اطلس</div>
+          <div class="final-output">داشبورد اولیه مدیریتی</div>
+          <div class="final-output">سند نقش‌ها و دسترسی‌ها</div>
+          <div class="final-output">گزارش ارزیابی فاز نخست</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="final-note">
+      <strong>اصل پیشنهادی اجرا:</strong>
+      توسعه سامانه به‌صورت مرحله‌ای انجام شود. در پایان هر مرحله،
+      خروجی‌ها و میزان آمادگی برای ورود به مرحله بعد بررسی و
+      تأیید شوند. دامنه دقیق فاز نخست و زمان‌بندی آن باید پس از
+      بررسی وضع موجود و تصویب برنامه اجرایی مشخص شود.
+    </div>
+  </section>
+
+  <!-- Approval -->
+  <section class="final-section">
+    <h2>۶. سازوکار تصویب و پیگیری طرح</h2>
+    <p>
+      برای اطمینان از هماهنگی سازمانی، کنترل پیشرفت و استفاده
+      صحیح از منابع، پیشنهاد می‌شود طرح در چارچوب یک سازوکار
+      مشخص برای تصویب، اجرا، نظارت و گزارش‌دهی دنبال شود.
+    </p>
+
+    <div class="final-process">
+      <div class="final-process-step">
+        <span>۱</span>
+        <strong>ارائه طرح</strong>
+        <small>ارائه طرح توجیهی و تشریح اهداف، دامنه و دستاوردها</small>
+      </div>
+      <div class="final-process-arrow">←</div>
+      <div class="final-process-step">
+        <span>۲</span>
+        <strong>بررسی کارشناسی</strong>
+        <small>بررسی فنی، مالی، سازمانی و اطلاعاتی توسط واحدهای مرتبط</small>
+      </div>
+      <div class="final-process-arrow">←</div>
+      <div class="final-process-step">
+        <span>۳</span>
+        <strong>تصویب مدیریتی</strong>
+        <small>تعیین دامنه، منابع و چارچوب اجرای طرح</small>
+      </div>
+      <div class="final-process-arrow">←</div>
+      <div class="final-process-step">
+        <span>۴</span>
+        <strong>اجرای مرحله‌ای</strong>
+        <small>آغاز فعالیت‌ها مطابق برنامه و مصوبات</small>
+      </div>
+      <div class="final-process-arrow">←</div>
+      <div class="final-process-step">
+        <span>۵</span>
+        <strong>پایش و گزارش</strong>
+        <small>بررسی پیشرفت، ثبت مسائل و ارائه گزارش‌های دوره‌ای</small>
+      </div>
+    </div>
+
+    <h3 class="final-subtitle">ارکان پیشنهادی پیگیری</h3>
+    <div class="final-table-wrap">
+      <table class="final-table">
+        <thead>
+          <tr>
+            <th>رکن</th>
+            <th>مسئولیت اصلی</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>مدیریت ارشد یا مرجع تعیین‌شده</td>
+            <td>تصویب چارچوب کلان، حمایت مدیریتی و تصمیم‌گیری درباره مسائل کلیدی</td>
+          </tr>
+          <tr>
+            <td>کمیته راهبری طرح</td>
+            <td>هماهنگی بین‌واحدی، بررسی پیشرفت، رفع موانع و تأیید نقاط کنترل</td>
+          </tr>
+          <tr>
+            <td>مدیر طرح</td>
+            <td>برنامه‌ریزی، هماهنگی فعالیت‌ها، کنترل زمان و هزینه و ارائه گزارش</td>
+          </tr>
+          <tr>
+            <td>واحد مسئولیت‌های اجتماعی</td>
+            <td>تعیین نیازهای بهره‌برداری، تأیید فرآیندهای اجتماعی و ارزیابی کاربرد سامانه</td>
+          </tr>
+          <tr>
+            <td>واحد فناوری اطلاعات</td>
+            <td>تأمین و مدیریت زیرساخت، امنیت، پشتیبان‌گیری و نگهداری فنی</td>
+          </tr>
+          <tr>
+            <td>واحد GIS و معدن</td>
+            <td>تأمین و اعتبارسنجی اطلاعات مکانی و همکاری در تحلیل تداخل‌ها</td>
+          </tr>
+          <tr>
+            <td>واحدهای تأمین‌کننده داده</td>
+            <td>ارائه، تأیید و به‌روزرسانی اطلاعات مرتبط با حوزه مسئولیت خود</td>
+          </tr>
+          <tr>
+            <td>تیم اجرایی یا پیمانکار</td>
+            <td>تحلیل، طراحی، توسعه، آزمون، مستندسازی و انتقال دانش</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="final-caption">
+      ساختار فوق پیشنهادی است و باید با چارت سازمانی، اختیارات
+      و رویه‌های مصوب مجتمع تطبیق داده شود.
+    </p>
+  </section>
+
+  <!-- Follow up -->
+  <section class="final-section">
+    <h2>۷. نظام پیگیری و کنترل اجرای طرح</h2>
+    <p>
+      پس از تصویب طرح، لازم است سازوکار مشخصی برای کنترل پیشرفت
+      و بررسی کیفیت خروجی‌ها برقرار شود. این سازوکار باید امکان
+      شناسایی به‌موقع انحراف‌ها و اتخاذ تصمیم‌های اصلاحی را فراهم کند.
+    </p>
+
+    <div class="final-grid final-grid-3">
+      <div class="final-card">
+        <span class="final-icon">A</span>
+        <h3>گزارش پیشرفت</h3>
+        <p>
+          ارائه گزارش دوره‌ای از فعالیت‌های انجام‌شده،
+          میزان تحقق برنامه و وضعیت هزینه‌ها.
+        </p>
+      </div>
+      <div class="final-card">
+        <span class="final-icon">B</span>
+        <h3>کنترل کیفیت خروجی‌ها</h3>
+        <p>
+          بررسی انطباق خروجی‌های هر مرحله با نیازمندی‌ها
+          و معیارهای پذیرش مصوب.
+        </p>
+      </div>
+      <div class="final-card">
+        <span class="final-icon">C</span>
+        <h3>اقدام اصلاحی</h3>
+        <p>
+          ثبت مسائل، تعیین مسئول و مهلت رفع مشکل و
+          پیگیری تا حصول نتیجه.
+        </p>
+      </div>
+    </div>
+
+    <div class="final-note">
+      <strong>پیشنهاد:</strong>
+      برای هر مرحله از طرح، معیارهای پذیرش و خروجی‌های قابل
+      تحویل تعریف شود و ورود به مرحله بعد، پس از بررسی و
+      تأیید نتایج مرحله قبلی صورت گیرد.
+    </div>
+  </section>
+
+  <!-- Final conclusion -->
+  <section class="final-conclusion">
+    <div class="final-conclusion-label">نتیجه‌گیری نهایی</div>
+    <h2>حرکت به‌سوی مدیریت داده‌محور مسئولیت‌های اجتماعی</h2>
+    <p>
+      اجرای سامانه هوشمند مدیریت راهبردی مسئولیت‌های اجتماعی
+      مجتمع مس درآلو، فرصتی برای ایجاد یک بستر منسجم اطلاعاتی
+      و مدیریتی در حوزه ارتباط با جوامع پیرامونی است. تحقق
+      اهداف این طرح مستلزم حمایت مدیریت، مشارکت واحدهای مرتبط،
+      تأمین منابع، تعریف مسئولیت‌های مشخص و اجرای مرحله‌ای
+      بر اساس نیازهای واقعی مجتمع خواهد بود.
+    </p>
+    <p>
+      پیشنهاد می‌شود پس از بررسی و تصویب طرح توجیهی، اجرای
+      فاز نخست با تمرکز بر ایجاد اطلس هوشمند، سامان‌دهی
+      اطلاعات پایه و طراحی هسته اولیه سامانه آغاز شود.
+      نتایج این مرحله می‌تواند مبنای تصمیم‌گیری درباره
+      توسعه قابلیت‌های بعدی و تخصیص منابع مراحل آتی قرار گیرد.
+    </p>
+    <div class="final-conclusion-action">
+      <span>پیشنهاد اجرایی نهایی</span>
+      <strong>تصویب آغاز فاز نخست و تشکیل ساختار راهبری و اجرایی طرح</strong>
+    </div>
+  </section>
+
+  <footer class="final-footer">
+    <strong>DARALOO SMART CSR MANAGEMENT SYSTEM</strong>
+    <span>فصل نهم ـ جمع‌بندی و پیشنهادهای اجرایی</span>
+  </footer>
+
+</div>
+
+</body>
+</html>

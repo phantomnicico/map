@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>فصل سوم | معماری و چارت عملکردی سامانه</title>
+<style>
+
+/* =========================================================
+   DARALOO SMART CSR SYSTEM
+   Soft UI / Neumorphism Theme
+========================================================= */
+
+:root {
+
+    /* ---------- Brand Colors ---------- */
+
+    --navy: #17324d;
+    --navy-light: #294c68;
+
+    --teal: #167d83;
+    --teal-light: #249da3;
+
+    --gold: #d7a94b;
+    --gold-light: #e5c16f;
+
+    --ink: #263746;
+    --muted: #647585;
+
+    /* ---------- Soft UI Surface ---------- */
+
+    --bg: #e8edf2;
+    --surface: #e8edf2;
+    --surface-light: #f2f5f8;
+
+    --white: #ffffff;
+
+    --line: rgba(255,255,255,.65);
+
+    /* ---------- Shadows ---------- */
+
+    --shadow-out:
+        12px 12px 24px rgba(163,177,198,.55),
+        -12px -12px 24px rgba(255,255,255,.95);
+
+    --shadow-soft:
+        7px 7px 16px rgba(163,177,198,.45),
+        -7px -7px 16px rgba(255,255,255,.9);
+
+    --shadow-small:
+        4px 4px 10px rgba(163,177,198,.40),
+        -4px -4px 10px rgba(255,255,255,.85);
+
+    --shadow-in:
+        inset 6px 6px 12px rgba(163,177,198,.42),
+        inset -6px -6px 12px rgba(255,255,255,.9);
+
+    /* ---------- Radius ---------- */
+
+    --radius-xl: 26px;
+    --radius-lg: 20px;
+    --radius-md: 15px;
+    --radius-sm: 11px;
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+
+    margin: 0;
+
+    background:
+        radial-gradient(
+            circle at 10% 10%,
+            rgba(255,255,255,.85),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 90% 90%,
+            rgba(22,125,131,.07),
+            transparent 30%
+        ),
+        var(--bg);
+
+    color: var(--ink);
+
+    font-family:
+        Tahoma,
+        Arial,
+        "Segoe UI",
+        sans-serif;
+
+    line-height: 2;
+}
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.page {
+
+    max-width: 1100px;
+
+    margin: 35px auto;
+
+    padding: 0 20px;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 38px 42px;
+
+    color: #fff;
+
+    border-radius: var(--radius-xl);
+
+    background:
+        linear-gradient(
+            145deg,
+            #17324d,
+            #216b75
+        );
+
+    box-shadow:
+        12px 12px 24px rgba(163,177,198,.45),
+        -10px -10px 24px rgba(255,255,255,.9);
+
+}
+
+
+/* Decorative futuristic glow */
+
+.hero::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 260px;
+    height: 260px;
+
+    top: -150px;
+    left: -80px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.16),
+            transparent 70%
+        );
+
+    pointer-events: none;
+}
+
+
+.hero::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 300px;
+    height: 300px;
+
+    bottom: -190px;
+    right: -120px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(215,169,75,.18),
+            transparent 70%
+        );
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.eyebrow {
+
+    position: relative;
+
+    color: var(--gold-light);
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    letter-spacing: .3px;
+
+}
+
+
+/* =========================================================
+   HERO TITLE
+========================================================= */
+
+.hero h1 {
+
+    position: relative;
+
+    font-size: 25px;
+
+    line-height: 1.7;
+
+    margin: 8px 0 10px;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   SUBTITLE
+========================================================= */
+
+.subtitle {
+
+    position: relative;
+
+    color: #e0edf0;
+
+    font-size: 14px;
+
+    opacity: .95;
+
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.content {
+
+    margin-top: 22px;
+
+    padding: 34px 40px;
+
+    border-radius: var(--radius-xl);
+
+    background: var(--surface);
+
+    box-shadow: var(--shadow-out);
+
+}
+
+
+/* =========================================================
+   HEADINGS
+========================================================= */
+
+h2 {
+
+    position: relative;
+
+    color: var(--navy);
+
+    font-size: 18px;
+
+    margin: 30px 0 12px;
+
+    padding-right: 15px;
+
+    line-height: 1.8;
+
+}
+
+
+h2::before {
+
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+
+    top: 5px;
+
+    width: 5px;
+
+    height: calc(100% - 10px);
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            180deg,
+            var(--gold-light),
+            var(--gold)
+        );
+
+    box-shadow:
+        2px 2px 5px rgba(163,177,198,.3),
+        -2px -2px 5px rgba(255,255,255,.8);
+
+}
+
+
+h3 {
+
+    font-size: 15px;
+
+    color: var(--teal);
+
+    margin: 18px 0 7px;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   TEXT
+========================================================= */
+
+p {
+
+    font-size: 13.5px;
+
+    text-align: justify;
+
+    margin: 8px 0 15px;
+
+    color: var(--ink);
+
+}
+
+
+/* =========================================================
+   LISTS
+========================================================= */
+
+ul,
+ol {
+
+    font-size: 13.5px;
+
+    padding-right: 25px;
+
+    margin: 7px 0 17px;
+
+}
+
+
+li {
+
+    margin: 5px 0;
+
+}
+
+
+/* =========================================================
+   CALLOUT
+========================================================= */
+
+.callout {
+
+    position: relative;
+
+    margin: 20px 0;
+
+    padding: 16px 20px;
+
+    border-radius: var(--radius-md);
+
+    background: var(--surface);
+
+    box-shadow: var(--shadow-soft);
+
+    border: none;
+
+    font-size: 13.5px;
+
+}
+
+
+/* Teal indicator */
+
+.callout::before {
+
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+
+    top: 15px;
+
+    bottom: 15px;
+
+    width: 4px;
+
+    border-radius: 10px;
+
+    background: var(--teal);
+
+}
+
+
+.callout strong {
+
+    color: var(--teal);
+
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 18px;
+
+    margin: 18px 0;
+
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card {
+
+    position: relative;
+
+    padding: 18px 20px;
+
+    border-radius: var(--radius-lg);
+
+    background: var(--surface);
+
+    border: none;
+
+    box-shadow: var(--shadow-soft);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+
+}
+
+
+/* Hover */
+
+.card:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        10px 10px 22px rgba(163,177,198,.48),
+        -10px -10px 22px rgba(255,255,255,.95);
+
+}
+
+
+.card h3 {
+
+    margin: 0 0 6px;
+
+}
+
+
+.card p {
+
+    margin: 0;
+
+    font-size: 12.5px;
+
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+table {
+
+    width: 100%;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+
+    margin: 16px 0 22px;
+
+    font-size: 12.5px;
+
+    overflow: hidden;
+
+    border-radius: var(--radius-md);
+
+    background: var(--surface);
+
+    box-shadow: var(--shadow-small);
+
+}
+
+
+/* Header */
+
+th {
+
+    background:
+        linear-gradient(
+            145deg,
+            #edf2f6,
+            #e1e7ed
+        );
+
+    color: var(--navy);
+
+    text-align: right;
+
+    font-weight: 700;
+
+}
+
+
+/* Cells */
+
+td,
+th {
+
+    padding: 11px 12px;
+
+    vertical-align: top;
+
+    border: none;
+
+    border-bottom:
+        1px solid
+        rgba(163,177,198,.18);
+
+}
+
+
+/* Last row */
+
+tr:last-child td {
+
+    border-bottom: none;
+
+}
+
+
+/* Hover */
+
+tbody tr {
+
+    transition: background .2s ease;
+
+}
+
+
+tbody tr:hover {
+
+    background:
+        rgba(255,255,255,.45);
+
+}
+
+
+/* =========================================================
+   FLOW
+========================================================= */
+
+.flow {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin: 18px 0;
+
+}
+
+
+/* =========================================================
+   FLOW STEP
+========================================================= */
+
+.step {
+
+    padding: 9px 14px;
+
+    font-size: 12px;
+
+    border-radius: var(--radius-sm);
+
+    background: var(--surface);
+
+    box-shadow: var(--shadow-small);
+
+    border: none;
+
+    color: var(--ink);
+
+}
+
+
+/* =========================================================
+   FLOW ARROW
+========================================================= */
+
+.arrow {
+
+    color: var(--teal);
+
+    font-weight: bold;
+
+    font-size: 16px;
+
+}
+
+
+/* =========================================================
+   PILL ROW
+========================================================= */
+
+.pillrow {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 14px;
+
+}
+
+
+/* =========================================================
+   PILL
+========================================================= */
+
+.pill {
+
+    background: var(--surface);
+
+    border: none;
+
+    border-radius: 30px;
+
+    padding: 5px 14px;
+
+    font-size: 11.5px;
+
+    color: #405363;
+
+    box-shadow: var(--shadow-small);
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer {
+
+    color: var(--muted);
+
+    text-align: center;
+
+    font-size: 11px;
+
+    padding: 20px 0 30px;
+
+}
+
+
+/* =========================================================
+   LINKS
+========================================================= */
+
+a {
+
+    color: var(--teal);
+
+    text-decoration: none;
+
+    transition: .2s ease;
+
+}
+
+
+a:hover {
+
+    color: var(--navy);
+
+}
+
+
+/* =========================================================
+   SELECTION
+========================================================= */
+
+::selection {
+
+    background: rgba(22,125,131,.18);
+
+    color: var(--navy);
+
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+
+    width: 9px;
+    height: 9px;
+
+}
+
+
+::-webkit-scrollbar-track {
+
+    background: var(--bg);
+
+}
+
+
+::-webkit-scrollbar-thumb {
+
+    background:
+        linear-gradient(
+            180deg,
+            #cbd4dd,
+            #aebbc8
+        );
+
+    border-radius: 20px;
+
+    box-shadow:
+        inset 2px 2px 4px rgba(255,255,255,.6);
+
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+
+    background:
+        linear-gradient(
+            180deg,
+            #aebbc8,
+            #98a8b7
+        );
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .page {
+
+        margin: 20px auto;
+
+        padding: 0 12px;
+
+    }
+
+
+    .hero {
+
+        padding: 26px 22px;
+
+        border-radius: 20px;
+
+    }
+
+
+    .hero h1 {
+
+        font-size: 21px;
+
+    }
+
+
+    .subtitle {
+
+        font-size: 12.5px;
+
+    }
+
+
+    .content {
+
+        padding: 24px 19px;
+
+        border-radius: 20px;
+
+    }
+
+
+    .grid {
+
+        grid-template-columns: 1fr;
+
+        gap: 14px;
+
+    }
+
+
+    table {
+
+        display: block;
+
+        overflow-x: auto;
+
+        white-space: normal;
+
+    }
+
+
+    h2 {
+
+        font-size: 17px;
+
+    }
+
+
+    p {
+
+        font-size: 13px;
+
+    }
+
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print {
+
+    body {
+
+        background: #fff;
+
+    }
+
+
+    .page {
+
+        margin: 0 auto;
+
+    }
+
+
+    .content {
+
+        box-shadow: none;
+
+        border:
+            1px solid
+            #dfe5ea;
+
+    }
+
+
+    .hero {
+
+        print-color-adjust: exact;
+
+        -webkit-print-color-adjust: exact;
+
+    }
+
+
+    .card {
+
+        box-shadow: none;
+
+        border:
+            1px solid
+            #dfe5ea;
+
+    }
+
+}
+
+
+</style>
+</head>
+<body><div class="page">
+<header class="hero"><div class="eyebrow">طرح توجیهی توصیفی | فصل سوم</div><h1>معماری و چارت عملکردی سامانه</h1><div class="subtitle">سامانه هوشمند مدیریت راهبردی مسئولیت‌های اجتماعی مجتمع مس درآلو</div></header>
+<main><article>
+<h2>۳-۱. مقدمه و رویکرد معماری</h2>
+<p>معماری کلان سامانه بر ایجاد یک بستر یکپارچه برای شناخت منطقه، مدیریت پروژه‌های مسئولیت اجتماعی و پشتیبانی از تصمیم‌گیری مدیریتی استوار است. در این معماری، «اطلس هوشمند» لایه شناخت و داده‌های پایه منطقه را فراهم می‌کند و «سامانه مدیریت پروژه‌ها» از این داده‌ها برای ثبت، بررسی، اجرا و ارزیابی پروژه‌ها بهره می‌گیرد. پایگاه داده، خدمات مکانی GIS و لایه کاربردی، اجزای مرتبط این ساختار هستند.</p>
+<p>با توجه به هدف اجرای مرحله‌ای طرح، معماری باید توسعه‌پذیر باشد؛ به‌گونه‌ای که ابتدا داده‌های پایه و اطلس شکل بگیرند و سپس قابلیت‌های مدیریت پروژه، کنترل تداخل، پایش و گزارش‌گیری به‌صورت تدریجی به آن متصل شوند.</p>
+<div class="callout"><b>اصل معماری:</b> اطلس هوشمند منبع مرجع شناخت منطقه است؛ سامانه مدیریت پروژه‌ها مصرف‌کننده و تکمیل‌کننده اطلاعات مرتبط با پروژه‌هاست. ارتباط این دو باید از طریق شناسه‌های یکتا و داده‌های دارای منبع و تاریخ به‌روزرسانی برقرار شود.</div>
+
+<h2>۳-۲. معماری کلان سامانه</h2>
+<p>معماری پیشنهادی از چند لایه منطقی تشکیل می‌شود. این لایه‌ها می‌توانند در پیاده‌سازی اولیه روی زیرساخت محدودتری مستقر شوند، اما تفکیک وظایف آن‌ها، نگهداری و توسعه آتی را ساده‌تر می‌کند.</p>
+<div class="diagram"><div class="diagram-title">نمای کلان لایه‌ای سامانه</div>
+<div class="arch">
+<div class="box dark">لایه کاربران و دسترسی<br><small>مدیران، کارشناسان، ناظران و کاربران مجاز</small></div><div class="connector">↓</div>
+<div class="box primary">لایه رابط کاربری و داشبوردها<br><small>وب‌اپلیکیشن، فرم‌ها، نقشه، جست‌وجو و گزارش‌ها</small></div><div class="connector">↓</div>
+<div class="row"><div class="box">ماژول اطلس هوشمند</div><div class="box">ماژول مدیریت پروژه‌ها</div><div class="box">ماژول کنترل تداخل</div><div class="box">ماژول پایش و بحران</div></div><div class="connector">↓</div>
+<div class="box primary">لایه خدمات و منطق کسب‌وکار<br><small>اعتبارسنجی، گردش کار، قواعد، هشدارها و مجوزها</small></div><div class="connector">↓</div>
+<div class="row"><div class="box gold">پایگاه داده توصیفی<br><small>مناطق، پروژه‌ها، کاربران، سوابق</small></div><div class="box gold">پایگاه داده مکانی / GIS<br><small>نقاط، خطوط، محدوده‌ها و لایه‌ها</small></div><div class="box gold">مخزن مستندات<br><small>نقشه‌ها، تصاویر و فایل‌های مجاز</small></div></div>
+<div class="connector">↕</div><div class="box">منابع داده و سامانه‌های مرتبط<br><small>داده‌های میدانی، اسناد معتبر و اطلاعات واحدهای تخصصی</small></div>
+</div></div>
+<p>این نمودار نمای مفهومی است و الزاماً به معنای وجود سرور یا پایگاه داده مستقل برای هر جزء نیست. انتخاب فناوری و نحوه استقرار در فصل زیرساخت و طراحی تفصیلی تعیین می‌شود.</p>
+
+<h2>۳-۳. ارتباط اطلس هوشمند با سامانه مدیریت پروژه‌ها</h2>
+<p>اطلس، اطلاعات مرجع درباره محدوده جغرافیایی و ویژگی‌های منطقه را نگهداری می‌کند. هر پروژه در سامانه مدیریت پروژه‌ها می‌تواند به یک یا چند موجودیت اطلس، مانند روستا، دهستان، جامعه هدف یا محدوده مکانی مرتبط شود. این پیوند، امکان مشاهده نیازهای ثبت‌شده و زمینه اجرای پروژه را در کنار اطلاعات پروژه فراهم می‌کند.</p>
+<div class="diagram"><div class="diagram-title">رابطه منطقی اطلس و مدیریت پروژه</div><div class="arch">
+<div class="row"><div class="box primary">اطلس هوشمند<br><small>شناسنامه مناطق، جمعیت، خدمات، زیرساخت و لایه‌های پایه</small></div><div class="box primary">سامانه مدیریت پروژه‌ها<br><small>پیشنهاد، بررسی، تصویب، اجرا، هزینه و ارزیابی</small></div></div>
+<div class="connector">↕</div><div class="box gold">لایه ارتباط و شناسه‌های مشترک<br><small>شناسه منطقه، شناسه پروژه، ارتباط پروژه با جامعه هدف و موقعیت</small></div>
+<div class="connector">↕</div><div class="box">نمای یکپارچه مدیریتی<br><small>مشاهده نیاز، پروژه‌های مرتبط، وضعیت اجرا و نتایج در بستر منطقه</small></div>
+</div></div>
+<ul><li>اطلس اطلاعات پایه و شناسنامه منطقه را فراهم می‌کند.</li><li>پروژه، به منطقه و جامعه هدف مرتبط می‌شود و اطلاعات اجرایی اختصاصی خود را دارد.</li><li>تغییرات داده‌های پایه باید با ثبت منبع، تاریخ و مسئول به‌روزرسانی انجام شود.</li><li>ارتباط دو بخش باید از طریق شناسه‌های پایدار برقرار شود، نه صرفاً نام متنی روستا یا پروژه.</li></ul>
+
+<h2>۳-۴. ارتباط پایگاه داده و GIS</h2>
+<p>پایگاه داده توصیفی برای نگهداری اطلاعات ساخت‌یافته مانند شناسنامه مناطق، پرونده پروژه‌ها، وضعیت‌ها، شاخص‌ها و سوابق استفاده می‌شود. GIS برای نگهداری و نمایش ویژگی‌های مکانی از جمله نقطه، مسیر، محدوده و لایه‌های زمینه‌ای به کار می‌رود. ارتباط این دو، امکان تحلیل و نمایش اطلاعات پروژه در بستر جغرافیایی را فراهم می‌سازد.</p>
+<table><thead><tr><th>نوع داده</th><th>نمونه محتوا</th><th>نحوه استفاده</th></tr></thead><tbody>
+<tr><td>داده توصیفی</td><td>شناسه و نام منطقه، جمعیت، خدمات، مشخصات پروژه، بودجه و وضعیت</td><td>فرم‌ها، جست‌وجو، گزارش و داشبورد</td></tr>
+<tr><td>داده مکانی</td><td>مختصات روستا، مسیر عشایری، محدوده پروژه، محدوده‌ها و تأسیسات معدن</td><td>نمایش نقشه، سنجش فاصله و بررسی هم‌پوشانی</td></tr>
+<tr><td>داده پیوندی</td><td>شناسه منطقه، شناسه پروژه، شناسه لایه یا عارضه</td><td>اتصال پرونده‌ها به عوارض مکانی و نمایش یکپارچه</td></tr>
+<tr><td>فراداده</td><td>منبع، تاریخ برداشت، مقیاس، دستگاه مختصات، وضعیت تأیید</td><td>ارزیابی اعتبار و محدودیت استفاده از داده</td></tr>
+</tbody></table>
+<p>برای تحلیل مکانی، دستگاه مختصات، دقت، مقیاس و تاریخ داده‌ها باید مشخص باشد. نتیجه بررسی تداخل باید همراه با پارامترهای تحلیل و تأیید کارشناس ثبت شود؛ زیرا هم‌پوشانی هندسی به‌تنهایی تعارض اجرایی قطعی را اثبات نمی‌کند.</p>
+
+<h2>۳-۵. گردش اطلاعات و جریان کاری</h2>
+<p>گردش اطلاعات از ورود داده‌های پایه آغاز می‌شود و پس از ثبت و بررسی پیشنهاد پروژه، اطلاعات موردنیاز از اطلس، پایگاه داده و لایه‌های GIS بازیابی می‌شود. نتیجه بررسی‌ها برای تصمیم‌گیری در اختیار نقش‌های مجاز قرار می‌گیرد و در مرحله اجرا، اطلاعات پیشرفت و مستندات به پرونده پروژه افزوده می‌شود.</p>
+<div class="diagram"><div class="diagram-title">چارت گردش اطلاعات پروژه</div><div class="arch">
+<div class="box">ثبت یا به‌روزرسانی داده‌های اطلس</div><div class="connector">↓</div>
+<div class="box primary">ثبت پیشنهاد و تشکیل پرونده پروژه</div><div class="connector">↓</div>
+<div class="row"><div class="box">اتصال به منطقه و جامعه هدف</div><div class="box">بازیابی داده‌های مکانی و GIS</div><div class="box">بررسی منابع و سوابق پروژه</div></div><div class="connector">↓</div>
+<div class="box gold">بررسی کارشناسی و امکان‌سنجی<br><small>نیاز، محدودیت، ریسک و تداخل احتمالی</small></div><div class="connector">↓</div>
+<div class="box dark">تصمیم مرجع مجاز و ثبت نتیجه</div><div class="connector">↓</div>
+<div class="box primary">اجرا، ثبت پیشرفت، هزینه و مستندات</div><div class="connector">↓</div>
+<div class="box">پایش، ارزیابی، خاتمه و گزارش مدیریتی</div>
+</div></div>
+<p>در هر مرحله باید مسئول انجام، وضعیت، تاریخ و مستندات مرتبط قابل ثبت باشد. در صورت ناقص بودن داده‌ها، پرونده می‌تواند برای تکمیل بازگردانده شود. تصمیم‌های مهم و تغییرات وضعیت باید در تاریخچه پرونده باقی بمانند.</p>
+
+<h2>۳-۶. نقش کاربران در معماری سامانه</h2>
+<table><thead><tr><th>نقش</th><th>تعامل اصلی با سامانه</th><th>حدود دسترسی پیشنهادی</th></tr></thead><tbody>
+<tr><td>مدیر سامانه</td><td>مدیریت کاربران، تنظیمات، نقش‌ها و ساختار داده</td><td>مدیریت فنی و دسترسی؛ ثبت ردپای تغییرات</td></tr>
+<tr><td>مدیر مسئولیت‌های اجتماعی</td><td>مشاهده سبد پروژه‌ها، بررسی گزارش‌ها و ثبت تصمیم در حدود اختیار</td><td>دسترسی مدیریتی به اطلاعات مجاز</td></tr>
+<tr><td>کارشناس مسئولیت‌های اجتماعی</td><td>ثبت نیاز و پروژه، تکمیل پرونده و پیگیری اجرا</td><td>ایجاد و ویرایش پرونده‌های مرتبط با حوزه کاری</td></tr>
+<tr><td>کارشناس GIS و فنی معدن</td><td>مدیریت یا بررسی لایه‌ها و ثبت نظر مکانی و تخصصی</td><td>دسترسی تخصصی به داده‌های مرتبط</td></tr>
+<tr><td>واحد مالی و برنامه‌ریزی</td><td>بررسی بودجه، تخصیص و هزینه‌کرد</td><td>دسترسی به اطلاعات مالی در حدود مجوز</td></tr>
+<tr><td>مجری یا ناظر پروژه</td><td>ثبت گزارش پیشرفت، بازدید و مستندات</td><td>دسترسی به پروژه‌های ارجاع‌شده</td></tr>
+<tr><td>مدیر مشاهده‌گر</td><td>استفاده از داشبوردها و گزارش‌های مدیریتی</td><td>مشاهده بدون تغییر داده‌های پایه</td></tr>
+</tbody></table>
+<p>نقش‌ها و سطوح دسترسی نهایی باید با ساختار سازمانی و فرآیندهای مصوب مجتمع تطبیق داده شوند. اصل پیشنهادی، اعطای حداقل دسترسی لازم و تفکیک وظایف ثبت، بررسی و تصویب است.</p>
+
+<h2>۳-۷. ساختار ماژول‌های سامانه</h2>
+<div class="twocol">
+<div class="panel"><h3>۱. ماژول اطلس هوشمند</h3><p>شناسنامه مناطق، جمعیت و خانوار، خدمات و زیرساخت، جوامع عشایری، منابع داده و نمایش نقشه.</p></div>
+<div class="panel"><h3>۲. ماژول مدیریت پروژه‌ها</h3><p>ثبت پیشنهاد، پرونده پروژه، گردش بررسی و تصویب، زمان‌بندی، بودجه، اجرا و خاتمه.</p></div>
+<div class="panel"><h3>۳. ماژول امکان‌سنجی و اولویت‌بندی</h3><p>ثبت معیارها، بررسی نیاز و محدودیت، مقایسه گزینه‌ها و مستندسازی نظر کارشناسی.</p></div>
+<div class="panel"><h3>۴. ماژول معدن و کنترل تداخل</h3><p>شناسنامه و لایه‌های مکانی معدن، ارتباط با پروژه‌ها و ثبت نتایج بررسی تداخل یا مجاورت.</p></div>
+<div class="panel"><h3>۵. ماژول مدیریت بحران</h3><p>ثبت رخداد، محدوده اثر، پروژه‌های متأثر، اقدامات و گزارش‌های وضعیت.</p></div>
+<div class="panel"><h3>۶. ماژول پایش و ارزیابی</h3><p>شاخص‌ها، گزارش پیشرفت، شواهد، انحراف از برنامه و ارزیابی نتایج.</p></div>
+<div class="panel"><h3>۷. ماژول گزارش‌ساز و داشبورد</h3><p>نمای مدیریتی، گزارش‌های دوره‌ای و فیلتر بر اساس منطقه، حوزه، زمان و وضعیت.</p></div>
+<div class="panel"><h3>۸. ماژول مدیریت داده و امنیت</h3><p>کاربران و نقش‌ها، اعتبارسنجی، تاریخچه تغییرات، پشتیبان‌گیری و کنترل دسترسی.</p></div>
+</div>
+<p>ماژول‌ها از نظر منطقی تفکیک می‌شوند، اما داده‌های مشترک و شناسه‌های واحد خواهند داشت. برای نمونه، پرونده پروژه از اطلاعات منطقه در اطلس استفاده می‌کند و ماژول کنترل تداخل به موقعیت پروژه و لایه‌های معتبر معدن متصل می‌شود.</p>
+
+<h2>۳-۸. چارت ارتباطی ماژول‌ها</h2>
+<div class="diagram"><div class="diagram-title">ساختار ارتباطی پیشنهادی ماژول‌ها</div><div class="arch">
+<div class="box dark">داشبورد مدیریتی و درگاه کاربران</div><div class="connector">↓</div>
+<div class="row"><div class="box primary">اطلس هوشمند</div><div class="box primary">مدیریت پروژه‌ها</div><div class="box primary">مدیریت معدن و GIS</div></div>
+<div class="connector">↕</div><div class="row"><div class="box">شناخت نیاز و امکان‌سنجی</div><div class="box">کنترل تداخل و هماهنگی</div><div class="box">پایش و ارزیابی</div><div class="box">مدیریت بحران</div></div>
+<div class="connector">↕</div><div class="box gold">خدمات مشترک و پایگاه داده<br><small>شناسه‌ها، کاربران، سوابق، مستندات و قواعد گردش کار</small></div><div class="connector">↓</div><div class="box">گزارش‌ساز، خروجی‌ها و داشبوردهای تخصصی</div>
+</div></div>
+
+<h2>۳-۹. ملاحظات توسعه و استقرار مرحله‌ای</h2>
+<ul><li><strong>مرحله نخست:</strong> طراحی ساختار داده، شناسنامه‌ها، شناسه‌های یکتا و ایجاد اطلس هوشمند با داده‌های پایه معتبر.</li><li><strong>مرحله دوم:</strong> اتصال پرونده پروژه‌ها به اطلس و ایجاد گردش کار ثبت، بررسی و پیگیری.</li><li><strong>مرحله سوم:</strong> تکمیل لایه‌های GIS معدن و منطقه و افزودن قابلیت کنترل تداخل و تحلیل‌های مکانی.</li><li><strong>مرحله چهارم:</strong> توسعه پایش، ارزیابی، گزارش‌ساز و قابلیت‌های ثبت و پیگیری رخدادهای بحرانی.</li></ul>
+<p>این توالی، پیشنهاد معماری و توسعه است و زمان‌بندی قطعی آن باید با برنامه اجرایی، کیفیت داده‌ها و ظرفیت واحدهای مشارکت‌کننده هماهنگ شود.</p>
+<div class="callout"><b>جمع‌بندی فصل:</b> معماری پیشنهادی، اطلس هوشمند را به‌عنوان پایه شناخت منطقه و سامانه مدیریت پروژه‌ها را به‌عنوان بستر اجرای چرخه پروژه در یک ساختار داده‌محور به هم متصل می‌کند. پیوند پایگاه داده و GIS، گردش اطلاعات قابل ردیابی، نقش‌های مشخص کاربران و تفکیک ماژول‌ها، زمینه توسعه تدریجی و تصمیم‌گیری مستند را فراهم می‌سازد.</div>
+</article></main><footer>فصل سوم طرح توجیهی | معماری مفهومی پیشنهادی، قابل تکمیل در طراحی تفصیلی</footer></div></body></html>
