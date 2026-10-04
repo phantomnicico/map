@@ -1,0 +1,2401 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>داشبورد یکپارچه سه‌لایه | نقشه همپوشان و چندرکوردی</title>
+
+<link rel="preconnect" href="https://unpkg.com">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
+<style>
+:root{
+  --bg:#eef1f5;
+  --surface:#eef1f5;
+  --surface-soft:#f5f7fa;
+  --surface-dark:#e4e7ec;
+
+  --ink:#202631;
+  --ink-soft:#3f4856;
+  --muted:#7a8494;
+
+  --orange:#f47b20;
+  --orange2:#ff9a3d;
+  --orange-dark:#d95f0b;
+  --orange-soft:#fff0e4;
+
+  --success:#20a66a;
+  --warning:#e9a11b;
+  --danger:#df4d4d;
+  --violet:#8067d8;
+  --cyan:#2c9fb3;
+
+  --line:rgba(255,255,255,.72);
+
+  --radius:22px;
+  --radius-sm:15px;
+
+  --shadow-out:
+    10px 10px 24px rgba(163,170,181,.42),
+    -10px -10px 24px rgba(255,255,255,.92);
+
+  --shadow-soft:
+    6px 6px 16px rgba(163,170,181,.30),
+    -6px -6px 16px rgba(255,255,255,.82);
+
+  --shadow-in:
+    inset 5px 5px 12px rgba(163,170,181,.30),
+    inset -5px -5px 12px rgba(255,255,255,.88);
+
+  --shadow-orange:
+    7px 7px 16px rgba(194,92,24,.25),
+    -5px -5px 14px rgba(255,255,255,.88);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html,
+body{
+  margin:0;
+  min-height:100%;
+  font-family:
+    Tahoma,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+
+  background:
+    radial-gradient(
+      circle at 10% 5%,
+      rgba(255,255,255,.9),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 90% 10%,
+      rgba(244,123,32,.07),
+      transparent 25%
+    ),
+    var(--bg);
+
+  color:var(--ink);
+}
+
+body{
+  overflow-x:hidden;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+/* =========================
+   APP
+========================= */
+
+.app{
+  min-height:100vh;
+}
+
+/* =========================
+   TOP BAR
+========================= */
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:1000;
+
+  height:76px;
+  padding:0 24px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+
+  background:rgba(238,241,245,.88);
+  backdrop-filter:blur(18px);
+
+  border-bottom:1px solid rgba(255,255,255,.75);
+
+  box-shadow:
+    0 7px 20px rgba(163,170,181,.18);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.brand-mark{
+  width:45px;
+  height:45px;
+
+  border-radius:15px;
+
+  display:grid;
+  place-items:center;
+
+  color:#fff;
+  font-size:21px;
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--orange2),
+      var(--orange-dark)
+    );
+
+  box-shadow:var(--shadow-orange);
+
+  border:1px solid rgba(255,255,255,.55);
+}
+
+.brand h1{
+  font-size:17px;
+  margin:0 0 4px;
+  font-weight:900;
+  letter-spacing:-.2px;
+}
+
+.brand small{
+  color:var(--muted);
+  font-size:10px;
+}
+
+.top-actions{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.icon-btn,
+.ghost-btn{
+  border:0;
+
+  background:var(--surface);
+
+  color:var(--ink-soft);
+
+  border-radius:13px;
+
+  padding:10px 13px;
+
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+
+  box-shadow:var(--shadow-soft);
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    color .18s ease;
+}
+
+.icon-btn:hover,
+.ghost-btn:hover{
+  transform:translateY(-1px);
+  color:var(--orange-dark);
+
+  box-shadow:
+    8px 8px 18px rgba(163,170,181,.34),
+    -7px -7px 17px rgba(255,255,255,.9);
+}
+
+.icon-btn:active,
+.ghost-btn:active{
+  transform:translateY(1px);
+  box-shadow:var(--shadow-in);
+}
+
+.status{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  color:var(--muted);
+  font-size:10px;
+}
+
+.dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--warning);
+
+  box-shadow:
+    0 0 0 4px rgba(233,161,27,.10);
+}
+
+.dot.ok{
+  background:var(--success);
+  box-shadow:
+    0 0 0 4px rgba(32,166,106,.10);
+}
+
+.dot.bad{
+  background:var(--danger);
+  box-shadow:
+    0 0 0 4px rgba(223,77,77,.10);
+}
+
+/* =========================
+   SHELL
+========================= */
+
+.shell{
+  display:grid;
+  grid-template-columns:310px minmax(0,1fr);
+
+  min-height:calc(100vh - 76px);
+}
+
+.sidebar{
+  border:0;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(245,247,250,.95),
+      rgba(229,232,237,.88)
+    );
+
+  padding:20px;
+
+  position:sticky;
+  top:76px;
+
+  height:calc(100vh - 76px);
+
+  overflow:auto;
+
+  box-shadow:
+    inset -1px 0 rgba(255,255,255,.75),
+    8px 0 22px rgba(163,170,181,.12);
+}
+
+.main{
+  min-width:0;
+  padding:22px 22px 40px;
+}
+
+/* =========================
+   SECTION
+========================= */
+
+.section-title{
+  font-size:11px;
+  font-weight:900;
+
+  color:var(--ink-soft);
+
+  margin:4px 0 12px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+/* =========================
+   LAYERS
+========================= */
+
+.layer-list{
+  display:grid;
+  gap:12px;
+  margin-bottom:22px;
+}
+
+.layer-card{
+  border:0;
+
+  border-radius:18px;
+
+  padding:14px;
+
+  background:var(--surface);
+
+  box-shadow:var(--shadow-soft);
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease;
+}
+
+.layer-card:hover{
+  transform:translateY(-2px);
+
+  box-shadow:
+    10px 10px 22px rgba(163,170,181,.35),
+    -9px -9px 21px rgba(255,255,255,.9);
+}
+
+.layer-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.layer-name{
+  display:flex;
+  align-items:center;
+  gap:9px;
+
+  font-weight:900;
+  font-size:12px;
+}
+
+.layer-badge{
+  width:11px;
+  height:11px;
+  border-radius:50%;
+
+  box-shadow:
+    0 0 0 4px rgba(244,123,32,.08);
+}
+
+.layer-card .count{
+  font-weight:900;
+  font-size:17px;
+  color:var(--orange-dark);
+}
+
+.layer-actions{
+  display:flex;
+  gap:7px;
+  margin-top:11px;
+}
+
+.layer-actions button{
+  flex:1;
+
+  border:0;
+
+  background:var(--surface);
+
+  border-radius:11px;
+
+  padding:8px;
+
+  font-size:10px;
+
+  color:var(--ink-soft);
+
+  box-shadow:var(--shadow-soft);
+
+  transition:.18s;
+}
+
+.layer-actions button:hover{
+  color:var(--orange-dark);
+}
+
+.layer-actions button:active{
+  box-shadow:var(--shadow-in);
+}
+
+.layer-map-controls{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:9px;
+}
+
+.layer-map-controls button{
+  border:0;
+
+  background:var(--surface);
+
+  border-radius:10px;
+
+  padding:7px;
+
+  font-size:9px;
+
+  color:var(--muted);
+
+  box-shadow:var(--shadow-soft);
+}
+
+.layer-filter{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:9px;
+}
+
+.layer-filter select{
+  width:100%;
+  height:32px;
+
+  border:0;
+
+  border-radius:10px;
+
+  background:var(--surface);
+
+  padding:0 7px;
+
+  font-size:9px;
+  color:var(--ink-soft);
+
+  outline:none;
+
+  box-shadow:var(--shadow-in);
+}
+
+.layer-opacity{
+  width:100%;
+  height:18px;
+  margin:6px 0 0;
+
+  accent-color:var(--orange);
+}
+
+.layer-meta-note{
+  font-size:9px;
+  color:var(--muted);
+  margin-top:7px;
+}
+
+/* =========================
+   FILTERS
+========================= */
+
+.filter-box{
+  display:grid;
+  gap:10px;
+}
+
+.field label{
+  display:block;
+
+  color:var(--muted);
+
+  font-size:9px;
+
+  margin:0 0 6px 3px;
+}
+
+.field input,
+.field select{
+  width:100%;
+  height:40px;
+
+  border:0;
+
+  background:var(--surface);
+
+  border-radius:12px;
+
+  padding:0 11px;
+
+  outline:none;
+
+  color:var(--ink);
+
+  box-shadow:var(--shadow-in);
+
+  transition:.18s;
+}
+
+.field input:focus,
+.field select:focus{
+  box-shadow:
+    inset 4px 4px 9px rgba(163,170,181,.25),
+    inset -4px -4px 9px rgba(255,255,255,.88),
+    0 0 0 2px rgba(244,123,32,.16);
+}
+
+.checkrow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  font-size:10px;
+  color:var(--ink-soft);
+}
+
+.checkrow input{
+  accent-color:var(--orange);
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:20px;
+
+  margin-bottom:18px;
+}
+
+.hero h2{
+  font-size:23px;
+  margin:0 0 6px;
+
+  font-weight:900;
+
+  letter-spacing:-.5px;
+}
+
+.hero p{
+  margin:0;
+
+  color:var(--muted);
+
+  font-size:11px;
+}
+
+.refresh-info{
+  font-size:10px;
+  color:var(--muted);
+  text-align:left;
+}
+
+/* =========================
+   KPI
+========================= */
+
+.kpis{
+  display:grid;
+
+  grid-template-columns:
+    repeat(6,minmax(0,1fr));
+
+  gap:13px;
+
+  margin-bottom:17px;
+}
+
+.kpi{
+  position:relative;
+
+  background:var(--surface);
+
+  border:0;
+
+  border-radius:19px;
+
+  padding:14px;
+
+  box-shadow:var(--shadow-soft);
+
+  min-width:0;
+
+  overflow:hidden;
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease;
+}
+
+.kpi::before{
+  content:"";
+
+  position:absolute;
+
+  right:0;
+  top:0;
+
+  width:55px;
+  height:55px;
+
+  border-radius:0 0 0 55px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(244,123,32,.15),
+      transparent
+    );
+}
+
+.kpi:hover{
+  transform:translateY(-3px);
+
+  box-shadow:
+    11px 11px 24px rgba(163,170,181,.35),
+    -9px -9px 22px rgba(255,255,255,.92);
+}
+
+.kpi .kpi-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  color:var(--muted);
+  font-size:9px;
+}
+
+.kpi .kpi-icon{
+  width:31px;
+  height:31px;
+
+  border-radius:11px;
+
+  display:grid;
+  place-items:center;
+
+  background:var(--orange-soft);
+  color:var(--orange-dark);
+
+  box-shadow:
+    3px 3px 8px rgba(163,170,181,.18),
+    -3px -3px 8px rgba(255,255,255,.8);
+}
+
+.kpi strong{
+  display:block;
+
+  font-size:24px;
+
+  margin-top:8px;
+
+  letter-spacing:-.7px;
+}
+
+.kpi small{
+  display:block;
+
+  color:var(--muted);
+
+  font-size:8px;
+
+  margin-top:3px;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.grid{
+  display:grid;
+  gap:17px;
+}
+
+.map-grid{
+  grid-template-columns:
+    minmax(0,1.7fr)
+    minmax(320px,.75fr);
+}
+
+.map-card,
+.panel{
+  background:var(--surface);
+
+  border:0;
+
+  border-radius:var(--radius);
+
+  box-shadow:var(--shadow-out);
+
+  overflow:hidden;
+}
+
+.card-head{
+  height:58px;
+
+  padding:0 17px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  border-bottom:1px solid rgba(255,255,255,.65);
+}
+
+.card-title{
+  font-size:12px;
+
+  font-weight:900;
+
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+
+.card-title i{
+  color:var(--orange);
+}
+
+.card-tools{
+  display:flex;
+  gap:7px;
+  align-items:center;
+}
+
+.mini-btn{
+  height:32px;
+
+  border:0;
+
+  background:var(--surface);
+
+  border-radius:10px;
+
+  padding:0 10px;
+
+  font-size:9px;
+
+  color:var(--muted);
+
+  box-shadow:var(--shadow-soft);
+
+  transition:.18s;
+}
+
+.mini-btn:hover{
+  color:var(--orange-dark);
+}
+
+.mini-btn.active{
+  background:var(--orange-soft);
+
+  color:var(--orange-dark);
+
+  box-shadow:var(--shadow-in);
+}
+
+#map{
+  height:600px;
+  width:100%;
+
+  background:#e1e6ec;
+}
+
+/* =========================
+   MAP
+========================= */
+
+.map-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:11px;
+
+  padding:11px 17px;
+
+  border-top:1px solid rgba(255,255,255,.7);
+
+  font-size:9px;
+  color:var(--muted);
+}
+
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.legend-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+
+  box-shadow:
+    1px 1px 4px rgba(0,0,0,.18);
+}
+
+.map-note{
+  position:absolute;
+  z-index:500;
+
+  top:82px;
+  right:28px;
+
+  background:rgba(238,241,245,.88);
+
+  padding:8px 10px;
+
+  border:0;
+
+  border-radius:12px;
+
+  font-size:9px;
+
+  color:var(--ink-soft);
+
+  box-shadow:var(--shadow-soft);
+
+  backdrop-filter:blur(10px);
+}
+
+/* =========================
+   CHARTS
+========================= */
+
+.chart-grid{
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+
+  margin-top:17px;
+}
+
+.chart-wrap{
+  height:260px;
+  padding:12px 14px 14px;
+}
+
+.chart-wrap canvas{
+  width:100%!important;
+  height:100%!important;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.table-card{
+  margin-top:17px;
+}
+
+.table-controls{
+  display:flex;
+  gap:8px;
+
+  align-items:center;
+
+  flex-wrap:wrap;
+
+  padding:11px 17px;
+
+  border-bottom:1px solid rgba(255,255,255,.7);
+}
+
+.table-controls input{
+  height:35px;
+
+  border:0;
+
+  border-radius:11px;
+
+  padding:0 10px;
+
+  min-width:220px;
+
+  background:var(--surface);
+
+  box-shadow:var(--shadow-in);
+
+  outline:none;
+}
+
+.table-controls input:focus{
+  box-shadow:
+    var(--shadow-in),
+    0 0 0 2px rgba(244,123,32,.14);
+}
+
+.table-scroll{
+  overflow:auto;
+  max-height:470px;
+}
+
+table{
+  border-collapse:separate;
+  border-spacing:0;
+
+  width:100%;
+
+  font-size:9px;
+}
+
+th{
+  position:sticky;
+  top:0;
+  z-index:2;
+
+  background:#e8ebef;
+
+  color:var(--ink-soft);
+
+  font-weight:900;
+
+  text-align:right;
+
+  padding:11px;
+
+  border-bottom:0;
+
+  white-space:nowrap;
+
+  box-shadow:
+    0 4px 8px rgba(163,170,181,.12);
+}
+
+td{
+  padding:10px;
+
+  border-bottom:1px solid rgba(255,255,255,.7);
+
+  white-space:nowrap;
+
+  max-width:240px;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+tbody tr{
+  cursor:pointer;
+
+  transition:.15s;
+}
+
+tbody tr:hover{
+  background:var(--orange-soft);
+}
+
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:35px;
+}
+
+/* =========================
+   PILLS
+========================= */
+
+.pill{
+  display:inline-flex;
+  align-items:center;
+
+  border-radius:999px;
+
+  padding:4px 9px;
+
+  font-size:8px;
+  font-weight:900;
+
+  background:#e5e9ee;
+
+  color:var(--ink-soft);
+
+  box-shadow:
+    inset 1px 1px 3px rgba(163,170,181,.2);
+}
+
+.pill.ok{
+  background:#e2f6ec;
+  color:#168153;
+}
+
+.pill.warn{
+  background:#fff3dc;
+  color:#b66b05;
+}
+
+.pill.bad{
+  background:#fde8e8;
+  color:#b93838;
+}
+
+.pill.info{
+  background:var(--orange-soft);
+  color:var(--orange-dark);
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+
+  background:rgba(42,48,58,.48);
+
+  backdrop-filter:blur(8px);
+
+  z-index:3000;
+
+  display:none;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:18px;
+}
+
+.modal.open{
+  display:flex;
+}
+
+.modal-box{
+  width:min(1180px,100%);
+  height:min(88vh,900px);
+
+  background:var(--surface);
+
+  border-radius:26px;
+
+  box-shadow:
+    25px 25px 70px rgba(25,30,38,.28),
+    -15px -15px 45px rgba(255,255,255,.7);
+
+  overflow:hidden;
+
+  display:flex;
+  flex-direction:column;
+}
+
+.modal-head{
+  min-height:64px;
+
+  border-bottom:1px solid rgba(255,255,255,.7);
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  padding:0 17px;
+
+  gap:12px;
+}
+
+.modal-title{
+  font-size:15px;
+  font-weight:900;
+  min-width:0;
+}
+
+.modal-sub{
+  font-size:9px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+.modal-close{
+  border:0;
+
+  background:var(--surface);
+
+  color:var(--muted);
+
+  width:36px;
+  height:36px;
+
+  border-radius:12px;
+
+  box-shadow:var(--shadow-soft);
+
+  transition:.18s;
+}
+
+.modal-close:hover{
+  color:var(--orange-dark);
+}
+
+.modal-close:active{
+  box-shadow:var(--shadow-in);
+}
+
+.modal-body{
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    390px;
+
+  min-height:0;
+
+  flex:1;
+}
+
+.record-info{
+  overflow:auto;
+  padding:19px;
+}
+
+.info-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:9px;
+}
+
+.info-item{
+  border:0;
+
+  border-radius:13px;
+
+  padding:10px;
+
+  background:var(--surface);
+
+  box-shadow:var(--shadow-in);
+}
+
+.info-item .label{
+  font-size:8px;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+
+.info-item .value{
+  font-size:10px;
+  font-weight:700;
+  word-break:break-word;
+}
+
+.doc-actions{
+  display:flex;
+  gap:9px;
+  flex-wrap:wrap;
+
+  margin-bottom:14px;
+}
+
+.doc-btn{
+  border:0;
+
+  border-radius:11px;
+
+  background:var(--surface);
+
+  padding:9px 12px;
+
+  font-size:9px;
+
+  text-decoration:none;
+
+  color:var(--ink-soft);
+
+  display:inline-flex;
+
+  gap:7px;
+  align-items:center;
+
+  box-shadow:var(--shadow-soft);
+}
+
+.doc-btn:hover{
+  color:var(--orange-dark);
+}
+
+.doc-btn.primary{
+  background:
+    linear-gradient(
+      145deg,
+      var(--orange2),
+      var(--orange-dark)
+    );
+
+  border:0;
+
+  color:#fff;
+
+  box-shadow:var(--shadow-orange);
+}
+
+.iframe-box{
+  border-right:1px solid rgba(255,255,255,.7);
+
+  background:var(--surface-dark);
+
+  display:flex;
+  flex-direction:column;
+
+  min-width:0;
+}
+
+.iframe-head{
+  padding:11px 14px;
+
+  border-bottom:1px solid rgba(255,255,255,.7);
+
+  font-size:9px;
+  font-weight:900;
+
+  color:var(--ink-soft);
+}
+
+#recordFrame{
+  border:0;
+  flex:1;
+  width:100%;
+  background:#f4f5f7;
+}
+
+/* =========================
+   POPUP
+========================= */
+
+.popup-record{
+  min-width:250px;
+  max-width:310px;
+}
+
+.popup-record h3{
+  font-size:13px;
+  margin:0 0 6px;
+}
+
+.popup-record .pmeta{
+  font-size:9px;
+  color:#64748b;
+  margin-bottom:9px;
+}
+
+.popup-actions{
+  display:flex;
+  gap:6px;
+}
+
+.popup-actions a,
+.popup-actions button{
+  font-size:9px;
+
+  padding:7px 9px;
+
+  border-radius:9px;
+
+  border:0;
+
+  background:#eef1f5;
+
+  box-shadow:var(--shadow-soft);
+
+  text-decoration:none;
+
+  color:#334155;
+}
+
+.popup-actions .main{
+  background:
+    linear-gradient(
+      145deg,
+      var(--orange2),
+      var(--orange-dark)
+    );
+
+  color:#fff;
+
+  border:0;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.loading{
+  position:fixed;
+  inset:0;
+
+  z-index:5000;
+
+  background:
+    rgba(238,241,245,.94);
+
+  backdrop-filter:blur(10px);
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+}
+
+.loading.hidden{
+  display:none;
+}
+
+.loader-card{
+  text-align:center;
+
+  padding:28px;
+
+  border-radius:24px;
+
+  background:var(--surface);
+
+  box-shadow:var(--shadow-out);
+}
+
+.spinner{
+  width:48px;
+  height:48px;
+
+  border:4px solid #e4e7ec;
+
+  border-top-color:var(--orange);
+
+  border-right-color:var(--orange2);
+
+  border-radius:50%;
+
+  animation:spin .8s linear infinite;
+
+  margin:0 auto 14px;
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+.loader-card strong{
+  display:block;
+  font-size:14px;
+}
+
+.loader-card span{
+  display:block;
+
+  color:var(--muted);
+
+  font-size:9px;
+
+  margin-top:5px;
+}
+
+.toast{
+  position:fixed;
+
+  left:20px;
+  bottom:20px;
+
+  z-index:6000;
+
+  background:var(--surface);
+
+  color:var(--ink);
+
+  border-radius:14px;
+
+  padding:11px 15px;
+
+  font-size:10px;
+
+  box-shadow:var(--shadow-out);
+
+  display:none;
+
+  border-right:4px solid var(--orange);
+}
+
+.toast.show{
+  display:block;
+}
+
+/* =========================
+   LEAFLET
+========================= */
+
+.leaflet-popup-content-wrapper{
+  border-radius:16px;
+
+  background:var(--surface);
+
+  box-shadow:
+    10px 10px 25px rgba(163,170,181,.35),
+    -8px -8px 20px rgba(255,255,255,.9);
+}
+
+.leaflet-popup-tip{
+  background:var(--surface);
+}
+
+.leaflet-popup-content{
+  margin:13px;
+}
+
+.cluster-count{
+  background:
+    linear-gradient(
+      145deg,
+      var(--orange2),
+      var(--orange-dark)
+    );
+
+  color:#fff;
+
+  border-radius:50%;
+
+  width:34px;
+  height:34px;
+
+  display:grid;
+  place-items:center;
+
+  border:3px solid rgba(255,255,255,.9);
+
+  box-shadow:
+    5px 5px 12px rgba(163,170,181,.35),
+    -4px -4px 10px rgba(255,255,255,.85);
+
+  font-weight:900;
+  font-size:10px;
+}
+
+.boundary-shape{
+  stroke-width:2.2;
+  fill-opacity:.13;
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar{
+  width:8px;
+  height:8px;
+}
+
+::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#cbd0d8;
+  border-radius:20px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background:#b8bec8;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:1250px){
+
+  .kpis{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .map-grid{
+    grid-template-columns:1fr;
+  }
+
+  .sidebar{
+    position:fixed;
+
+    right:-330px;
+
+    z-index:2000;
+
+    width:310px;
+
+    transition:.25s;
+
+    box-shadow:
+      -15px 0 35px rgba(0,0,0,.14);
+  }
+
+  .sidebar.open{
+    right:0;
+  }
+
+  .shell{
+    display:block;
+  }
+
+  .main{
+    padding:16px;
+  }
+
+  .chart-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:800px){
+
+  .topbar{
+    height:64px;
+    padding:0 12px;
+  }
+
+  .shell{
+    min-height:calc(100vh - 64px);
+  }
+
+  .main{
+    padding:12px;
+  }
+
+  .hero{
+    display:block;
+  }
+
+  .refresh-info{
+    margin-top:9px;
+    text-align:right;
+  }
+
+  .kpis{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  #map{
+    height:55vh;
+    min-height:430px;
+  }
+
+  .chart-grid{
+    grid-template-columns:1fr;
+  }
+
+  .modal{
+    padding:0;
+  }
+
+  .modal-box{
+    height:100vh;
+    border-radius:0;
+  }
+
+  .modal-body{
+    grid-template-columns:1fr;
+  }
+
+  .iframe-box{
+    display:none;
+  }
+
+  .info-grid{
+    grid-template-columns:1fr;
+  }
+
+  .brand h1{
+    font-size:13px;
+  }
+
+  .brand small{
+    display:none;
+  }
+
+  .top-actions .status{
+    display:none;
+  }
+}
+
+@media(max-width:430px){
+
+  .kpi strong{
+    font-size:20px;
+  }
+
+  .kpi{
+    padding:11px;
+  }
+
+  .card-head{
+    padding:0 12px;
+  }
+
+  .table-controls input{
+    min-width:160px;
+    width:100%;
+  }
+}
+</style>
+
+
+</head>
+
+<body>
+<div id="loading" class="loading">
+  <div class="loader-card">
+    <div class="spinner"></div>
+    <strong>در حال بارگذاری داشبورد</strong>
+    <span>دریافت آخرین اطلاعات از سرور</span>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark"><i class="bi bi-diagram-3-fill"></i></div>
+    <div>
+      <h1>داشبورد یکپارچه منطقه</h1>
+      <small>مناطق و جامعه · مداخلات اجتماعی · عملیات و توسعه</small>
+    </div>
+  </div>
+  <div class="top-actions">
+    <div class="status"><span id="statusDot" class="dot"></span><span id="statusText">در حال اتصال…</span></div>
+    <button class="icon-btn" id="refreshBtn" title="به‌روزرسانی"><i class="bi bi-arrow-clockwise"></i><span>به‌روزرسانی</span></button>
+    <button class="icon-btn" id="sideBtn"><i class="bi bi-sliders2"></i><span>فیلترها</span></button>
+  </div>
+</header>
+
+<div class="shell">
+  <aside id="sidebar" class="sidebar">
+    <div class="section-title">لایه‌ها <span id="visibleCount"></span></div>
+    <div class="layer-list">
+      <div class="layer-card">
+        <div class="layer-head"><div class="layer-name"><span class="layer-badge" style="background:#2563eb"></span>لایه ۱ · مناطق و جامعه</div><span id="countL1" class="count">—</span></div>
+        <div class="layer-actions"><button data-layer="l1" class="layer-toggle">مخفی</button><button data-only="l1" class="layer-only">فقط این لایه</button></div><div class="layer-map-controls"><button data-fit-layer="l1">نمایش روی نقشه</button><button data-filter-layer="l1">فیلتر لایه</button></div><div class="layer-filter" id="layerFilter-l1" hidden><select data-lf="province" data-layer="l1"><option value="">همه استان‌ها</option></select><select data-lf="county" data-layer="l1"><option value="">همه شهرستان‌ها</option></select><select data-lf="status" data-layer="l1"><option value="">همه وضعیت‌ها</option></select><select data-lf="risk" data-layer="l1"><option value="">همه ریسک‌ها</option></select></div><input class="layer-opacity" data-opacity="l1" type="range" min="10" max="100" value="35" title="شفافیت محدوده"><div class="layer-meta-note" id="layerNote-l1">در حال بارگذاری…</div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-head"><div class="layer-name"><span class="layer-badge" style="background:#059669"></span>لایه ۲ · مداخلات اجتماعی</div><span id="countL2" class="count">—</span></div>
+        <div class="layer-actions"><button data-layer="l2" class="layer-toggle">مخفی</button><button data-only="l2" class="layer-only">فقط این لایه</button></div><div class="layer-map-controls"><button data-fit-layer="l2">نمایش روی نقشه</button><button data-filter-layer="l2">فیلتر لایه</button></div><div class="layer-filter" id="layerFilter-l2" hidden><select data-lf="province" data-layer="l2"><option value="">همه استان‌ها</option></select><select data-lf="county" data-layer="l2"><option value="">همه شهرستان‌ها</option></select><select data-lf="status" data-layer="l2"><option value="">همه وضعیت‌ها</option></select><select data-lf="risk" data-layer="l2"><option value="">همه ریسک‌ها</option></select></div><input class="layer-opacity" data-opacity="l2" type="range" min="10" max="100" value="35" title="شفافیت محدوده"><div class="layer-meta-note" id="layerNote-l2">در حال بارگذاری…</div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-head"><div class="layer-name"><span class="layer-badge" style="background:#7c3aed"></span>لایه ۳ · عملیات و توسعه</div><span id="countL3" class="count">—</span></div>
+        <div class="layer-actions"><button data-layer="l3" class="layer-toggle">مخفی</button><button data-only="l3" class="layer-only">فقط این لایه</button></div><div class="layer-map-controls"><button data-fit-layer="l3">نمایش روی نقشه</button><button data-filter-layer="l3">فیلتر لایه</button></div><div class="layer-filter" id="layerFilter-l3" hidden><select data-lf="province" data-layer="l3"><option value="">همه استان‌ها</option></select><select data-lf="county" data-layer="l3"><option value="">همه شهرستان‌ها</option></select><select data-lf="status" data-layer="l3"><option value="">همه وضعیت‌ها</option></select><select data-lf="risk" data-layer="l3"><option value="">همه ریسک‌ها</option></select></div><input class="layer-opacity" data-opacity="l3" type="range" min="10" max="100" value="35" title="شفافیت محدوده"><div class="layer-meta-note" id="layerNote-l3">در حال بارگذاری…</div>
+      </div>
+    </div>
+
+    <div class="section-title">فیلترهای مشترک</div>
+    <div class="filter-box">
+      <div class="field"><label>جستجوی آزاد</label><input id="q" placeholder="عنوان، کد، استان، شهرستان…"></div>
+      <div class="field"><label>استان</label><select id="province"><option value="">همه استان‌ها</option></select></div>
+      <div class="field"><label>شهرستان</label><select id="county"><option value="">همه شهرستان‌ها</option></select></div>
+      <div class="field"><label>وضعیت</label><select id="statusFilter"><option value="">همه وضعیت‌ها</option></select></div>
+      <div class="field"><label>سطح ریسک</label><select id="risk"><option value="">همه سطوح ریسک</option></select></div>
+      <div class="field"><label>سطح اولویت</label><select id="priority"><option value="">همه سطوح اولویت</option></select></div>
+      <div class="field"><label>سال داده / پروژه / عملیات</label><select id="year"><option value="">همه سال‌ها</option></select></div>
+      <label class="checkrow"><input id="boundaries" type="checkbox" checked> نمایش محدوده‌های مرزی</label>
+      <label class="checkrow"><input id="pins" type="checkbox" checked> نمایش پین‌ها</label>
+    </div>
+    <div style="height:14px"></div>
+    <button id="resetFilters" class="ghost-btn" style="width:100%;justify-content:center"><i class="bi bi-arrow-counterclockwise"></i> پاک‌سازی فیلترها</button>
+  </aside>
+
+  <main class="main">
+    <section class="hero">
+      <div>
+        <h2>نمای مدیریتی وضعیت منطقه</h2>
+        <p>یک نمای عملیاتی برای مشاهده همزمان محدوده‌ها، مداخلات اجتماعی، عملیات، ریسک‌ها و عملکرد.</p>
+      </div>
+      <div class="refresh-info"><div>آخرین دریافت: <strong id="lastUpdate">—</strong></div><div>رکوردهای قابل مشاهده: <strong id="visibleRecords">—</strong></div></div>
+    </section>
+
+    <section class="kpis">
+      <div class="kpi"><div class="kpi-top"><span>کل رکوردها</span><span class="kpi-icon"><i class="bi bi-collection"></i></span></div><strong id="kTotal">—</strong><small>سه لایه</small></div>
+      <div class="kpi"><div class="kpi-top"><span>مناطق و جامعه</span><span class="kpi-icon"><i class="bi bi-geo-alt"></i></span></div><strong id="kRegions">—</strong><small>لایه ۱</small></div>
+      <div class="kpi"><div class="kpi-top"><span>مداخلات اجتماعی</span><span class="kpi-icon"><i class="bi bi-people"></i></span></div><strong id="kProjects">—</strong><small>لایه ۲</small></div>
+      <div class="kpi"><div class="kpi-top"><span>عملیات و توسعه</span><span class="kpi-icon"><i class="bi bi-buildings"></i></span></div><strong id="kOperations">—</strong><small>لایه ۳</small></div>
+      <div class="kpi"><div class="kpi-top"><span>در وضعیت هشدار</span><span class="kpi-icon"><i class="bi bi-exclamation-triangle"></i></span></div><strong id="kAlerts">—</strong><small>هشدار / اضطرار / ریسک</small></div>
+      <div class="kpi"><div class="kpi-top"><span>میانگین تکمیل</span><span class="kpi-icon"><i class="bi bi-speedometer2"></i></span></div><strong id="kCompletion">—</strong><small>بر اساس درصد تکمیل</small></div>
+    </section>
+
+    <section class="grid map-grid">
+      <div class="map-card">
+        <div class="card-head">
+          <div class="card-title"><i class="bi bi-map"></i> نقشه یکپارچه سه‌لایه</div>
+          <div class="card-tools">
+            <button class="mini-btn active" id="fitBtn"><i class="bi bi-arrows-fullscreen"></i> نمایش همه</button>
+            <button class="mini-btn" id="locBtn"><i class="bi bi-crosshair"></i></button>
+          </div>
+        </div>
+        <div style="position:relative"><div id="map"></div><div class="map-note" id="mapNote">در حال آماده‌سازی نقشه…</div></div>
+        <div class="map-legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#2563eb"></span> مناطق و جامعه</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#059669"></span> مداخلات اجتماعی</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#7c3aed"></span> عملیات و توسعه</span>
+          <span class="legend-item"><i class="bi bi-bounding-box"></i> محدوده هندسی</span>
+          <span class="legend-item"><i class="bi bi-geo-alt-fill"></i> موقعیت نقطه‌ای</span>
+        </div>
+      </div>
+
+      <div class="grid" style="align-content:start">
+        <div class="panel">
+          <div class="card-head"><div class="card-title"><i class="bi bi-pie-chart"></i> ترکیب رکوردهای سه لایه</div></div>
+          <div class="chart-wrap"><canvas id="layerChart"></canvas></div>
+        </div>
+        <div class="panel">
+          <div class="card-head"><div class="card-title"><i class="bi bi-bar-chart"></i> وضعیت رکوردها</div></div>
+          <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid chart-grid">
+      <div class="panel"><div class="card-head"><div class="card-title"><i class="bi bi-shield-exclamation"></i> توزیع ریسک</div></div><div class="chart-wrap"><canvas id="riskChart"></canvas></div></div>
+      <div class="panel"><div class="card-head"><div class="card-title"><i class="bi bi-bullseye"></i> توزیع اولویت</div></div><div class="chart-wrap"><canvas id="priorityChart"></canvas></div></div>
+      <div class="panel"><div class="card-head"><div class="card-title"><i class="bi bi-calendar3"></i> رکورد بر اساس سال</div></div><div class="chart-wrap"><canvas id="yearChart"></canvas></div></div>
+    </section>
+
+    <section class="panel table-card">
+      <div class="card-head">
+        <div class="card-title"><i class="bi bi-table"></i> فهرست تعاملی رکوردها</div>
+        <div class="card-tools"><span id="tableCount" class="pill info">—</span></div>
+      </div>
+      <div class="table-controls">
+        <input id="tableSearch" placeholder="جستجو در نتایج…">
+        <button id="exportCsv" class="mini-btn"><i class="bi bi-download"></i> CSV</button>
+        <button id="openSelected" class="mini-btn"><i class="bi bi-box-arrow-up-left"></i> شناسنامه</button>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>لایه</th><th>عنوان</th><th>کد</th><th>استان</th><th>شهرستان</th><th>وضعیت</th><th>ریسک</th><th>اولویت</th><th>تکمیل</th><th>عملیات</th></tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="recordModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div><div id="modalTitle" class="modal-title">—</div><div id="modalSub" class="modal-sub">—</div></div>
+      <button class="modal-close" id="modalClose"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="record-info">
+        <div id="modalActions" class="doc-actions"></div>
+        <div id="infoGrid" class="info-grid"></div>
+      </div>
+      <div class="iframe-box">
+        <div class="iframe-head">نمایش آیتم / شناسنامه در preview</div>
+        <iframe id="recordFrame" title="نمایش آیتم"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+<script>
+/* =========================================================
+   CONFIG
+   ========================================================= */
+const CONFIG = {
+  gasUrl: 'https://script.google.com/macros/s/AKfycbxoTRWofUvwo28efBl3izq52JDG6B9nnf2gkWY5-6x8SUUYLgQhnJ5qH97t35mwa_cgGQ/exec',
+  action: 'getDashboardData',
+  jsonp: true
+};
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const state = {
+  raw: {l1:[],l2:[],l3:[]},
+  filtered: {l1:[],l2:[],l3:[]},
+  visibleLayers: {l1:true,l2:true,l3:true},
+  layerFilters: {l1:{province:'',county:'',status:'',risk:''},l2:{province:'',county:'',status:'',risk:''},l3:{province:'',county:'',status:'',risk:''}},
+  layerOpacity: {l1:.35,l2:.35,l3:.35},
+  selected: null,
+  charts: {},
+  map: null,
+  markerLayers: {l1:null,l2:null,l3:null},
+  boundaryLayers: {l1:null,l2:null,l3:null},
+  layerMeta: {
+    l1:{name:'مناطق و جامعه',color:'#2563eb',sheet:'لایه ۱ - مناطق و جامعه'},
+    l2:{name:'مداخلات اجتماعی',color:'#059669',sheet:'لایه ۲ - مداخلات اجتماعی'},
+    l3:{name:'عملیات و توسعه',color:'#7c3aed',sheet:'لایه ۳ - عملیات و توسعه'}
+  }
+};
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const clean = v => String(v ?? '').trim();
+const num = v => {
+  if(v===null||v===undefined||v==='') return null;
+  const n=Number(String(v).replace(/,/g,'').replace(/[٪%]/g,''));
+  return Number.isFinite(n)?n:null;
+};
+const first = (r, keys) => {
+  for(const k of keys){ if(r && r[k]!==undefined && clean(r[k])!=='') return r[k]; }
+  return '';
+};
+const uniqueSorted = arr => [...new Set(arr.map(clean).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fa',{numeric:true}));
+const fmt = n => new Intl.NumberFormat('fa-IR').format(Number(n||0));
+const layerName = l => state.layerMeta[l]?.name || l;
+const layerColor = l => state.layerMeta[l]?.color || '#2563eb';
+
+function toast(msg){
+  $('toast').textContent=msg;
+  $('toast').classList.add('show');
+  clearTimeout(window.__toast);
+  window.__toast=setTimeout(()=>$('toast').classList.remove('show'),3000);
+}
+
+function valueFor(r, type){
+  if(type==='province') return first(r,['نام استان','استان','نام رسمی']);
+  if(type==='county') return first(r,['نام شهرستان','شهرستان']);
+  if(type==='status') return first(r,['وضعیت','وضعیت کلی','وضعیت عملیاتی','وضعیت پروژه']);
+  if(type==='risk') return first(r,['سطح ریسک','وضعیت ریسک','امتیاز ریسک']);
+  if(type==='priority') return first(r,['سطح اولویت','اولویت‌های توسعه','امتیاز اولویت']);
+  if(type==='year') return first(r,['سال داده','سال پروژه','سال']);
+  return '';
+}
+
+function searchableText(r){
+  return Object.values(r||{}).map(clean).join(' ').toLocaleLowerCase('fa-IR');
+}
+
+function recordTitle(r){
+  return first(r,['عنوان','عنوان کوتاه','نام منطقه','نام رسمی']) || 'بدون عنوان';
+}
+function recordCode(r){
+  return first(r,['کد رکورد','کد پروژه','کد عملیات','شناسه رکورد','شناسه پروژه','شناسه عملیات']) || '—';
+}
+function latLon(r){
+  const lat=num(first(r,['عرض جغرافیایی','lat','latitude']));
+  const lon=num(first(r,['طول جغرافیایی','lon','longitude']));
+  if(lat!==null && lon!==null && Math.abs(lat)<=90 && Math.abs(lon)<=180) return [lat,lon];
+  const p=first(r,['نقطه مرکزی','مختصات']);
+  if(p) {
+    const m=String(p).match(/(-?\d+(?:\.\d+)?)\s*[,; ]\s*(-?\d+(?:\.\d+)?)/);
+    if(m){
+      const a=Number(m[1]),b=Number(m[2]);
+      if(Math.abs(a)<=90&&Math.abs(b)<=180) return [a,b];
+      if(Math.abs(b)<=90&&Math.abs(a)<=180) return [b,a];
+    }
+  }
+  return null;
+}
+
+function tryParse(v){
+  if(v && typeof v==='object') return v;
+  if(typeof v!=='string') return null;
+  const s=v.trim();
+  if(!s) return null;
+  try{return JSON.parse(s)}catch(_){return null}
+}
+
+function parseWKT(wkt){
+  const s=String(wkt||'').trim();
+  if(!s) return null;
+  const type=(s.match(/^([A-Z]+)\s*/i)||[])[1]?.toUpperCase();
+  const body=s.replace(/^([A-Z]+)\s*/i,'').trim();
+  const pair=p=>{const a=p.trim().split(/\s+/).map(Number);return a.length>=2?[a[0],a[1]]:null};
+  if(type==='POINT'){
+    const m=body.match(/\(([^)]+)\)/); const p=m&&pair(m[1]);
+    return p?{type:'Point',coordinates:p}:null;
+  }
+  if(type==='LINESTRING'){
+    const m=body.match(/\(([^)]+)\)/); if(!m)return null;
+    return {type:'LineString',coordinates:m[1].split(',').map(pair).filter(Boolean)};
+  }
+  if(type==='POLYGON'){
+    const rings=[]; const re=/\(([^()]+)\)/g; let m;
+    while((m=re.exec(body))) rings.push(m[1].split(',').map(pair).filter(Boolean));
+    return rings.length?{type:'Polygon',coordinates:rings}:null;
+  }
+  if(type==='MULTILINESTRING'){
+    const lines=[]; const re=/\(([^()]+)\)/g; let m;
+    while((m=re.exec(body))) lines.push(m[1].split(',').map(pair).filter(Boolean));
+    return lines.length?{type:'MultiLineString',coordinates:lines}:null;
+  }
+  if(type==='MULTIPOLYGON'){
+    const polys=[]; let depth=0,start=-1;
+    for(let i=0;i<body.length;i++){
+      if(body[i]==='('){depth++; if(depth===2)start=i+1;}
+      if(body[i]===')'){if(depth===2){const txt=body.slice(start,i);const rings=[];const re=/\(([^()]+)\)/g;let m;while((m=re.exec(txt)))rings.push(m[1].split(',').map(pair).filter(Boolean));if(rings.length)polys.push(rings);}depth--;}
+    }
+    return polys.length?{type:'MultiPolygon',coordinates:polys}:null;
+  }
+  return null;
+}
+
+function geometryOf(r){
+  const raw=first(r,['هندسه مکانی','geometry','هندسه','GeoJSON','geojson','Geometry','مختصات هندسی']);
+  let parsed=tryParse(raw);
+  if(!parsed && raw) parsed=parseWKT(raw);
+  if(!parsed) return null;
+  if(parsed.type==='Feature') return parsed.geometry||null;
+  if(parsed.type==='FeatureCollection') return {type:'FeatureCollection',features:parsed.features||[]};
+  return parsed;
+}
+
+function geometryParts(g){
+  if(!g)return [];
+  if(g.type==='FeatureCollection') return (g.features||[]).map(f=>f&&f.geometry).filter(Boolean);
+  return [g];
+}
+
+function geometryPoint(g){
+  if(!g)return null;
+  if(g.type==='Point') return [g.coordinates[1],g.coordinates[0]];
+  const pts=[];
+  const walk=a=>{if(!Array.isArray(a))return;if(a.length>=2&&typeof a[0]==='number'&&typeof a[1]==='number'){pts.push([a[1],a[0]]);return}a.forEach(walk)};
+  walk(g.coordinates);
+  if(!pts.length)return null;
+  let lat=0,lon=0;pts.forEach(p=>{lat+=p[0];lon+=p[1]});
+  return [lat/pts.length,lon/pts.length];
+}
+
+function rowLatLon(r){
+  const explicit=latLon(r); if(explicit)return explicit;
+  const g=geometryOf(r);
+  const parts=geometryParts(g);
+  for(const part of parts){const p=geometryPoint(part);if(p)return p;}
+  return null;
+}
+
+function boundaryHasMeaning(r){
+  const g=geometryOf(r);
+  return geometryParts(g).some(x=>x&&['Polygon','MultiPolygon','LineString','MultiLineString'].includes(x.type));
+}
+
+function safeUrl(v){
+  const s=clean(v);
+  if(!s) return '';
+  try{
+    const u=new URL(s,location.href);
+    if(['http:','https:'].includes(u.protocol)) return u.href;
+  }catch(_){}
+  return '';
+}
+
+function layerFromRow(row, sheetName){
+  if(sheetName.includes('۱')||sheetName.includes('1')) return 'l1';
+  if(sheetName.includes('۲')||sheetName.includes('2')) return 'l2';
+  return 'l3';
+}
+
+/* =========================================================
+   DATA LOAD - JSONP for external hosting / GAS
+   ========================================================= */
+function loadData(){
+  return new Promise((resolve,reject)=>{
+    const cb='__dashboardCallback_'+Date.now()+'_'+Math.floor(Math.random()*9999);
+    let script=null;
+    const cleanup=()=>{
+      try{delete window[cb]}catch(_){window[cb]=undefined}
+      if(script&&script.parentNode) script.parentNode.removeChild(script);
+    };
+    const timer=setTimeout(()=>{cleanup();reject(new Error('زمان اتصال به GAS به پایان رسید.'))},30000);
+
+    window[cb]=data=>{
+      clearTimeout(timer); cleanup();
+      if(!data || data.success===false){reject(new Error(data?.error||'پاسخ نامعتبر از GAS'));return}
+      resolve(data);
+    };
+
+    script=document.createElement('script');
+    script.async=true;
+    script.onerror=()=>{
+      clearTimeout(timer);cleanup();
+      reject(new Error('اتصال JSONP به GAS برقرار نشد. پارامتر callback باید در doGet پشتیبانی شود.'));
+    };
+    script.src=CONFIG.gasUrl+'?action='+encodeURIComponent(CONFIG.action)+'&prefix='+encodeURIComponent(cb)+'&_='+Date.now();
+    document.body.appendChild(script);
+  });
+}
+
+function normalizePayload(payload){
+  const sheets=payload && payload.sheets ? payload.sheets : {};
+  const entries=Object.entries(sheets);
+  const findSheet=(meta,key)=>{
+    if(sheets[meta.sheet]) return sheets[meta.sheet];
+    const norm=x=>String(x||'').replace(/[\u200c\u200f\u202a-\u202e\s]/g,'').replace(/[يى]/g,'ی').replace(/[ك]/g,'ک');
+    const target=norm(meta.sheet);
+    let hit=entries.find(([name])=>norm(name)===target);
+    if(hit)return hit[1];
+    hit=entries.find(([name])=>layerFromRow([],name)===key);
+    return hit?hit[1]:null;
+  };
+  for(const [key,meta] of Object.entries(state.layerMeta)){
+    const obj=findSheet(meta,key)||{};
+    const rows=Array.isArray(obj.rows)?obj.rows:[];
+    state.raw[key]=rows.map((r,i)=>({...r,__layer:key,__index:i,__uid:key+'_'+i}));
+  }
+  state.filtered={l1:[...state.raw.l1],l2:[...state.raw.l2],l3:[...state.raw.l3]};
+  state.payloadMeta={generatedAt:payload.generatedAt||'',spreadsheetName:payload.spreadsheetName||''};
+}
+
+function applyLayerFilter(rows,l){
+  const f=state.layerFilters[l]||{};
+  return rows.filter(r=>{
+    if(f.province && valueFor(r,'province')!==f.province)return false;
+    if(f.county && valueFor(r,'county')!==f.county)return false;
+    if(f.status && valueFor(r,'status')!==f.status)return false;
+    if(f.risk && valueFor(r,'risk')!==f.risk)return false;
+    return true;
+  });
+}
+
+
+/* =========================================================
+   FILTERS
+   ========================================================= */
+function buildFilters(){
+  const all=[...state.raw.l1,...state.raw.l2,...state.raw.l3];
+  const fill=(id,values)=>{
+    const el=$(id), old=el.value;
+    const label=el.options[0]?.textContent||'همه';
+    el.innerHTML='<option value="">'+esc(label)+'</option>'+uniqueSorted(values).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
+    if([...el.options].some(o=>o.value===old)) el.value=old;
+  };
+  fill('province',all.map(r=>valueFor(r,'province')));
+  fill('county',all.map(r=>valueFor(r,'county')));
+  fill('statusFilter',all.map(r=>valueFor(r,'status')));
+  fill('risk',all.map(r=>valueFor(r,'risk')));
+  fill('priority',all.map(r=>valueFor(r,'priority')));
+  fill('year',all.map(r=>valueFor(r,'year')));
+  populateLayerFilters();
+}
+
+function applyFilters(){
+  const q=clean($('q').value).toLocaleLowerCase('fa-IR');
+  const province=$('province').value, county=$('county').value, status=$('statusFilter').value;
+  const risk=$('risk').value, priority=$('priority').value, year=$('year').value;
+  const matches=(r,l)=>{
+    if(q && !searchableText(r).includes(q)) return false;
+    if(province && valueFor(r,'province')!==province) return false;
+    if(county && valueFor(r,'county')!==county) return false;
+    if(status && valueFor(r,'status')!==status) return false;
+    if(risk && valueFor(r,'risk')!==risk) return false;
+    if(priority && valueFor(r,'priority')!==priority) return false;
+    if(year && valueFor(r,'year')!==year) return false;
+    const lf=state.layerFilters[l]||{};
+    if(lf.province && valueFor(r,'province')!==lf.province)return false;
+    if(lf.county && valueFor(r,'county')!==lf.county)return false;
+    if(lf.status && valueFor(r,'status')!==lf.status)return false;
+    if(lf.risk && valueFor(r,'risk')!==lf.risk)return false;
+    return true;
+  };
+  for(const l of ['l1','l2','l3']) state.filtered[l]=state.raw[l].filter(r=>matches(r,l));
+  renderAll();
+}
+
+function populateLayerFilters(){
+  for(const l of ['l1','l2','l3']){
+    const rows=state.raw[l];
+    document.querySelectorAll(`select[data-layer="${l}"][data-lf]`).forEach(el=>{
+      const type=el.dataset.lf; const old=state.layerFilters[l][type]||'';
+      const labels={province:'همه استان‌ها',county:'همه شهرستان‌ها',status:'همه وضعیت‌ها',risk:'همه ریسک‌ها'};
+      const vals=uniqueSorted(rows.map(r=>valueFor(r,type)));
+      el.innerHTML=`<option value="">${labels[type]}</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
+      el.value=vals.includes(old)?old:'';
+      state.layerFilters[l][type]=el.value;
+    });
+  }
+}
+
+
+/* =========================================================
+   MAP
+   ========================================================= */
+function initMap(){
+  state.map=L.map('map',{zoomControl:true,preferCanvas:true}).setView([32.4,53.7],5);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(state.map);
+  for(const l of ['l1','l2','l3']){
+    state.markerLayers[l]=L.layerGroup().addTo(state.map);
+    state.boundaryLayers[l]=L.layerGroup().addTo(state.map);
+  }
+  setTimeout(()=>state.map.invalidateSize(),200);
+}
+
+function makeMarkerIcon(color,kind='record'){
+  const html=kind==='polygon'
+    ? `<div style="width:25px;height:25px;border-radius:50%;background:#fff;border:4px solid ${color};box-shadow:0 2px 10px rgba(0,0,0,.25);display:grid;place-items:center"><span style="width:7px;height:7px;background:${color};border-radius:50%"></span></div>`
+    : `<div style="width:27px;height:27px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${color};border:3px solid #fff;box-shadow:0 3px 12px rgba(0,0,0,.25);position:relative"><span style="position:absolute;width:7px;height:7px;background:#fff;border-radius:50%;left:7px;top:7px"></span></div>`;
+  return L.divIcon({className:'',html,iconSize:[27,27],iconAnchor:kind==='polygon'?[13,13]:[13,26],popupAnchor:[0,-24]});
+}
+
+function popupHtml(r,l){
+  const doc=safeUrl(first(r,['لینک سند کامل','لینک سند اصلی','لینک منبع']));
+  const frame=safeUrl(first(r,['لینک نمایش در preview','لینک شناسنامه']));
+  const title=recordTitle(r);
+  return `<div class="popup-record"><h3>${esc(title)}</h3><div class="pmeta">${esc(layerName(l))} · ${esc(recordCode(r))}</div><div style="display:grid;gap:5px;font-size:9px;margin-bottom:9px"><div><b>استان:</b> ${esc(valueFor(r,'province')||'—')}</div><div><b>شهرستان:</b> ${esc(valueFor(r,'county')||'—')}</div><div><b>وضعیت:</b> ${esc(valueFor(r,'status')||'—')}</div><div><b>ریسک:</b> ${esc(valueFor(r,'risk')||'—')}</div></div><div class="popup-actions"><button class="main" onclick="openRecord('${l}',${r.__index})">شناسنامه</button>${frame?`<a href="${esc(frame)}" target="_blank" rel="noopener">iframe</a>`:''}${doc?`<a href="${esc(doc)}" target="_blank" rel="noopener">سند اصلی</a>`:''}</div></div>`;
+}
+
+function renderMap(){
+  let mapPins=0,mapGeoms=0;
+  for(const l of ['l1','l2','l3']){
+    state.markerLayers[l].clearLayers();state.boundaryLayers[l].clearLayers();
+    if(!state.visibleLayers[l]){updateLayerNote(l,0,0);continue;}
+    const rows=state.filtered[l]; const color=layerColor(l); const opacity=state.layerOpacity[l];
+    let pins=0,geoms=0;
+    rows.forEach(r=>{
+      const g=geometryOf(r);
+      const parts=geometryParts(g);
+      const boundaryParts=parts.filter(x=>x&&['Polygon','MultiPolygon','LineString','MultiLineString'].includes(x.type));
+      if($('boundaries').checked && boundaryParts.length){
+        boundaryParts.forEach(part=>{
+          const geo={type:'Feature',geometry:part,properties:{}};
+          const layer=L.geoJSON(geo,{style:{color,weight:2.2,opacity:.95,fillColor:color,fillOpacity:opacity,className:'boundary-shape'}});
+          layer.bindPopup(popupHtml(r,l),{maxWidth:340});layer.on('dblclick',()=>openRecord(l,r.__index));layer.addTo(state.boundaryLayers[l]);geoms++;
+        });
+      }
+      if($('pins').checked){
+        const ll=rowLatLon(r);
+        if(ll){
+          const marker=L.marker(ll,{icon:makeMarkerIcon(color),title:recordTitle(r)});
+          marker.bindPopup(popupHtml(r,l),{maxWidth:340});marker.on('dblclick',()=>openRecord(l,r.__index));marker.addTo(state.markerLayers[l]);pins++;
+        }
+      }
+    });
+    mapPins+=pins;mapGeoms+=geoms;updateLayerNote(l,rows.length,pins,geoms);
+  }
+  const total=Object.values(state.filtered).reduce((a,b)=>a+b.length,0);
+  $('mapNote').textContent=`${fmt(total)} رکورد · ${fmt(mapPins)} پین · ${fmt(mapGeoms)} هندسه · همپوشانی سه لایه فعال`;
+}
+
+function updateLayerNote(l,records,pins,geoms=0){
+  const el=$(`layerNote-${l}`);if(el)el.textContent=`${fmt(records)} رکورد · ${fmt(pins)} پین · ${fmt(geoms)} هندسه`;
+}
+
+function fitMap(){
+  const group=L.featureGroup();
+  for(const l of ['l1','l2','l3']){
+    if(!state.visibleLayers[l])continue;
+    state.markerLayers[l].eachLayer(x=>group.addLayer(x));state.boundaryLayers[l].eachLayer(x=>group.addLayer(x));
+  }
+  if(group.getLayers().length) state.map.fitBounds(group.getBounds().pad(.12),{maxZoom:14});
+}
+
+function fitLayer(l){
+  const group=L.featureGroup();state.markerLayers[l].eachLayer(x=>group.addLayer(x));state.boundaryLayers[l].eachLayer(x=>group.addLayer(x));
+  if(group.getLayers().length)state.map.fitBounds(group.getBounds().pad(.15),{maxZoom:15});
+  else toast('برای این لایه، هندسه یا مختصات قابل نمایش پیدا نشد.');
+}
+
+
+/* =========================================================
+   KPI + CHARTS
+   ========================================================= */
+function distribution(rows,key){
+  const m={};
+  rows.forEach(r=>{const v=key(r)||'نامشخص';m[v]=(m[v]||0)+1});
+  return Object.entries(m).sort((a,b)=>b[1]-a[1]);
+}
+function createChart(id,type,labels,data,opts={}){
+  if(state.charts[id]) state.charts[id].destroy();
+  state.charts[id]=new Chart($(id),{
+    type,
+    data:{labels,datasets:[{data,backgroundColor:['#2563eb','#059669','#7c3aed','#d97706','#dc2626','#0891b2','#64748b','#e11d48','#65a30d'],borderWidth:type==='line'?2:0,borderRadius:type==='bar'?6:0,tension:.35}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:type==='doughnut',position:'bottom',rtl:true}},scales:type==='bar'?{x:{grid:{display:false},ticks:{font:{size:9}}},y:{beginAtZero:true,ticks:{font:{size:9}}}}:undefined,...opts}
+  });
+}
+function renderCharts(){
+  const all=[...state.filtered.l1,...state.filtered.l2,...state.filtered.l3];
+  const ld=[state.filtered.l1.length,state.filtered.l2.length,state.filtered.l3.length];
+  createChart('layerChart','doughnut',['مناطق و جامعه','مداخلات اجتماعی','عملیات و توسعه'],ld);
+  const st=distribution(all,r=>valueFor(r,'status')).slice(0,8);
+  createChart('statusChart','bar',st.map(x=>x[0]),st.map(x=>x[1]));
+  const rk=distribution(all,r=>valueFor(r,'risk')).slice(0,8);
+  createChart('riskChart','bar',rk.map(x=>x[0]),rk.map(x=>x[1]));
+  const pr=distribution(all,r=>valueFor(r,'priority')).slice(0,8);
+  createChart('priorityChart','bar',pr.map(x=>x[0]),pr.map(x=>x[1]));
+  const yr=distribution(all,r=>valueFor(r,'year')).sort((a,b)=>String(a[0]).localeCompare(String(b[0]),'fa',{numeric:true})).slice(-12);
+  createChart('yearChart','line',yr.map(x=>x[0]),yr.map(x=>x[1]));
+}
+
+function renderKpis(){
+  const all=[...state.filtered.l1,...state.filtered.l2,...state.filtered.l3];
+  $('kTotal').textContent=fmt(all.length);
+  $('kRegions').textContent=fmt(state.filtered.l1.length);
+  $('kProjects').textContent=fmt(state.filtered.l2.length);
+  $('kOperations').textContent=fmt(state.filtered.l3.length);
+  const alerts=all.filter(r=>{
+    const a=first(r,['وضعیت هشدار','وضعیت اضطراری','وضعیت ریسک']);
+    const b=first(r,['سطح هشدار','سطح اضطرار']);
+    return clean(a)||clean(b);
+  }).length;
+  $('kAlerts').textContent=fmt(alerts);
+  const completions=all.map(r=>num(first(r,['درصد تکمیل']))).filter(v=>v!==null);
+  const avg=completions.length?completions.reduce((a,b)=>a+b,0)/completions.length:0;
+  $('kCompletion').textContent=fmt(Math.round(avg))+'٪';
+  $('countL1').textContent=fmt(state.filtered.l1.length);
+  $('countL2').textContent=fmt(state.filtered.l2.length);
+  $('countL3').textContent=fmt(state.filtered.l3.length);
+  $('visibleRecords').textContent=fmt(all.length);
+  $('tableCount').textContent=fmt(all.length)+' رکورد';
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+function pill(v){
+  const s=clean(v);
+  if(!s)return '<span class="pill">—</span>';
+  const low=s.toLocaleLowerCase('fa-IR');
+  let c='';
+  if(/فعال|مطلوب|تایید|خوب|جاری|بهره برداری|کم/.test(low)) c='ok';
+  else if(/هشدار|متوسط|در حال|نیمه/.test(low)) c='warn';
+  else if(/بحرانی|بالا|اضطرار|توقف|رد/.test(low)) c='bad';
+  else c='info';
+  return `<span class="pill ${c}">${esc(s)}</span>`;
+}
+function renderTable(){
+  const q=clean($('tableSearch').value).toLocaleLowerCase('fa-IR');
+  const rows=[];
+  for(const l of ['l1','l2','l3']){
+    if(!state.visibleLayers[l]) continue;
+    state.filtered[l].forEach(r=>rows.push({l,r}));
+  }
+  const shown=rows.filter(({r})=>!q||searchableText(r).includes(q)).slice(0,1000);
+  $('tableBody').innerHTML=shown.length?shown.map(({l,r})=>{
+    const pc=num(first(r,['درصد تکمیل']));
+    return `<tr onclick="openRecord('${l}',${r.__index})">
+      <td>${pill(layerName(l))}</td>
+      <td title="${esc(recordTitle(r))}"><b>${esc(recordTitle(r))}</b></td>
+      <td>${esc(recordCode(r))}</td>
+      <td>${esc(valueFor(r,'province')||'—')}</td>
+      <td>${esc(valueFor(r,'county')||'—')}</td>
+      <td>${pill(valueFor(r,'status'))}</td>
+      <td>${pill(valueFor(r,'risk'))}</td>
+      <td>${pill(valueFor(r,'priority'))}</td>
+      <td>${pc===null?'—':fmt(Math.round(pc))+'٪'}</td>
+      <td><button class="mini-btn" onclick="event.stopPropagation();openRecord('${l}',${r.__index})">مشاهده</button></td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="10" class="empty">رکوردی مطابق فیلترها پیدا نشد.</td></tr>`;
+}
+
+function renderAll(){
+  renderKpis(); renderCharts(); renderMap(); renderTable();
+}
+
+/* =========================================================
+   RECORD MODAL
+   ========================================================= */
+function openRecord(l,index){
+  const r=state.raw[l]?.find(x=>x.__index===index);
+  if(!r) return;
+  state.selected={l,index,r};
+  $('modalTitle').textContent=recordTitle(r);
+  $('modalSub').textContent=`${layerName(l)} · ${recordCode(r)}`;
+  const frame=safeUrl(first(r,['لینک نمایش در preview','لینک شناسنامه']));
+  const doc=safeUrl(first(r,['لینک سند کامل','لینک سند اصلی','لینک منبع']));
+  const source=safeUrl(first(r,['لینک منبع']));
+  $('modalActions').innerHTML=`
+    ${frame?`<a class="doc-btn primary" href="${esc(frame)}" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right"></i> بازکردن آیتم</a>`:''}
+    ${doc?`<a class="doc-btn" href="${esc(doc)}" target="_blank" rel="noopener"><i class="bi bi-file-earmark-text"></i> سند اصلی</a>`:''}
+    ${source?`<a class="doc-btn" href="${esc(source)}" target="_blank" rel="noopener"><i class="bi bi-link-45deg"></i> منبع</a>`:''}
+  `;
+  const preferred=['شناسه رکورد','کد رکورد','نوع رکورد','عنوان','وضعیت','سطح اولویت','سطح ریسک','وضعیت کلی','شرح','نام رسمی','نوع منطقه','نام استان','نام شهرستان','نام بخش','نام دهستان','نام روستا','نام آبادی','نام منطقه','شناسه پروژه','کد پروژه','عنوان کوتاه','نوع پروژه','دسته‌بندی','زیر‌دسته','شناسه عملیات','کد عملیات','نوع عملیات','واحد مسئول','مدیر','پیشرفت فیزیکی','پیشرفت برنامه‌ای','درصد عملکرد','وضعیت عملیاتی','وضعیت توسعه','وضعیت اضطراری','سطح اضطرار','وضعیت ریسک','امتیاز ریسک','شرح ریسک','درصد تکمیل','تاریخ ایجاد','تاریخ به‌روزرسانی'];
+  const keys=[...preferred,...Object.keys(r).filter(k=>!preferred.includes(k)&&!k.startsWith('__'))];
+  const used=new Set();
+  $('infoGrid').innerHTML=keys.filter(k=>!used.has(k)&&clean(r[k])!=='').map(k=>{used.add(k);return `<div class="info-item"><div class="label">${esc(k)}</div><div class="value">${esc(r[k])}</div></div>`}).join('');
+  $('recordFrame').src=frame||'about:blank';
+  $('recordModal').classList.add('open');
+}
+window.openRecord=openRecord;
+
+function closeModal(){
+  $('recordModal').classList.remove('open');
+  $('recordFrame').src='about:blank';
+}
+
+/* =========================================================
+   CSV
+   ========================================================= */
+function exportCsv(){
+  const rows=[];
+  for(const l of ['l1','l2','l3']) if(state.visibleLayers[l]) state.filtered[l].forEach(r=>rows.push({l,r}));
+  if(!rows.length){toast('رکوردی برای خروجی وجود ندارد.');return}
+  const keys=['__layer','عنوان','کد رکورد','نام استان','نام شهرستان','وضعیت','سطح ریسک','سطح اولویت','درصد تکمیل'];
+  const header=keys.map(k=>`"${String(k).replace(/"/g,'""')}"`).join(',');
+  const body=rows.map(({l,r})=>keys.map(k=>`"${String(k==='__layer'?layerName(l):r[k]??'').replace(/"/g,'""').replace(/\n/g,' ')}"`).join(',')).join('\n');
+  const blob=new Blob(['\ufeff'+header+'\n'+body],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='dashboard-records.csv';a.click();URL.revokeObjectURL(a.href);
+}
+
+/* =========================================================
+   UI EVENTS
+   ========================================================= */
+function setupEvents(){
+  ['q','province','county','statusFilter','risk','priority','year'].forEach(id=>{
+    $(id).addEventListener('input',applyFilters); $(id).addEventListener('change',applyFilters);
+  });
+  $('tableSearch').addEventListener('input',renderTable);
+  $('boundaries').addEventListener('change',renderMap);
+  $('pins').addEventListener('change',renderMap);
+  $('resetFilters').onclick=()=>{
+    ['q','province','county','statusFilter','risk','priority','year'].forEach(id=>$(id).value='');
+    $('boundaries').checked=true;$('pins').checked=true;
+    state.visibleLayers={l1:true,l2:true,l3:true};
+    state.layerFilters={l1:{province:'',county:'',status:'',risk:''},l2:{province:'',county:'',status:'',risk:''},l3:{province:'',county:'',status:'',risk:''}};
+    document.querySelectorAll('select[data-lf]').forEach(el=>el.value='');
+    document.querySelectorAll('.layer-toggle').forEach(b=>b.textContent='نمایش');
+    applyFilters();
+  };
+  document.querySelectorAll('.layer-toggle').forEach(btn=>btn.onclick=()=>{
+    const l=btn.dataset.layer;state.visibleLayers[l]=!state.visibleLayers[l];
+    btn.textContent=state.visibleLayers[l]?'مخفی':'نمایش';
+    renderAll();
+  });
+  document.querySelectorAll('.layer-only').forEach(btn=>btn.onclick=()=>{
+    const l=btn.dataset.only;state.visibleLayers={l1:false,l2:false,l3:false};state.visibleLayers[l]=true;
+    document.querySelectorAll('.layer-toggle').forEach(b=>b.textContent=state.visibleLayers[b.dataset.layer]?'نمایش':'مخفی');
+    renderAll();
+  });
+  document.querySelectorAll('select[data-lf]').forEach(el=>el.addEventListener('change',()=>{const l=el.dataset.layer;state.layerFilters[l][el.dataset.lf]=el.value;applyFilters();}));
+  document.querySelectorAll('[data-opacity]').forEach(el=>el.addEventListener('input',()=>{state.layerOpacity[el.dataset.opacity]=Number(el.value)/100;renderMap();}));
+  document.querySelectorAll('[data-fit-layer]').forEach(btn=>btn.onclick=()=>{const l=btn.dataset.fitLayer;state.visibleLayers[l]=true;document.querySelector(`.layer-toggle[data-layer="${l}"]`).textContent='مخفی';renderAll();fitLayer(l);});
+  document.querySelectorAll('[data-filter-layer]').forEach(btn=>btn.onclick=()=>{const box=$(`layerFilter-${btn.dataset.filterLayer}`);box.hidden=!box.hidden;});
+  $('refreshBtn').onclick=()=>startLoad(true);
+  $('fitBtn').onclick=fitMap;
+  $('sideBtn').onclick=()=>$('sidebar').classList.toggle('open');
+  $('locBtn').onclick=()=>{
+    if(!navigator.geolocation){toast('موقعیت مکانی در این مرورگر در دسترس نیست.');return}
+    navigator.geolocation.getCurrentPosition(p=>state.map.setView([p.coords.latitude,p.coords.longitude],13),()=>toast('دسترسی به موقعیت مکانی ممکن نیست.'));
+  };
+  $('modalClose').onclick=closeModal;
+  $('recordModal').addEventListener('click',e=>{if(e.target.id==='recordModal')closeModal()});
+  $('exportCsv').onclick=exportCsv;
+  $('openSelected').onclick=()=>{if(state.selected)openRecord(state.selected.l,state.selected.index);else toast('ابتدا یک رکورد را انتخاب کنید.')}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+}
+
+/* =========================================================
+   LOAD
+   ========================================================= */
+async function startLoad(isRefresh=false){
+  if(!CONFIG.gasUrl){
+    $('loading').classList.add('hidden');
+    $('statusDot').className='dot bad';$('statusText').textContent='آدرس GAS تنظیم نشده';
+    toast('آدرس وب‌اپ GAS در CONFIG تنظیم نشده است.');
+    return;
+  }
+  if(!isRefresh)$('loading').classList.remove('hidden');
+  try{
+    const payload=await loadData();
+    normalizePayload(payload);
+    buildFilters();
+    console.info('GAS rows:', {l1:state.raw.l1.length,l2:state.raw.l2.length,l3:state.raw.l3.length,generatedAt:payload.generatedAt});
+    if(!state.raw.l1.length&&!state.raw.l2.length&&!state.raw.l3.length) throw new Error('GAS متصل است اما هیچ رکوردی از سه شیت دریافت نشد.');
+    renderAll();
+    $('lastUpdate').textContent=new Date().toLocaleString('fa-IR');
+    $('statusDot').className='dot ok';$('statusText').textContent='متصل به دیتا بیس';
+    $('loading').classList.add('hidden');
+  }catch(err){
+    $('loading').classList.add('hidden');
+    $('statusDot').className='dot bad';$('statusText').textContent='خطا در اتصال';
+    toast(err.message);
+    console.error(err);
+  }
+}
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+document.addEventListener('DOMContentLoaded',()=>{
+  initMap();
+  setupEvents();
+  startLoad();
+});
+</script>
+</body>
+</html>
