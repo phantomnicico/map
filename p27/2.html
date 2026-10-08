@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>داشبورد مدیریت مجتمع مس</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{--bg:#1b2333;--sh-l:#263149;--sh-d:#0f1521;--ink:#e8eef8;--mute:#8f9db6;--cu:#ff8a4c;--ver:#35e0c2;--och:#ffc861;--red:#ff5d73;--cy:#5ec8ff;--r:22px;
+--up:9px 9px 20px var(--sh-d),-9px -9px 20px var(--sh-l);
+--in:inset 5px 5px 11px var(--sh-d),inset -5px -5px 11px var(--sh-l)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:Vazirmatn,Tahoma,sans-serif;line-height:1.7;
+background:radial-gradient(900px 520px at 88% -8%,rgba(94,200,255,.12),transparent 60%),radial-gradient(700px 520px at 0% 100%,rgba(255,138,76,.09),transparent 60%),var(--bg);background-attachment:fixed}
+header{position:relative;overflow:hidden;margin:24px 5vw 0;max-width:1400px;background:var(--bg);box-shadow:var(--up);border-radius:var(--r);padding:20px 28px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center}
+@media(min-width:1500px){header{margin-inline:auto}}
+header::after{content:"";position:absolute;inset-inline:28px;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--cy),var(--cu),transparent);opacity:.9}
+header h1{margin:0;font-size:1.5rem;font-weight:800;text-shadow:0 0 20px rgba(94,200,255,.4)}
+header p{margin:0;color:var(--mute);font-size:.85rem}
+.tag{box-shadow:var(--in);border-radius:30px;padding:6px 18px;font-size:.8rem;color:var(--cy)}
+main{padding:28px 5vw 56px;max-width:1400px;margin:auto}
+h2{font-size:1rem;margin:0 0 14px;font-weight:600;color:var(--ink)}
+.grid{display:grid;gap:24px;margin-bottom:24px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.two{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.three{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.card{background:var(--bg);box-shadow:var(--up);border-radius:var(--r);padding:20px;min-width:0}
+.kpi{display:flex;align-items:center;gap:14px}
+.kpi svg{flex:none;filter:drop-shadow(0 0 6px rgba(94,200,255,.25))}
+.kpi b{display:block;font-size:1.5rem;font-weight:800;line-height:1.2;text-shadow:0 0 14px rgba(94,200,255,.35)}
+.kpi span{color:var(--mute);font-size:.82rem}
+.kpi small{font-size:.78rem;font-weight:600}
+.up{color:var(--ver)}.dn{color:var(--red)}
+.chart{position:relative;height:260px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{text-align:right;padding:11px 8px;border-bottom:1px solid rgba(255,255,255,.06)}
+th{color:var(--mute);font-weight:600;font-size:.8rem}
+.scroll{overflow-x:auto}
+.badge{display:inline-block;padding:2px 14px;border-radius:14px;font-size:.78rem;font-weight:600;background:var(--bg);box-shadow:inset 3px 3px 7px var(--sh-d),inset -3px -3px 7px var(--sh-l)}
+.b-ok{color:var(--ver);text-shadow:0 0 10px rgba(53,224,194,.6)}
+.b-warn{color:var(--och);text-shadow:0 0 10px rgba(255,200,97,.6)}
+.b-bad{color:var(--red);text-shadow:0 0 10px rgba(255,93,115,.6)}
+.bar{height:10px;border-radius:6px;min-width:90px;background:var(--bg);box-shadow:inset 2px 2px 5px var(--sh-d),inset -2px -2px 5px var(--sh-l)}
+.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--cu),var(--och));box-shadow:0 0 10px rgba(255,138,76,.55)}
+.mapwrap{padding:8px;border-radius:26px;box-shadow:var(--in)}
+#map{height:380px;border-radius:19px;background:#18202f;overflow:hidden}
+.leaflet-tile-pane{filter:invert(1) hue-rotate(190deg) brightness(.85) saturate(.7) contrast(.95)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--bg);color:var(--ink);box-shadow:var(--up)}
+.leaflet-container .leaflet-control-attribution{background:rgba(27,35,51,.85);color:var(--mute)}
+.leaflet-control-attribution a{color:var(--cy)}
+.leaflet-bar a{background:var(--bg);color:var(--ink);border-color:var(--sh-d)}
+.mapfail{padding:20px;color:var(--mute)}
+.alerts{list-style:none;margin:0;padding:0}
+.alerts li{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.88rem}
+.dot{flex:none;width:10px;height:10px;border-radius:50%;margin-top:9px}
+.note{color:var(--mute);font-size:.8rem;margin-top:28px}
+.flow{display:flex;gap:14px;align-items:stretch;flex-wrap:wrap}
+.step{flex:1;min-width:120px;border-radius:18px;padding:12px;text-align:center;box-shadow:var(--in)}
+.step b{display:block;font-size:1.15rem;color:var(--cy);text-shadow:0 0 12px rgba(94,200,255,.5)}
+.step span{font-size:.78rem;color:var(--mute)}
+:focus-visible{outline:2px solid var(--cy);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>داشبورد مدیریت مجتمع مس</h1>
+    <p>نمای کلی تولید، فرآوری، تجهیزات و پروژه‌ها</p>
+  </div>
+  <div class="tag" id="stamp"></div>
+</header>
+<main>
+
+<section class="grid kpis" id="kpis"></section>
+
+<section class="card" style="margin-bottom:16px">
+  <h2>جریان تولید امروز (تن)</h2>
+  <div class="flow" id="flow"></div>
+</section>
+
+<section class="grid two">
+  <div class="card"><h2>تولید ماهانه: واقعی در برابر برنامه (تن کنسانتره)</h2><div class="chart"><canvas id="cProd"></canvas></div></div>
+  <div class="card"><h2>روند عیار خوراک و بازیابی (درصد)</h2><div class="chart"><canvas id="cGrade"></canvas></div></div>
+</section>
+
+<section class="grid three">
+  <div class="card"><h2>سهم هزینه‌ها</h2><div class="chart"><canvas id="cCost"></canvas></div></div>
+  <div class="card"><h2>دسترس‌پذیری تجهیزات (درصد)</h2><div class="chart"><canvas id="cEquip"></canvas></div></div>
+  <div class="card"><h2>هشدارهای فعال</h2><ul class="alerts" id="alerts"></ul></div>
+</section>
+
+<section class="grid two">
+  <div class="card">
+    <h2>موقعیت پروژه‌ها و واحدها</h2>
+    <div class="mapwrap"><div id="map"></div></div>
+  </div>
+  <div class="card scroll">
+    <h2>فهرست پروژه‌ها</h2>
+    <table>
+      <thead><tr><th>پروژه</th><th>وضعیت</th><th>پیشرفت</th></tr></thead>
+      <tbody id="projects"></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card scroll">
+  <h2>وضعیت واحدهای عملیاتی</h2>
+  <table>
+    <thead><tr><th>واحد</th><th>مسئول شیفت</th><th>ظرفیت اسمی (تن/روز)</th><th>عملکرد امروز</th><th>درصد تحقق</th><th>وضعیت</th></tr></thead>
+    <tbody id="units"></tbody>
+  </table>
+</section>
+
+<p class="note">همه‌ی اعداد و مختصات این صفحه داده‌ی نمونه هستند. برای استفاده‌ی واقعی، آبجکت DATA در ابتدای اسکریپت را با داده‌های مجتمع (مثلاً خروجی GAS) جایگزین کنید. نقشه به اینترنت نیاز دارد.</p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* ===== داده‌ی نمونه: این بخش را با داده‌ی واقعی جایگزین کنید ===== */
+const DATA = {
+  months: ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور'],
+  plan:   [4200,4200,4400,4400,4600,4600],
+  actual: [3950,4310,4180,4520,4390,4710],
+  grade:  [0.62,0.60,0.58,0.61,0.57,0.59],
+  recov:  [84.1,85.3,83.7,86.0,85.2,86.4],
+  cost: {labels:['استخراج','فرآوری','انرژی','نگهداری','حمل','سایر'], v:[31,27,17,12,8,5]},
+  equip: {labels:['کامیون‌های معدن','سنگ‌شکن','آسیاها','فلوتاسیون','پمپ‌ها'], v:[88,92,86,90,94]},
+  kpis: [
+    {t:'سنگ استخراج‌شده',v:'18,400',u:'تن/روز',p:92,d:'+3.1%'},
+    {t:'خوراک فرآوری',v:'17,150',u:'تن/روز',p:96,d:'+1.4%'},
+    {t:'عیار خوراک',v:'0.59',u:'درصد مس',p:94,d:'-0.02'},
+    {t:'بازیابی',v:'86.4',u:'درصد',p:101,d:'+1.2%'},
+    {t:'تولید کنسانتره',v:'4,710',u:'تن/ماه',p:102,d:'+2.4%'},
+    {t:'ایمنی',v:'0',u:'حادثه‌ی توقف‌کار این ماه',p:100,d:'۴۲ روز'}
+  ],
+  flow: [['سنگ استخراج‌شده','18,400'],['خوراک سنگ‌شکن','17,900'],['خوراک آسیا','17,150'],['کنسانتره تولیدی','156'],['باطله','16,994']],
+  alerts: [
+    {c:'#ff5d73',t:'توقف آسیای شماره ۲ برای تعویض آستر (۶ ساعت)'},
+    {c:'#ffc861',t:'عیار خوراک شیفت شب پایین‌تر از حد مجاز'},
+    {c:'#ffc861',t:'تراز سد باطله به ۸۵٪ ظرفیت رسید'},
+    {c:'#35e0c2',t:'تعمیرات برنامه‌ریزی‌شده‌ی پمپ‌ها طبق برنامه'}
+  ],
+  units: [
+    ['معدن','کریمی',20000,18400],['سنگ‌شکن','احمدی',18000,17900],
+    ['آسیا و فلوتاسیون','رضایی',18000,17150],['فیلتراسیون',' موسوی',200,156],['انبار و ارسال','حسینی',250,210]
+  ],
+  projects: [
+    {n:'توسعه‌ی معدن روباز',s:'در حال اجرا',p:64,lat:30.02,lng:57.05,c:'ok'},
+    {n:'خط جدید فلوتاسیون',s:'تأخیر',p:38,lat:29.93,lng:56.84,c:'bad'},
+    {n:'سد باطله‌ی شماره ۲',s:'در حال اجرا',p:71,lat:30.14,lng:56.72,c:'ok'},
+    {n:'پست برق ۶۳ کیلوولت',s:'در حال بررسی',p:15,lat:30.20,lng:57.25,c:'warn'},
+    {n:'خط انتقال آب',s:'تکمیل شده',p:100,lat:29.84,lng:57.18,c:'ok'}
+  ]
+};
+/* ============================================================== */
+const fa = n => Number(n).toLocaleString('fa-IR');
+const COL = {cu:'#ff8a4c',ver:'#35e0c2',och:'#ffc861',red:'#ff5d73',ink:'#e8eef8',mute:'#8f9db6',cy:'#5ec8ff'};
+const bcls = c => 'b-' + c;
+document.getElementById('stamp').textContent = 'آخرین به‌روزرسانی: ' + new Date().toLocaleString('fa-IR');
+
+/* حلقه‌ی پیشرفت (SVG) */
+function ring(p){
+  const r=26, c=2*Math.PI*r, f=Math.min(p,100)/100*c;
+  const col = p>=100?COL.ver:p>=90?COL.cu:COL.red;
+  return `<svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="${r}" fill="none" stroke="#141b29" stroke-width="8"/><circle cx="34" cy="34" r="${r}" fill="none" stroke="${col}" stroke-width="8" stroke-linecap="round" style="filter:drop-shadow(0 0 4px ${col})" stroke-dasharray="${f} ${c}" transform="rotate(-90 34 34)"/><text x="34" y="38" text-anchor="middle" font-size="13" font-weight="700" fill="${COL.ink}">${fa(p)}٪</text></svg>`;
+}
+document.getElementById('kpis').innerHTML = DATA.kpis.map(k=>`
+  <div class="card kpi">${ring(k.p)}<div><span>${k.t}</span><b>${k.v.replace(/\d/g,d=>fa(d))}</b><span>${k.u}</span><br><small class="${k.d.startsWith('-')?'dn':'up'}">${k.d.replace(/\d/g,d=>fa(d))}</small></div></div>`).join('');
+
+document.getElementById('flow').innerHTML = DATA.flow.map(f=>`<div class="step"><b>${f[1].replace(/\d/g,d=>fa(d))}</b><span>${f[0]}</span></div>`).join('');
+
+document.getElementById('alerts').innerHTML = DATA.alerts.map(a=>`<li><span class="dot" style="background:${a.c};box-shadow:0 0 10px ${a.c}"></span>${a.t}</li>`).join('');
+
+document.getElementById('units').innerHTML = DATA.units.map(u=>{
+  const pc = Math.round(u[3]/u[2]*100), c = pc>=95?'ok':pc>=85?'warn':'bad', t = c==='ok'?'مطلوب':c==='warn'?'نیازمند توجه':'بحرانی';
+  return `<tr><td>${u[0]}</td><td>${u[1].trim()}</td><td>${fa(u[2])}</td><td>${fa(u[3])}</td><td><div class="bar"><i style="width:${Math.min(pc,100)}%"></i></div>${fa(pc)}٪</td><td><span class="badge ${bcls(c)}">${t}</span></td></tr>`;
+}).join('');
+
+document.getElementById('projects').innerHTML = DATA.projects.map(p=>`<tr><td>${p.n}</td><td><span class="badge ${bcls(p.c)}">${p.s}</span></td><td><div class="bar"><i style="width:${p.p}%"></i></div>${fa(p.p)}٪</td></tr>`).join('');
+
+/* نمودارها */
+Chart.defaults.font.family = 'Vazirmatn, Tahoma, sans-serif';
+Chart.defaults.color = COL.mute;
+const opt = (extra={}) => Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12}}}},extra);
+
+new Chart(cProd,{data:{labels:DATA.months,datasets:[
+  {type:'bar',label:'واقعی',data:DATA.actual,backgroundColor:COL.cu,borderRadius:4},
+  {type:'line',label:'برنامه',data:DATA.plan,borderColor:COL.ink,borderDash:[6,4],pointRadius:3,tension:.25}
+]},options:opt({scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.07)'}},x:{grid:{display:false}}}})});
+
+new Chart(cGrade,{type:'line',data:{labels:DATA.months,datasets:[
+  {label:'عیار خوراک',data:DATA.grade,borderColor:COL.och,backgroundColor:COL.och,yAxisID:'y',tension:.3},
+  {label:'بازیابی',data:DATA.recov,borderColor:COL.ver,backgroundColor:COL.ver,yAxisID:'y1',tension:.3}
+]},options:opt({scales:{y:{position:'right',min:.4,max:.8,grid:{color:'rgba(255,255,255,.07)'},title:{display:true,text:'عیار'}},y1:{position:'left',min:80,max:90,grid:{display:false},title:{display:true,text:'بازیابی'}}}})});
+
+new Chart(cCost,{type:'doughnut',data:{labels:DATA.cost.labels,datasets:[{data:DATA.cost.v,backgroundColor:[COL.cu,COL.ver,COL.och,'#7b8cff',COL.red,COL.cy],borderWidth:4,borderColor:'#1b2333'}]},options:opt({cutout:'58%'})});
+
+new Chart(cEquip,{type:'bar',data:{labels:DATA.equip.labels,datasets:[{label:'دسترس‌پذیری',data:DATA.equip.v,backgroundColor:DATA.equip.v.map(v=>v>=90?COL.ver:COL.och),borderRadius:4}]},options:opt({indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{min:70,max:100,grid:{color:'rgba(255,255,255,.07)'}},y:{grid:{display:false}}}})});
+
+/* نقشه (OpenStreetMap) */
+(function(){
+  const el = document.getElementById('map');
+  if(typeof L === 'undefined'){ el.innerHTML = '<div class="mapfail">بارگذاری نقشه ممکن نشد. اتصال اینترنت را بررسی کنید.</div>'; return; }
+  const map = L.map('map',{scrollWheelZoom:false}).setView([30.05,57.0],10);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap contributors'}).addTo(map);
+  const colors = {ok:COL.ver,warn:COL.och,bad:COL.red};
+  const pts = DATA.projects.map(p=>{
+    L.circleMarker([p.lat,p.lng],{radius:10,color:'#1b2333',weight:3,fillColor:colors[p.c],fillOpacity:.95})
+      .addTo(map).bindPopup(`<div dir="rtl" style="font-family:Vazirmatn,Tahoma"><b>${p.n}</b><br>${p.s} - پیشرفت ${fa(p.p)}٪</div>`);
+    return [p.lat,p.lng];
+  });
+  map.fitBounds(pts,{padding:[30,30]});
+})();
+</script>
+</body>
+</html>

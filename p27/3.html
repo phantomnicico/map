@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مدل بلوکی عیار سه‌بعدی</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1b2333;--sh-l:#263149;--sh-d:#0f1521;--ink:#e8eef8;--mute:#8f9db6;--cu:#ff8a4c;--ver:#35e0c2;--och:#ffc861;--red:#ff5d73;--cy:#5ec8ff;--r:22px;
+--up:9px 9px 20px var(--sh-d),-9px -9px 20px var(--sh-l);
+--in:inset 5px 5px 11px var(--sh-d),inset -5px -5px 11px var(--sh-l)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:Vazirmatn,Tahoma,sans-serif;line-height:1.7;
+background:radial-gradient(900px 520px at 88% -8%,rgba(94,200,255,.12),transparent 60%),radial-gradient(700px 520px at 0% 100%,rgba(255,138,76,.09),transparent 60%),var(--bg);background-attachment:fixed}
+header{position:relative;overflow:hidden;margin:24px auto 0;width:90vw;max-width:1400px;background:var(--bg);box-shadow:var(--up);border-radius:var(--r);padding:20px 28px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center}
+header::after{content:"";position:absolute;inset-inline:28px;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--cy),var(--cu),transparent)}
+header h1{margin:0;font-size:1.5rem;font-weight:800;text-shadow:0 0 20px rgba(94,200,255,.4)}
+header p{margin:0;color:var(--mute);font-size:.85rem}
+.tag{box-shadow:var(--in);border-radius:30px;padding:6px 18px;font-size:.8rem;color:var(--cy)}
+main{width:90vw;max-width:1400px;margin:28px auto 56px;display:grid;gap:24px;grid-template-columns:minmax(0,1fr) 340px}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+.card{background:var(--bg);box-shadow:var(--up);border-radius:var(--r);padding:20px;min-width:0}
+h2{font-size:1rem;margin:0 0 14px;font-weight:600}
+.stage{padding:8px;border-radius:26px;box-shadow:var(--in)}
+#gl{height:560px;border-radius:19px;overflow:hidden;background:#141b29;position:relative;cursor:grab}
+#gl canvas{display:block}
+.hint{position:absolute;inset-inline:0;bottom:10px;text-align:center;color:var(--mute);font-size:.75rem;pointer-events:none}
+.msg{padding:24px;color:var(--mute)}
+label{display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:8px}
+label b{color:var(--cy)}
+.ctl{margin-bottom:22px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:12px;border-radius:8px;background:var(--bg);box-shadow:inset 3px 3px 6px var(--sh-d),inset -3px -3px 6px var(--sh-l);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--bg);box-shadow:4px 4px 9px var(--sh-d),-3px -3px 8px var(--sh-l),0 0 10px rgba(94,200,255,.6);border:2px solid var(--cy);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--bg);box-shadow:4px 4px 9px var(--sh-d),0 0 10px rgba(94,200,255,.6);border:2px solid var(--cy);cursor:pointer}
+button{font:inherit;color:var(--ink);background:var(--bg);border:0;border-radius:16px;padding:9px 18px;box-shadow:6px 6px 13px var(--sh-d),-6px -6px 13px var(--sh-l);cursor:pointer}
+button[aria-pressed=true]{box-shadow:var(--in);color:var(--cy);text-shadow:0 0 10px rgba(94,200,255,.6)}
+:focus-visible{outline:2px solid var(--cy);outline-offset:3px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0}
+.stat{border-radius:16px;padding:10px 12px;box-shadow:var(--in)}
+.stat span{display:block;font-size:.75rem;color:var(--mute)}
+.stat b{font-size:1.15rem;color:var(--cy);text-shadow:0 0 12px rgba(94,200,255,.45)}
+.legend{height:12px;border-radius:8px;background:linear-gradient(270deg,#3b4ba8,#35e0c2 35%,#ffc861 65%,#ff5d73);box-shadow:0 0 10px rgba(53,224,194,.25)}
+.lg{display:flex;justify-content:space-between;font-size:.75rem;color:var(--mute);margin-top:4px}
+.note{color:var(--mute);font-size:.78rem;margin-top:18px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>مدل بلوکی عیار و پیت سه‌بعدی</h1>
+    <p>نمونه‌ی WebGL با Three.js: بلوک‌های باقی‌مانده‌ی ذخیره زیر کف پیت</p>
+  </div>
+  <div class="tag">داده‌ی نمونه و مصنوعی</div>
+</header>
+
+<main>
+  <section class="card">
+    <h2>نمای سه‌بعدی</h2>
+    <div class="stage"><div id="gl"><div class="hint">چرخش: کشیدن | زوم: اسکرول | جابه‌جایی: کلیک راست و کشیدن</div></div></div>
+  </section>
+
+  <aside class="card">
+    <h2>فیلترها</h2>
+    <div class="ctl">
+      <label for="minG"><span>حداقل عیار مس</span><b id="vG"></b></label>
+      <input type="range" id="minG" min="0.1" max="1.1" step="0.05" value="0.3">
+    </div>
+    <div class="ctl">
+      <label for="lvl"><span>بالاترین پله‌ی نمایش (پله‌های بالاتر پنهان)</span><b id="vL"></b></label>
+      <input type="range" id="lvl" min="0" max="11" step="1" value="0">
+    </div>
+    <button id="rot" aria-pressed="true">چرخش خودکار</button>
+
+    <div class="stats">
+      <div class="stat"><span>تعداد بلوک نمایش‌داده‌شده</span><b id="sB">-</b></div>
+      <div class="stat"><span>تناژ سنگ (تن)</span><b id="sT">-</b></div>
+      <div class="stat"><span>میانگین عیار (درصد)</span><b id="sG">-</b></div>
+      <div class="stat"><span>مس محتوی (تن)</span><b id="sC">-</b></div>
+    </div>
+
+    <h2>راهنمای رنگ عیار</h2>
+    <div class="legend"></div>
+    <div class="lg"><span>۰٫۱</span><span>عیار مس (درصد)</span><span>۱٫۲</span></div>
+
+    <p class="note">هر بلوک ۲۵×۲۵×۱۲ متر با چگالی ۲٫۷ فرض شده است. شبکه‌ی خطی آبی، سطح پیت (پله‌های استخراج) را نشان می‌دهد و فقط بلوک‌های زیر آن نمایش داده می‌شوند. همه‌ی اعداد مصنوعی هستند.</p>
+  </aside>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const fa = n => Number(n).toLocaleString('fa-IR');
+const host = document.getElementById('gl');
+if (typeof THREE === 'undefined') {
+  host.innerHTML = '<div class="msg">بارگذاری Three.js ممکن نشد. اتصال اینترنت را بررسی کنید.</div>';
+} else {
+
+/* ===== داده‌ی مصنوعی: بعداً با خروجی واقعی مدل بلوکی (CSV/JSON) جایگزین شود ===== */
+const NX = 36, NZ = 36, NY = 12, BLOCK_T = 20250;  // تعداد بلوک‌ها و تن هر بلوک
+const BODIES = [ {x:3,z:-2,y:-8,s:4.5,a:1.1}, {x:-6,z:5,y:-6,s:3.8,a:.9}, {x:8,z:6,y:-9,s:3.5,a:.8} ];
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const pitY = (x, z) => { const r = Math.hypot(x, z); return r >= 14 ? 0 : -Math.ceil(7 * (1 - r / 14)); };
+
+const blocks = [];
+for (let i = 0; i < NX; i++) for (let k = 0; k < NZ; k++) for (let j = 0; j < NY; j++) {
+  const x = i - NX / 2 + .5, z = k - NZ / 2 + .5, y = -(j + .5);
+  if (j < -pitY(x, z)) continue;                 // بالای کف پیت = استخراج‌شده
+  let g = 0;
+  for (const b of BODIES) g += b.a * Math.exp(-((x-b.x)**2 + (z-b.z)**2 + (y-b.y)**2) / (2 * b.s * b.s));
+  g += (rnd() - .5) * .08;
+  if (g >= .1) blocks.push({x, y, z, j, g});
+}
+/* ============================================================================ */
+
+const stops = [[0,'#3b4ba8'],[.35,'#35e0c2'],[.65,'#ffc861'],[1,'#ff5d73']].map(s => [s[0], new THREE.Color(s[1])]);
+function ramp(g) {
+  const t = Math.min(Math.max((g - .1) / 1.1, 0), 1);
+  for (let i = 1; i < stops.length; i++) if (t <= stops[i][0]) {
+    const a = stops[i-1], b = stops[i];
+    return a[1].clone().lerp(b[1], (t - a[0]) / (b[0] - a[0]));
+  }
+  return stops[3][1].clone();
+}
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, .1, 300);
+camera.position.set(30, 22, 30);
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+host.prepend(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.target.set(0, -4, 0);
+controls.enableDamping = true;
+controls.autoRotate = true;
+controls.autoRotateSpeed = .8;
+
+scene.add(new THREE.AmbientLight(0x8fa0c8, .75));
+const sun = new THREE.DirectionalLight(0xffffff, .9); sun.position.set(12, 24, 10); scene.add(sun);
+const glow = new THREE.PointLight(0x5ec8ff, .7, 80); glow.position.set(-16, 8, -12); scene.add(glow);
+
+/* بلوک‌ها (یک InstancedMesh برای کل مدل) */
+const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(.9, .9, .9), new THREE.MeshStandardMaterial({roughness:.55, metalness:.15}), blocks.length);
+const zero = new THREE.Matrix4().makeScale(0, 0, 0), tmp = new THREE.Matrix4();
+blocks.forEach((b, i) => { b.m = new THREE.Matrix4().makeTranslation(b.x, b.y, b.z); mesh.setColorAt(i, ramp(b.g)); });
+scene.add(mesh);
+
+/* سطح پیت (شبکه‌ی خطی) و کف مدل */
+const shell = new THREE.PlaneGeometry(NX, NZ, NX * 2, NZ * 2); shell.rotateX(-Math.PI / 2);
+const pos = shell.attributes.position;
+for (let i = 0; i < pos.count; i++) pos.setY(i, pitY(pos.getX(i), pos.getZ(i)) + .02);
+scene.add(new THREE.Mesh(shell, new THREE.MeshBasicMaterial({color:0x5ec8ff, wireframe:true, transparent:true, opacity:.22})));
+const grid = new THREE.GridHelper(NX + 6, NX + 6, 0x2a3a55, 0x1d2a40); grid.position.y = -NY - .2; scene.add(grid);
+
+/* فیلتر و آمار */
+const minG = document.getElementById('minG'), lvl = document.getElementById('lvl');
+function update() {
+  const g0 = +minG.value, L = +lvl.value;
+  let n = 0, sum = 0;
+  blocks.forEach((b, i) => {
+    const on = b.g >= g0 && b.j >= L;
+    mesh.setMatrixAt(i, on ? b.m : zero);
+    if (on) { n++; sum += b.g; }
+  });
+  mesh.instanceMatrix.needsUpdate = true;
+  document.getElementById('vG').textContent = fa(g0.toFixed(2)) + '٪';
+  document.getElementById('vL').textContent = 'پله‌ی ' + fa(L + 1);
+  document.getElementById('sB').textContent = fa(n);
+  document.getElementById('sT').textContent = fa(n * BLOCK_T);
+  document.getElementById('sG').textContent = n ? fa((sum / n).toFixed(2)) : '-';
+  document.getElementById('sC').textContent = fa(Math.round(sum / 100 * BLOCK_T));
+}
+minG.oninput = lvl.oninput = update;
+update();
+
+const rot = document.getElementById('rot');
+rot.onclick = () => { controls.autoRotate = !controls.autoRotate; rot.setAttribute('aria-pressed', controls.autoRotate); };
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) { controls.autoRotate = false; rot.setAttribute('aria-pressed', false); }
+
+function resize() {
+  const w = host.clientWidth, h = host.clientHeight;
+  renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(host); resize();
+(function loop() { requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
+}
+</script>
+</body>
+</html>
