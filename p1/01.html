@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>اطلس هوشمند درآلو | مدیریت مسئولیت‌های اجتماعی</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font:'Vazirmatn',Tahoma,'Segoe UI',sans-serif;
+  --bg:#e3e8f0; --text:#26324a; --muted:#6c7a93;
+  --sd:rgba(163,177,198,.72); --sl:rgba(255,255,255,.95);
+  --acc:#06b6d4; --acc2:#7c3aed; --grad:linear-gradient(135deg,#06b6d4 0%,#7c3aed 100%);
+  --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444; --info:#3b82f6;
+  --radius:22px; --hdr:76px;
+  --c-region:#14b8a6; --c-project:#6366f1; --c-operation:#f97316;
+}
+[data-theme="dark"]{
+  --bg:#1b2030; --text:#e5eaf7; --muted:#8f9bb8;
+  --sd:rgba(5,7,14,.8); --sl:rgba(62,72,100,.40);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;-webkit-tap-highlight-color:transparent}
+button,input,select{font-family:inherit;color:inherit;font-size:inherit}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:var(--sd);border-radius:8px}
+::-webkit-scrollbar-track{background:transparent}
+a{color:inherit}
+
+.neu{background:var(--bg);box-shadow:8px 8px 18px var(--sd),-8px -8px 18px var(--sl);border-radius:var(--radius)}
+.neu-sm{background:var(--bg);box-shadow:4px 4px 9px var(--sd),-4px -4px 9px var(--sl);border-radius:14px}
+.neu-in{background:var(--bg);box-shadow:inset 4px 4px 9px var(--sd),inset -4px -4px 9px var(--sl);border-radius:14px}
+
+.btn{border:0;background:var(--bg);cursor:pointer;border-radius:14px;padding:9px 14px;box-shadow:4px 4px 9px var(--sd),-4px -4px 9px var(--sl);transition:box-shadow .15s,transform .15s;display:inline-flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap;line-height:1.4}
+.btn:hover{transform:translateY(-1px)}
+.btn:active,.btn.on{box-shadow:inset 3px 3px 7px var(--sd),inset -3px -3px 7px var(--sl);transform:none}
+.btn.primary{background:var(--grad);color:#fff;box-shadow:4px 4px 12px rgba(124,58,237,.35),-3px -3px 9px var(--sl)}
+.btn.icon{padding:0;width:40px;height:40px;justify-content:center;font-size:17px}
+.btn.sm{padding:6px 10px;font-size:12.5px;border-radius:11px}
+.btn[disabled],.btn.disabled{opacity:.45;pointer-events:none}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+#app{display:grid;grid-template-rows:var(--hdr) minmax(0,1fr);grid-template-columns:300px minmax(0,1fr) 440px;
+  grid-template-areas:"hdr hdr hdr" "layers map insights";height:100dvh;gap:14px;padding:14px}
+.topbar{grid-area:hdr;display:flex;align-items:center;gap:14px;padding:0 18px;z-index:30;position:relative}
+#panelLayers{grid-area:layers}
+.mapwrap{grid-area:map;position:relative;min-height:0}
+#panelInsights{grid-area:insights}
+.panel{padding:16px;overflow:auto;min-height:0}
+
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:46px;height:46px;border-radius:15px;background:var(--grad);display:grid;place-items:center;box-shadow:4px 4px 10px var(--sd),-4px -4px 10px var(--sl);flex:none}
+.logo svg{width:28px;height:28px}
+.brand h1{margin:0;font-size:18px;font-weight:800;line-height:1.2;white-space:nowrap}
+.brand p{margin:2px 0 0;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.glance{display:flex;gap:8px;margin-inline-start:6px}
+.gl{padding:6px 12px;border-radius:14px;display:flex;align-items:baseline;gap:6px;font-size:12px;color:var(--muted);white-space:nowrap}
+.gl b{font-size:17px;font-weight:800;color:var(--text)}
+.gl i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.spacer{flex:1}
+.search{position:relative;width:min(380px,32vw)}
+.search input{width:100%;border:0;background:var(--bg);border-radius:16px;padding:11px 42px 11px 14px;box-shadow:inset 4px 4px 9px var(--sd),inset -4px -4px 9px var(--sl);outline:none}
+.search .ic{position:absolute;right:14px;top:50%;transform:translateY(-50%);opacity:.6;pointer-events:none}
+.sresults{position:absolute;top:calc(100% + 10px);right:0;left:0;max-height:60vh;overflow:auto;padding:8px;display:none;z-index:50}
+.sresults.show{display:block}
+.sr{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:12px;cursor:pointer}
+.sr:hover,.sr.act{box-shadow:inset 3px 3px 7px var(--sd),inset -3px -3px 7px var(--sl)}
+.sr .dot{width:12px;height:12px;border-radius:50%;flex:none}
+.sr b{display:block;font-weight:600;font-size:13px}
+.sr small{color:var(--muted);font-size:11.5px}
+.sr-empty{padding:14px;text-align:center;color:var(--muted)}
+.hbtns{display:flex;gap:10px;align-items:center}
+.mob-only{display:none}
+.demo-badge{background:var(--warn);color:#fff;border-radius:10px;padding:3px 9px;font-size:11px;font-weight:700;display:none}
+.demo-badge.show{display:inline-block}
+
+.ptitle{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px;font-weight:800;font-size:15px}
+.sect{margin-bottom:18px}
+.sect>h4{margin:0 0 10px;font-size:12.5px;color:var(--muted);font-weight:700}
+
+.lcard{padding:12px 13px;margin-bottom:14px;border-radius:18px;position:relative}
+.lcard .lh{display:flex;align-items:center;gap:10px}
+.lcard .ldot{width:14px;height:14px;border-radius:50%;flex:none;box-shadow:0 0 10px var(--lc)}
+.lcard .ln{flex:1;min-width:0}
+.lcard .ln b{display:block;font-size:13.5px;line-height:1.35}
+.lcard .ln small{color:var(--muted);font-size:11.5px}
+.lcard .lctl{margin-top:11px;display:grid;gap:9px}
+.lrow{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px}
+.lrow .lbl{display:flex;align-items:center;gap:6px;color:var(--muted)}
+.sw{position:relative;width:44px;height:24px;flex:none;display:inline-block}
+.sw input{opacity:0;width:0;height:0;position:absolute}
+.sw span{position:absolute;inset:0;border-radius:24px;background:var(--bg);box-shadow:inset 3px 3px 6px var(--sd),inset -3px -3px 6px var(--sl);cursor:pointer;transition:.2s}
+.sw span::after{content:"";position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:var(--bg);box-shadow:2px 2px 5px var(--sd),-1px -1px 4px var(--sl);transition:.2s}
+.sw input:checked+span{background:var(--lc,var(--acc))}
+.sw input:checked+span::after{right:23px;background:#fff}
+.sw input:focus-visible+span{outline:2px solid var(--acc);outline-offset:2px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:8px;background:var(--bg);box-shadow:inset 2px 2px 5px var(--sd),inset -2px -2px 5px var(--sl);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--grad);box-shadow:2px 2px 6px var(--sd);cursor:pointer;border:2px solid var(--bg)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--acc);border:2px solid var(--bg);cursor:pointer}
+.lcard .lbtns{display:flex;gap:8px;margin-top:2px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:12px;font-size:12px;cursor:pointer;border:0;background:var(--bg);box-shadow:3px 3px 7px var(--sd),-3px -3px 7px var(--sl);user-select:none}
+.chip.off{opacity:.5;box-shadow:inset 2px 2px 5px var(--sd),inset -2px -2px 5px var(--sl)}
+.chip i{width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--cc,var(--muted))}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:10px;font-size:11.5px;font-weight:600;background:color-mix(in srgb,var(--cc,var(--muted)) 16%,transparent);color:var(--cc,var(--muted))}
+select.sel{width:100%;border:0;background:var(--bg);border-radius:14px;padding:10px 12px;box-shadow:inset 3px 3px 7px var(--sd),inset -3px -3px 7px var(--sl);outline:none}
+
+.mapwrap{border-radius:var(--radius);overflow:hidden;box-shadow:8px 8px 18px var(--sd),-8px -8px 18px var(--sl);background:var(--bg)}
+#map{position:absolute;inset:0}
+.mtools{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;gap:9px;z-index:6}
+.mtools .btn{box-shadow:3px 3px 8px var(--sd),-3px -3px 8px var(--sl)}
+.bmenu{position:absolute;top:12px;left:62px;padding:8px;display:none;flex-direction:column;gap:4px;z-index:7;min-width:150px}
+.bmenu.show{display:flex}
+.bmenu button{border:0;background:transparent;text-align:right;padding:8px 10px;border-radius:10px;cursor:pointer}
+.bmenu button.on{box-shadow:inset 3px 3px 6px var(--sd),inset -3px -3px 6px var(--sl);font-weight:700}
+.legend{position:absolute;bottom:12px;right:12px;padding:10px 12px;z-index:5;font-size:11.5px;display:grid;gap:5px;max-width:230px}
+.legend .lr{display:flex;align-items:center;gap:8px}
+.legend .lg-sep{height:1px;background:var(--sd);opacity:.5;margin:3px 0}
+.legend i{width:11px;height:11px;border-radius:50%;display:inline-block;flex:none}
+.legend i.sq{border-radius:3px}
+.mprog{position:absolute;top:12px;left:50%;transform:translateX(-50%);padding:7px 16px;border-radius:14px;z-index:6;font-size:12px;display:none;align-items:center;gap:8px}
+.mprog.show{display:flex}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--sd);border-top-color:var(--acc);animation:sp .8s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+.maplibregl-ctrl-group{background:var(--bg)!important;border-radius:14px!important;box-shadow:3px 3px 8px var(--sd),-3px -3px 8px var(--sl)!important;border:0!important}
+.maplibregl-ctrl-group button{border:0!important;background:transparent!important}
+[data-theme="dark"] .maplibregl-ctrl-icon{filter:invert(.9)}
+.maplibregl-ctrl-attrib{background:color-mix(in srgb,var(--bg) 80%,transparent)!important;font-size:10px!important}
+.maplibregl-ctrl-attrib a{color:var(--muted)!important}
+.maplibregl-ctrl-scale{background:color-mix(in srgb,var(--bg) 75%,transparent)!important;color:var(--text)!important;border-color:var(--muted)!important}
+
+.maplibregl-popup{max-width:none!important;z-index:9}
+.maplibregl-popup-content{background:var(--bg)!important;color:var(--text);border-radius:24px!important;padding:0!important;box-shadow:12px 12px 28px var(--sd),-8px -8px 22px var(--sl)!important;font-family:var(--font);width:min(330px,86vw)}
+.maplibregl-popup-tip{display:none!important}
+.maplibregl-popup-close-button{left:10px!important;right:auto!important;top:8px;width:28px;height:28px;font-size:18px;border-radius:50%;color:var(--text)!important;background:var(--bg)!important;box-shadow:2px 2px 6px var(--sd),-2px -2px 6px var(--sl);z-index:2;line-height:1}
+.tip .maplibregl-popup-content{width:auto;max-width:260px;border-radius:12px!important;padding:6px 11px!important;font-size:12px;box-shadow:4px 4px 10px var(--sd),-3px -3px 8px var(--sl)!important}
+.pp{direction:rtl;text-align:right;padding:16px 16px 14px}
+.pp-head{display:flex;gap:11px;align-items:flex-start;padding-left:30px}
+.pp-head .dot{width:14px;height:14px;border-radius:50%;margin-top:5px;flex:none;box-shadow:0 0 10px var(--lc);background:var(--lc)}
+.pp-layer{font-size:11.5px;color:var(--muted)}
+.pp h3{margin:2px 0 0;font-size:15.5px;line-height:1.5;font-weight:800}
+.pp-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 8px}
+.pp-desc{margin:0 0 10px;font-size:12.5px;line-height:1.85;color:var(--muted);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.pp-meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;margin-bottom:12px;color:var(--muted)}
+.pp-meta b{color:var(--text)}
+.pp-warn{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:12px;font-size:12px;margin-bottom:12px;cursor:pointer;background:color-mix(in srgb,var(--bad) 12%,transparent);color:var(--bad);font-weight:600}
+.pp-act{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.pp-act .full{grid-column:1/-1}
+.pp-act .btn{justify-content:center;font-size:12.5px;padding:9px 8px}
+.pp-nav{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px dashed color-mix(in srgb,var(--muted) 40%,transparent);font-size:12px;color:var(--muted)}
+
+.tabs{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding:4px 2px 10px}
+.tab{flex:1;white-space:nowrap;border:0;background:var(--bg);cursor:pointer;padding:9px 10px;border-radius:14px;box-shadow:4px 4px 9px var(--sd),-4px -4px 9px var(--sl);font-weight:600;font-size:12.5px}
+.tab.on{background:var(--grad);color:#fff;box-shadow:3px 3px 10px rgba(124,58,237,.3),-2px -2px 6px var(--sl)}
+.tabpane{display:none}.tabpane.on{display:block}
+
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.kpi{padding:12px 10px;text-align:center;border-radius:18px;cursor:default}
+.kpi b{display:block;font-size:23px;font-weight:800;line-height:1.2}
+.kpi small{color:var(--muted);font-size:11.5px}
+.kpi.wide{grid-column:span 3;display:flex;align-items:center;justify-content:space-around}
+.kpi .ks{width:100%;height:7px;border-radius:7px;margin-top:8px;display:flex;overflow:hidden;box-shadow:inset 1px 1px 3px var(--sd)}
+.card{padding:14px;margin-bottom:16px;border-radius:20px}
+.card h4{margin:0 0 10px;font-size:13.5px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+.cbox{position:relative;height:210px}
+.cbox.tall{height:240px}
+.qrow{display:flex;justify-content:space-between;align-items:center;padding:8px 6px;border-radius:12px;cursor:pointer;font-size:12.5px}
+.qrow:hover{box-shadow:inset 2px 2px 6px var(--sd),inset -2px -2px 6px var(--sl)}
+.qrow b{font-weight:800}
+
+.sevs{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}
+.sev{text-align:center;padding:9px 4px;border-radius:15px}
+.sev b{display:block;font-size:19px;font-weight:800;color:var(--cc)}
+.sev small{font-size:11px;color:var(--muted)}
+.mx{width:100%;border-collapse:separate;border-spacing:7px;font-size:12px;text-align:center}
+.mx th{font-weight:600;color:var(--muted);font-size:11.5px;padding:2px}
+.mx td{border-radius:12px;padding:10px 4px;cursor:pointer;font-weight:800;font-size:15px;background:color-mix(in srgb,var(--bad) calc(var(--k,0)*55%),var(--bg));box-shadow:3px 3px 7px var(--sd),-3px -3px 7px var(--sl)}
+.mx td.dis{opacity:.35;pointer-events:none;box-shadow:none}
+.mx td.act{box-shadow:inset 3px 3px 6px var(--sd),inset -3px -3px 6px var(--sl);outline:2px solid var(--acc)}
+.rel{padding:11px 12px;border-radius:16px;margin-bottom:11px;cursor:pointer;border-right:4px solid var(--cc)}
+.rel-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.rel-top b{font-size:12.5px}
+.rel-pair{display:flex;flex-wrap:wrap;align-items:center;gap:5px 7px;font-size:12.5px;line-height:1.7}
+.rel-pair i{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+.rel-pair em{font-style:normal;color:var(--muted)}
+.rel-meta{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.7}
+.empty{padding:26px 12px;text-align:center;color:var(--muted);line-height:2}
+
+.tblw{overflow:auto;max-height:calc(100dvh - 320px);border-radius:16px}
+table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{position:sticky;top:0;background:var(--bg);text-align:right;padding:9px 8px;cursor:pointer;white-space:nowrap;font-weight:700;color:var(--muted);z-index:1;box-shadow:0 2px 0 var(--sd)}
+.tbl td{padding:9px 8px;border-bottom:1px solid color-mix(in srgb,var(--muted) 18%,transparent);vertical-align:middle}
+.tbl tr.row{cursor:pointer}.tbl tr.row:hover td{background:color-mix(in srgb,var(--acc) 8%,transparent)}
+.tbl .tdn{max-width:170px}
+.rcard{padding:12px 13px;border-radius:18px;margin-bottom:12px;cursor:pointer}
+.rcard .rh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.rcard .rh b{font-size:13.5px}
+.rcard .rs{display:flex;gap:8px;flex-wrap:wrap}
+.rcard .rs span{padding:4px 9px;border-radius:10px;font-size:11.5px;color:var(--muted)}
+.rcard .rs b{color:var(--text)}
+
+.modal-bd{position:fixed;inset:0;background:rgba(8,12,24,.55);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:100;padding:14px}
+.modal-bd.open{display:flex}
+.modal{width:min(1120px,100%);height:min(88vh,860px);display:flex;flex-direction:column;overflow:hidden}
+.modal.sm{width:min(560px,100%);height:auto;max-height:90vh}
+.mh{display:flex;align-items:center;gap:12px;padding:16px 20px}
+.mh h2{margin:0;font-size:17px;font-weight:800;flex:1;min-width:0}
+.mb{flex:1;min-height:0;overflow:auto;padding:4px 20px 20px}
+.mgrid{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:18px;height:100%}
+.mcol{overflow:auto;min-height:0;padding:4px 6px 6px 10px}
+.ifw{height:100%;min-height:320px;display:flex;flex-direction:column;gap:10px}
+.ifw iframe{flex:1;border:0;border-radius:18px;background:#fff;width:100%;min-height:300px}
+.ifnote{font-size:11.5px;color:var(--muted)}
+.ftbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.ftbl th{width:36%;text-align:right;color:var(--muted);font-weight:600;padding:8px 6px;vertical-align:top}
+.ftbl td{padding:8px 6px;line-height:1.8;word-break:break-word}
+.ftbl tr+tr{border-top:1px solid color-mix(in srgb,var(--muted) 16%,transparent)}
+.sub{margin:16px 0 8px;font-size:13px;font-weight:800}
+.fld{display:grid;gap:6px;margin-bottom:14px}
+.fld label{font-size:12.5px;color:var(--muted)}
+.fld input[type=text],.fld input[type=url]{width:100%;border:0;background:var(--bg);border-radius:14px;padding:11px 13px;box-shadow:inset 3px 3px 7px var(--sd),inset -3px -3px 7px var(--sl);outline:none;direction:ltr;text-align:left}
+
+#loading{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;transition:opacity .4s}
+#loading.hide{opacity:0;pointer-events:none}
+#loading .spin{width:38px;height:38px;border-width:4px}
+#toasts{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:grid;gap:10px;z-index:300;width:min(480px,92vw)}
+.toast{padding:12px 16px;border-radius:16px;font-size:13px;line-height:1.8;animation:ti .25s}
+.toast.err{border-right:4px solid var(--bad)}.toast.ok{border-right:4px solid var(--ok)}.toast.inf{border-right:4px solid var(--acc)}
+@keyframes ti{from{opacity:0;transform:translateY(10px)}}
+
+@media (max-width:1280px){
+  #app{grid-template-columns:270px minmax(0,1fr) 380px}
+  .glance .gl:nth-child(n+4){display:none}
+}
+@media (max-width:1100px){
+  #app{grid-template-columns:minmax(0,1fr);grid-template-areas:"hdr" "map";gap:10px;padding:10px}
+  .panel{position:fixed;top:calc(var(--hdr) + 22px);bottom:10px;width:min(92vw,400px);z-index:40;transition:transform .3s;border-radius:var(--radius)}
+  #panelLayers{right:10px;transform:translateX(120%)}
+  #panelInsights{left:10px;transform:translateX(-120%)}
+  .panel.open{transform:none}
+  .mob-only{display:inline-flex}
+  .glance,.brand p{display:none}
+  .search{width:auto;flex:1}
+  .mgrid{grid-template-columns:1fr;height:auto}
+  .modal{height:94vh}
+}
+@media (max-width:640px){
+  :root{--hdr:64px}
+  .brand h1{font-size:14px}
+  .logo{width:38px;height:38px}
+  .hbtns .hide-sm{display:none}
+  .topbar{padding:0 10px;gap:8px}
+  .legend{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="loading"><div class="spin"></div><div id="loadingMsg" style="color:var(--muted)">در حال آماده‌سازی اطلس…</div></div>
+
+<div id="app">
+  <header class="topbar neu">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M16 3 4 9.5v13L16 29l12-6.5v-13L16 3Z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M4 9.5 16 16l12-6.5M16 16v13" stroke="#fff" stroke-width="2" stroke-linejoin="round" opacity=".85"/></svg>
+      </div>
+      <div>
+        <h1>اطلس هوشمند درآلو <span class="demo-badge" id="demoBadge">نمایشی</span></h1>
+        <p>سامانه مدیریت مسئولیت‌های اجتماعی · مجتمع مس درآلو</p>
+      </div>
+    </div>
+    <div class="glance" id="glance"></div>
+    <div class="spacer"></div>
+    <div class="search">
+      <input id="q" type="search" autocomplete="off" placeholder="جستجو در روستاها، پروژه‌ها و عملیات…   ( / )" aria-label="جستجو">
+      <span class="ic">🔍</span>
+      <div class="sresults neu" id="sres"></div>
+    </div>
+    <div class="hbtns">
+      <button class="btn icon mob-only" id="btnMobLayers" title="لایه‌ها" aria-label="لایه‌ها">☰</button>
+      <button class="btn icon mob-only" id="btnMobInsights" title="تحلیل‌ها" aria-label="تحلیل‌ها">📊</button>
+      <button class="btn icon hide-sm" id="btnRefresh" title="بارگذاری مجدد داده‌ها" aria-label="بارگذاری مجدد">⟳</button>
+      <button class="btn icon" id="btnTheme" title="تغییر تم" aria-label="تغییر تم">◐</button>
+      <button class="btn icon" id="btnSettings" title="تنظیمات" aria-label="تنظیمات">⚙</button>
+    </div>
+  </header>
+
+  <aside id="panelLayers" class="panel neu">
+    <div class="ptitle"><span>لایه‌ها</span>
+      <span style="display:flex;gap:6px"><button class="btn sm" id="allOn">همه</button><button class="btn sm" id="allOff">هیچ</button></span>
+    </div>
+    <div id="layerCards"></div>
+    <div class="sect"><h4>وضعیت</h4><div class="chips" id="statusChips"></div></div>
+    <div class="sect"><h4>نوع آیتم</h4><select class="sel" id="kindSel"></select></div>
+    <div class="sect"><h4>ابزارهای نقشه</h4>
+      <div style="display:grid;gap:10px">
+        <div class="lrow"><span class="lbl">نمایش نواحی تداخل (قرمز)</span><label class="sw"><input type="checkbox" id="swClash" checked><span></span></label></div>
+        <div class="lrow"><span class="lbl">نمای شیب‌دار ۳بعدی</span><label class="sw"><input type="checkbox" id="swTilt"><span></span></label></div>
+      </div>
+    </div>
+    <button class="btn" id="resetFilters" style="width:100%;justify-content:center">بازنشانی فیلترها</button>
+  </aside>
+
+  <main class="mapwrap">
+    <div id="map"></div>
+    <div class="mtools">
+      <button class="btn icon" id="mtFit" title="نمایش همه آیتم‌ها" aria-label="نمایش همه">⤢</button>
+      <button class="btn icon" id="mtBase" title="نقشه پایه" aria-label="نقشه پایه">🗺</button>
+      <button class="btn icon" id="mtFull" title="تمام‌صفحه" aria-label="تمام‌صفحه">⛶</button>
+      <button class="btn icon" id="mtClear" title="پاک‌کردن هایلایت" aria-label="پاک‌کردن هایلایت">✕</button>
+    </div>
+    <div class="bmenu neu" id="bmenu"></div>
+    <div class="mprog neu-sm" id="mprog"><span class="spin"></span><span id="mprogTxt"></span></div>
+    <div class="legend neu-sm" id="legend"></div>
+  </main>
+
+  <aside id="panelInsights" class="panel neu">
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-tab="ov">نمای کلی</button>
+      <button class="tab" data-tab="co">هماهنگی و تداخل</button>
+      <button class="tab" data-tab="rg">مناطق</button>
+      <button class="tab" data-tab="tb">جدول</button>
+    </div>
+
+    <section class="tabpane on" id="tab-ov">
+      <div class="kpis" id="kpis"></div>
+      <div class="card neu-sm"><h4>وضعیت آیتم‌ها</h4><div class="cbox"><canvas id="chStatus"></canvas></div></div>
+      <div class="card neu-sm"><h4>وضعیت هر لایه</h4><div class="cbox"><canvas id="chLayer"></canvas></div></div>
+      <div class="card neu-sm"><h4>انواع آیتم</h4><div class="cbox tall"><canvas id="chKind"></canvas></div></div>
+      <div class="card neu-sm"><h4>پروژه‌ها و عملیات مرتبط با هر منطقه</h4><div class="cbox tall"><canvas id="chRegion"></canvas></div></div>
+      <div class="card neu-sm"><h4>پایش کیفیت داده</h4><div id="quality"></div></div>
+    </section>
+
+    <section class="tabpane" id="tab-co">
+      <div class="sevs" id="sevs"></div>
+      <div class="card neu-sm"><h4>ماتریس هماهنگی لایه‌ها <small style="color:var(--muted);font-weight:400">برای فیلتر کلیک کنید</small></h4><div id="matrix"></div></div>
+      <div class="card neu-sm">
+        <h4>فیلتر روابط</h4>
+        <div class="sect"><h4>نوع رابطه</h4><div class="chips" id="relTypes"></div></div>
+        <div class="sect"><h4>جفت لایه‌ها</h4><div class="chips" id="relPairs"></div></div>
+        <div class="sect"><h4>آستانه مجاورت: <b id="nearVal"></b></h4><input type="range" id="nearRange" min="0" max="2000" step="50"></div>
+        <div class="lrow"><span class="lbl">نمایش روابط ساختاری (والد ⟷ فرزند)</span><label class="sw"><input type="checkbox" id="swLinked"><span></span></label></div>
+      </div>
+      <div class="ptitle"><span id="relCount"></span></div>
+      <div id="relList"></div>
+    </section>
+
+    <section class="tabpane" id="tab-rg"><div id="regions"></div></section>
+
+    <section class="tabpane" id="tab-tb">
+      <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:12px">
+        <select class="sel" id="tblQuality">
+          <option value="">همه آیتم‌ها</option>
+          <option value="nogeom">بدون مختصات و محدوده</option>
+          <option value="nodoc">بدون لینک سند</option>
+          <option value="noiframe">بدون لینک وضعیت</option>
+          <option value="conf">دارای تداخل مهم/بحرانی</option>
+        </select>
+        <button class="btn" id="btnCsv">خروجی CSV</button>
+      </div>
+      <div class="tblw neu-in"><table class="tbl" id="tbl"></table></div>
+      <div id="tblInfo" style="margin-top:10px;font-size:12px;color:var(--muted)"></div>
+    </section>
+  </aside>
+</div>
+
+<div class="modal-bd" id="mIdentity"><div class="modal neu" role="dialog" aria-modal="true" aria-labelledby="idTitle">
+  <div class="mh"><h2 id="idTitle"></h2><span id="idHeadBtns" style="display:flex;gap:8px"></span><button class="btn icon" data-close aria-label="بستن">✕</button></div>
+  <div class="mb" id="idBody"></div>
+</div></div>
+
+<div class="modal-bd" id="mStatus"><div class="modal neu" role="dialog" aria-modal="true" aria-labelledby="stTitle">
+  <div class="mh"><h2 id="stTitle"></h2><span id="stHeadBtns" style="display:flex;gap:8px"></span><button class="btn icon" data-close aria-label="بستن">✕</button></div>
+  <div class="mb" id="stBody" style="padding-top:0"></div>
+</div></div>
+
+<div class="modal-bd" id="mSettings"><div class="modal sm neu" role="dialog" aria-modal="true" aria-labelledby="seTitle">
+  <div class="mh"><h2 id="seTitle">تنظیمات اتصال</h2><button class="btn icon" data-close aria-label="بستن">✕</button></div>
+  <div class="mb">
+    <div class="fld"><label for="apiUrl">آدرس Web App </label>
+      <input type="url" id="apiUrl" placeholder="https://script.google.com/macros/s/…/exec"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <button class="btn primary" id="seSave">ذخیره و بارگذاری</button>
+      <button class="btn" id="seDemo">نمایش داده نمونه</button>
+      <button class="btn" id="seTest">آزمون اتصال</button>
+    </div>
+    <div id="seMsg" style="font-size:12.5px;color:var(--muted);line-height:2"></div>
+  </div>
+</div></div>
+
+<div id="toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+<script>
+(()=>{
+'use strict';
+
+/* ═════════════ پیکربندی ═════════════ */
+const CONFIG={
+  API_URL:'https://script.google.com/macros/s/AKfycbw7yEqhdUmfec4_HGdeeqEnuoQWwDt_MqU2b_QDKXC_C4EikBGI3Fs1M_agK4Vc-Z4PhA/exec',                 // آدرس Web App را اینجا یا از «تنظیمات» وارد کنید (یا ?api=... در آدرس صفحه)
+  COORD_ORDER:'auto',         // 'auto' | 'lnglat' | 'latlng'  (auto: برای ایران، طول جغرافیایی همیشه بزرگ‌تر از عرض است)
+  TOUCH_TOL_M:15,             // فاصله زیر این مقدار = هم‌مرز
+  PROX_MAX_M:2000,            // بیشینه فاصله‌ی تحلیل مجاورت
+  PROX_DEFAULT_M:500,
+  MIN_OVERLAP_M2:10,
+  CENTER:[57.55,29.16], ZOOM:11
+};
+
+const LAYERS=[
+  {key:'region',   sheet:'لایه ۱ - مناطق و جامعه', name:'مناطق و جامعه', short:'مناطق', n:'لایه ۱', color:'#14b8a6'},
+  {key:'project',  sheet:'لایه ۲ - پروژه های مسئولیت های اجتماعی', name:'پروژه‌های مسئولیت اجتماعی', short:'پروژه‌ها', n:'لایه ۲', color:'#6366f1'},
+  {key:'operation',sheet:'لایه ۳ - فرایندها پروژه ها و عملیات های مجتمع', name:'فرایندها و عملیات مجتمع', short:'عملیات', n:'لایه ۳', color:'#f97316'}
+];
+const LK=Object.fromEntries(LAYERS.map(l=>[l.key,l]));
+const STATUS={
+  active:{label:'در حال اجرا',color:'#0ea5e9'},
+  done:{label:'تکمیل‌شده',color:'#22c55e'},
+  plan:{label:'برنامه‌ریزی',color:'#f59e0b'},
+  risk:{label:'متوقف / نیازمند توجه',color:'#ef4444'},
+  other:{label:'سایر',color:'#a855f7'},
+  unknown:{label:'نامشخص',color:'#94a3b8'}
+};
+const SEV={high:{label:'بحرانی',color:'#ef4444',rank:4},medium:{label:'مهم',color:'#f97316',rank:3},low:{label:'کم',color:'#eab308',rank:2},info:{label:'اطلاعاتی',color:'#3b82f6',rank:1}};
+const REL={overlap:'هم‌پوشانی',contain:'شمول کامل',inside:'قرارگیری در محدوده',touch:'هم‌مرزی',near:'مجاورت'};
+const PAIRS=[
+  {k:'project-region',l:'پروژه ⟷ منطقه'},
+  {k:'operation-region',l:'عملیات ⟷ منطقه'},
+  {k:'operation-project',l:'عملیات ⟷ پروژه'},
+  {k:'same',l:'درون یک لایه'}
+];
+const GEOM_COLS=['هندسه محدوده (Polygon)','هندسه محدوده پروژه','هندسه محدوده عملیات'];
+
+/* ═════════════ ابزارهای عمومی ═════════════ */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fa=(n,d=0)=>Number(n||0).toLocaleString('fa-IR',{maximumFractionDigits:d});
+const normDigits=s=>String(s??'').replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/٫/g,'.');
+const normText=s=>normDigits(s).toLowerCase().replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/[\u200c]/g,' ').replace(/[\u200f\u200e\u064B-\u0652\u0640]/g,'').replace(/\s+/g,' ').trim();
+const parseNum=s=>{s=normDigits(s).trim();if(!s)return NaN;if(!s.includes('.')&&/^-?\d+,\d+$/.test(s))s=s.replace(',','.');return parseFloat(s.replace(/[^\d.\-eE+]/g,''));};
+const fmtArea=m=>m>=10000?fa(m/10000,m>=1e6?0:1)+' هکتار':fa(m)+' متر‌مربع';
+const fmtDist=m=>m>=1000?fa(m/1000,2)+' کیلومتر':fa(m)+' متر';
+const validUrl=v=>{v=String(v||'').trim();return /^https?:\/\//i.test(v)?v:'';};
+const splitRefs=s=>String(s||'').split(/[,،;؛|\n]+/).map(x=>normText(x)).filter(Boolean);
+const debounce=(fn,ms)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}};
+
+function statusKey(s){
+  const t=normText(s);
+  if(!t||/نامشخص/.test(t))return 'unknown';
+  if(/غیر ?فعال/.test(t))return 'other';
+  if(/(متوقف|معلق|تاخیر|تأخیر|مشکل|لغو|بحران|خطر|نیاز ?مند)/.test(t))return 'risk';
+  if(/(در حال|جاری)/.test(t))return 'active';
+  if(/(تکمیل|پایان|اتمام|انجام شد|بهره ?برداری|تحویل|خاتمه)/.test(t))return 'done';
+  if(/(برنامه|مطالعه|آینده|طراحی|پیشنهاد|ایده|تعریف|در انتظار|انتظار|تصویب)/.test(t))return 'plan';
+  if(/(اجرا|فعال|عملیاتی|ساخت)/.test(t))return 'active';
+  return 'other';
+}
+
+/* ═════════════ تجزیه هندسه ═════════════ */
+function toLngLat(a){
+  const x=+a[0],y=+a[1];
+  if(!isFinite(x)||!isFinite(y))return null;
+  const m=CONFIG.COORD_ORDER;
+  if(m==='lnglat')return [x,y];
+  if(m==='latlng')return [y,x];
+  if(Math.abs(x)>90&&Math.abs(y)<=90)return [x,y];
+  if(Math.abs(y)>90&&Math.abs(x)<=90)return [y,x];
+  return x>=y?[x,y]:[y,x];
+}
+function ringFrom(arr){
+  if(!Array.isArray(arr))return null;
+  const r=arr.map(toLngLat).filter(Boolean);
+  if(r.length<3)return null;
+  const f=r[0],l=r[r.length-1];
+  if(f[0]!==l[0]||f[1]!==l[1])r.push([f[0],f[1]]);
+  return r.length>=4?r:null;
+}
+const polyFrom=rings=>{const o=rings.map(ringFrom).filter(Boolean);return o.length?o:null};
+function depth(a){let d=0;while(Array.isArray(a)){d++;a=a[0]}return d}
+function geomFromCoords(c){
+  const d=depth(c);
+  if(d===2){const p=polyFrom([c]);return p?{type:'Polygon',coordinates:p}:null}
+  if(d===3){const p=polyFrom(c);return p?{type:'Polygon',coordinates:p}:null}
+  if(d>=4){const polys=c.map(polyFrom).filter(Boolean);if(!polys.length)return null;return polys.length===1?{type:'Polygon',coordinates:polys[0]}:{type:'MultiPolygon',coordinates:polys}}
+  return null;
+}
+function fromJSON(j){
+  if(Array.isArray(j)){
+    if(j.length&&j[0]&&typeof j[0]==='object'&&!Array.isArray(j[0])){
+      const c=j.map(o=>[o.lng??o.lon??o.longitude??o.Lng,o.lat??o.latitude??o.Lat]);
+      return geomFromCoords(c);
+    }
+    return geomFromCoords(j);
+  }
+  if(!j||typeof j!=='object')return null;
+  if(j.type==='FeatureCollection'){
+    const polys=[];
+    (j.features||[]).forEach(f=>{const g=fromJSON(f);if(!g)return;if(g.type==='Polygon')polys.push(g.coordinates);else if(g.type==='MultiPolygon')polys.push(...g.coordinates)});
+    if(!polys.length)return null;
+    return polys.length===1?{type:'Polygon',coordinates:polys[0]}:{type:'MultiPolygon',coordinates:polys};
+  }
+  if(j.type==='Feature')return fromJSON(j.geometry);
+  if(j.type==='Polygon'||j.type==='MultiPolygon')return geomFromCoords(j.coordinates);
+  return null;
+}
+function parseWKT(s){
+  s=s.replace(/^SRID=\d+;/i,'').trim();
+  let body=s.replace(/^[A-Za-z]+\s*(ZM|Z|M)?\s*/i,'');
+  body=body.replace(/(-?\d+(?:\.\d+)?(?:e[-+]?\d+)?)\s+(-?\d+(?:\.\d+)?(?:e[-+]?\d+)?)(?:\s+-?\d+(?:\.\d+)?)?/gi,'[$1,$2]').replace(/\(/g,'[').replace(/\)/g,']');
+  try{return geomFromCoords(JSON.parse(body))}catch(e){return null}
+}
+function parsePairs(s){
+  const nums=(s.match(/-?\d+(?:\.\d+)?/g)||[]).map(Number);
+  if(nums.length<6)return null;
+  const pts=[];for(let i=0;i+1<nums.length;i+=2)pts.push([nums[i],nums[i+1]]);
+  return geomFromCoords(pts);
+}
+function parseGeometry(text){
+  let s=normDigits(text).trim();
+  if(!s)return null;
+  let g=null;
+  try{
+    if(/^(SRID=\d+;)?\s*(MULTI)?POLYGON/i.test(s))g=parseWKT(s);
+    else if(s[0]==='{'||s[0]==='[')g=fromJSON(JSON.parse(s));
+    else g=parsePairs(s);
+  }catch(e){g=null}
+  return g?{type:'Feature',properties:{},geometry:g}:null;
+}
+const countVerts=g=>{let n=0;const rec=a=>{if(typeof a[0]==='number')n++;else a.forEach(rec)};rec(g.coordinates);return n};
+
+/* ═════════════ وضعیت برنامه ═════════════ */
+const state={
+  items:[],byUid:new Map(),idIndex:new Map(),
+  layerVis:{region:true,project:true,operation:true},
+  pinsVis:{region:true,project:true,operation:true},
+  polysVis:{region:true,project:true,operation:true},
+  opacity:{region:.7,project:.7,operation:.7},
+  statusOn:new Set(Object.keys(STATUS)),
+  kind:'',q:'',tab:'ov',
+  rels:[],relById:new Map(),analysisDone:false,
+  rf:{types:{overlap:true,contain:true,inside:true,touch:true,near:true},pairs:{'project-region':true,'operation-region':true,'operation-project':true,'same':true},near:CONFIG.PROX_DEFAULT_M,linked:false},
+  showClash:true,
+  sel:null,pp:null,
+  tbl:{sort:'title',dir:1,quality:''},
+  demo:false,mapReady:false,basemap:'osm',lat0:29.16,lng0:57.55,dataset:null
+};
+const itemVisible=it=>state.layerVis[it.layer]&&state.statusOn.has(it.st)&&(!state.kind||it.kind===state.kind);
+
+/* ═════════════ ساخت آیتم‌ها از پاسخ API ═════════════ */
+function findSheet(sheets,L,idx){
+  const names=Object.keys(sheets||{});
+  const t=normText(L.sheet);
+  let k=names.find(n=>normText(n)===t);
+  if(!k)k=names[idx];
+  return k?sheets[k]:null;
+}
+function buildItem(row,L,i,headers){
+  const g=(...ns)=>{for(const n of ns){const v=row[n];if(v!==undefined&&v!==null&&String(v).trim()!=='')return String(v).trim()}return ''};
+  const recId=g('شناسه رکورد'),code=g('کد رکورد');
+  const ext=L.key==='project'?g('شناسه پروژه'):L.key==='operation'?g('شناسه عملیات'):'';
+  const title=g('عنوان','_title','نام منطقه','نام پروژه','نام عملیات')||'بدون عنوان';
+  const status=g('وضعیت','_status')||'نامشخص';
+  const subtype=L.key==='region'?g('نوع منطقه'):L.key==='project'?g('نوع پروژه'):g('نوع عملیات');
+  const recType=g('نوع رکورد');
+  const parentRef=L.key==='region'?g('شناسه منطقه والد'):L.key==='project'?g('شناسه منطقه مرتبط'):g('شناسه عملیات والد');
+  const it={
+    uid:L.key+':'+(recId||code||ext||i)+':'+i,layer:L.key,row,headers,
+    id:recId||code||ext,code:code||recId||ext,ext,title,status,st:statusKey(status),
+    desc:g('شرح کوتاه','_description','شرح','توضیحات'),recType,subtype,kind:subtype||recType||'نامشخص',
+    unit:g('نام واحد / فرآیند'),parentRef,
+    iframeUrl:validUrl(g('لینک نمایش وضعیت','_iframeUrl')),docUrl:validUrl(g('لینک سند کامل','_documentUrl')),
+    ids:[recId,code,ext].filter(Boolean).map(normText),refs:splitRefs(parentRef),
+    feature:null,pin:null,hasPoint:false,parents:[],children:[],bbox:null,area:0
+  };
+  const gt=g('هندسه محدوده پروژه','هندسه محدوده عملیات','هندسه محدوده (Polygon)','_geometry');
+  if(gt){it.feature=parseGeometry(gt);it.badGeom=!it.feature}
+  let lat=parseNum(g('عرض جغرافیایی','_latitude')),lng=parseNum(g('طول جغرافیایی','_longitude'));
+  if(isFinite(lat)&&isFinite(lng)){
+    if(Math.abs(lat)>90&&Math.abs(lng)<=90){const t=lat;lat=lng;lng=t}
+    it.pin=[lng,lat];it.hasPoint=true;
+  }
+  if(it.feature){
+    try{
+      it.area=turf.area(it.feature);
+      it.bbox=turf.bbox(it.feature);
+      if(!it.pin)it.pin=turf.pointOnFeature(it.feature).geometry.coordinates;
+    }catch(e){it.feature=null;it.badGeom=true}
+  }
+  if(!it.feature&&it.pin)it.bbox=[it.pin[0],it.pin[1],it.pin[0],it.pin[1]];
+  return it;
+}
+function ingest(payload){
+  const items=[];
+  if(!payload||!payload.sheets)throw new Error('ساختار پاسخ API معتبر نیست.');
+  LAYERS.forEach((L,li)=>{
+    const sh=findSheet(payload.sheets,L,li);
+    if(!sh||!sh.rows)return;
+    sh.rows.forEach((row,i)=>items.push(buildItem(row,L,i,sh.headers||Object.keys(row))));
+  });
+  state.items=items;
+  state.byUid=new Map(items.map(i=>[i.uid,i]));
+  state.idIndex=new Map();
+  items.forEach(it=>it.ids.forEach(k=>{if(!state.idIndex.has(k))state.idIndex.set(k,[]);state.idIndex.get(k).push(it)}));
+  items.forEach(it=>{
+    it.parents=[];
+    it.refs.forEach(r=>(state.idIndex.get(r)||[]).forEach(p=>{if(p!==it&&!it.parents.includes(p))it.parents.push(p)}));
+  });
+  items.forEach(it=>it.parents.forEach(p=>p.children.push(it)));
+  const withPt=items.filter(i=>i.pin);
+  if(withPt.length){
+    state.lat0=withPt.reduce((s,i)=>s+i.pin[1],0)/withPt.length;
+    state.lng0=withPt.reduce((s,i)=>s+i.pin[0],0)/withPt.length;
+  }
+  state.dataset=payload;
+  buildAnalysisGeoms();
+}
+
+/* ═════════════ موتور تحلیل هماهنگی (Clash / Coordination) ═════════════ */
+let KX=96000,KY=110574;
+function proj(c){return [(c[0]-state.lng0)*KX,(c[1]-state.lat0)*KY]}
+function buildAnalysisGeoms(){
+  KX=111320*Math.cos(state.lat0*Math.PI/180);
+  state.items.forEach(it=>{
+    it.ana=null;it.pr=null;it.pp=null;
+    if(it.feature){
+      let f=it.feature;
+      try{if(countVerts(f.geometry)>500)f=turf.simplify(f,{tolerance:0.00006,highQuality:false,mutate:false})}catch(e){}
+      it.ana=f;
+      const polys=f.geometry.type==='Polygon'?[f.geometry.coordinates]:f.geometry.coordinates;
+      it.pr=polys.flatMap(p=>p.map(r=>r.map(proj)));
+    }else if(it.pin){it.pp=proj(it.pin)}
+  });
+}
+function segD2(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay;let t=((px-ax)*dx+(py-ay)*dy)/(dx*dx+dy*dy||1);t=t<0?0:t>1?1:t;const cx=ax+t*dx-px,cy=ay+t*dy-py;return cx*cx+cy*cy}
+function ptRingsD(p,rings){let m=Infinity;for(const r of rings)for(let i=0;i<r.length-1;i++){const d=segD2(p[0],p[1],r[i][0],r[i][1],r[i+1][0],r[i+1][1]);if(d<m)m=d}return Math.sqrt(m)}
+function polyPolyD(A,B){let m=Infinity;for(const r of A.pr)for(const p of r){const d=ptRingsD(p,B.pr);if(d<m)m=d;if(m<1)return m}for(const r of B.pr)for(const p of r){const d=ptRingsD(p,A.pr);if(d<m)m=d;if(m<1)return m}return m}
+const bboxGap=(a,b)=>{const gx=Math.max(0,a[0]-b[2],b[0]-a[2]),gy=Math.max(0,a[1]-b[3],b[1]-a[3]);return Math.hypot(gx*KX,gy*KY)};
+const bboxHit=(a,b)=>!(a[0]>b[2]||b[0]>a[2]||a[1]>b[3]||b[1]>a[3]);
+const isAdmin=it=>it.layer==='region'&&/(دهستان|بخش|شهرستان|استان|حوزه)/.test(normText(it.kind+' '+it.title));
+const pairKey=(a,b)=>a.layer===b.layer?'same':[a.layer,b.layer].sort().join('-');
+const isLinked=(a,b)=>a.parents.includes(b)||b.parents.includes(a);
+
+function severity(a,b,type,pct){
+  const pk=pairKey(a,b);
+  if(isAdmin(a)||isAdmin(b))return 'info';
+  if(type==='overlap'){const s=pct>=.5?'high':pct>=.1?'medium':'low';return pk==='project-region'&&s==='high'?'medium':s}
+  if(type==='contain'||type==='inside')return pk==='project-region'?'info':'high';
+  if(type==='touch')return pk==='project-region'?'low':'medium';
+  return 'info';
+}
+function analyzePair(a,b){
+  let type,dist=0,area=0,pct=0,inner=null,outer=null,inter=null;
+  if(a.ana&&b.ana){
+    let ix=null;
+    if(bboxHit(a.bbox,b.bbox)){try{ix=turf.intersect(a.ana,b.ana)}catch(e){ix=null}}
+    if(ix){area=turf.area(ix)}
+    if(ix&&area>CONFIG.MIN_OVERLAP_M2){
+      pct=area/(Math.min(a.area,b.area)||1);inter=ix;
+      if(pct>.97){type='contain';inner=a.area<=b.area?a:b;outer=inner===a?b:a}else type='overlap';
+    }else{
+      dist=polyPolyD(a,b);
+      if(dist<=CONFIG.TOUCH_TOL_M)type='touch';else if(dist<=CONFIG.PROX_MAX_M)type='near';else return null;
+    }
+  }else if(a.ana||b.ana){
+    const P=a.ana?b:a,Q=a.ana?a:b;
+    if(!P.pp||!Q.pr)return null;
+    let inside=false;
+    try{inside=turf.booleanPointInPolygon(turf.point(P.pin),Q.ana)}catch(e){}
+    if(inside){type='inside';inner=P;outer=Q}
+    else{dist=ptRingsD(P.pp,Q.pr);if(dist<=CONFIG.TOUCH_TOL_M)type='touch';else if(dist<=CONFIG.PROX_MAX_M)type='near';else return null}
+  }else{
+    if(!a.pp||!b.pp)return null;
+    dist=Math.hypot(a.pp[0]-b.pp[0],a.pp[1]-b.pp[1]);
+    if(dist>CONFIG.PROX_MAX_M)return null;
+    type=dist<=CONFIG.TOUCH_TOL_M?'touch':'near';
+  }
+  return{a:a.uid,b:b.uid,type,dist,area,pct,inner:inner&&inner.uid,outer:outer&&outer.uid,inter,
+    sev:severity(a,b,type,pct),linked:isLinked(a,b)};
+}
+let analysisToken=0;
+function runAnalysis(){
+  const token=++analysisToken;
+  state.rels=[];state.relById=new Map();state.analysisDone=false;
+  const its=state.items.filter(i=>i.ana||i.pp);
+  const pairs=[];
+  for(let i=0;i<its.length;i++)for(let j=i+1;j<its.length;j++){
+    const a=its[i],b=its[j];
+    if(a.layer==='region'&&b.layer==='region')continue;
+    if(bboxGap(a.bbox,b.bbox)>CONFIG.PROX_MAX_M)continue;
+    pairs.push([a,b]);
+  }
+  let k=0,id=1;const total=pairs.length;
+  showProg(total?'در حال تحلیل هماهنگی…':'');
+  function step(){
+    if(token!==analysisToken)return;
+    const t0=performance.now();
+    while(k<total&&performance.now()-t0<14){
+      const r=analyzePair(pairs[k][0],pairs[k][1]);k++;
+      if(r){r.id=id++;state.rels.push(r);state.relById.set(r.id,r)}
+    }
+    if(total)showProg('در حال تحلیل هماهنگی… '+fa(Math.round(k/total*100))+'٪');
+    if(k<total)setTimeout(step,0);
+    else{state.analysisDone=true;showProg('');scheduleRefresh()}
+  }
+  step();
+}
+function showProg(t){const el=$('#mprog');if(!t){el.classList.remove('show');return}$('#mprogTxt').textContent=t;el.classList.add('show')}
+
+function relVisible(r,o={}){
+  const a=state.byUid.get(r.a),b=state.byUid.get(r.b);
+  if(!a||!b||!itemVisible(a)||!itemVisible(b))return false;
+  if(!state.rf.types[r.type])return false;
+  if(r.type==='near'&&r.dist>state.rf.near)return false;
+  if(r.linked&&!state.rf.linked)return false;
+  if(!o.ignorePairs&&!state.rf.pairs[pairKey(a,b)])return false;
+  return true;
+}
+const visibleRels=o=>state.rels.filter(r=>relVisible(r,o));
+function relsOf(uid,o={}){
+  return state.rels.filter(r=>(r.a===uid||r.b===uid)&&(o.all?(r.type!=='near'||r.dist<=state.rf.near):relVisible(r)))
+    .sort((x,y)=>SEV[y.sev].rank-SEV[x.sev].rank||y.pct-x.pct||x.dist-y.dist);
+}
+function relText(r){
+  const a=state.byUid.get(r.a),b=state.byUid.get(r.b);
+  if(r.type==='overlap')return 'هم‌پوشانی '+fmtArea(r.area)+' ('+fa(r.pct*100)+'٪ از آیتم کوچک‌تر)';
+  if(r.type==='contain'){const i=state.byUid.get(r.inner),o=state.byUid.get(r.outer);return '«'+i.title+'» کاملاً درون «'+o.title+'» قرار دارد'}
+  if(r.type==='inside'){const i=state.byUid.get(r.inner),o=state.byUid.get(r.outer);return 'پین «'+i.title+'» درون محدوده «'+o.title+'» است'}
+  if(r.type==='touch')return 'هم‌مرز — فاصله کمتر از '+fa(CONFIG.TOUCH_TOL_M)+' متر';
+  return 'فاصله '+fmtDist(r.dist);
+}
+
+/* ═════════════ نقشه ═════════════ */
+let map,popup,tipPopup;
+const BASES={
+  osm:{label:'خیابانی',tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],attr:'© OpenStreetMap',max:19},
+  sat:{label:'ماهواره‌ای',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],attr:'Esri World Imagery',max:19},
+  topo:{label:'توپوگرافی',tiles:['https://a.tile.opentopomap.org/{z}/{x}/{y}.png','https://b.tile.opentopomap.org/{z}/{x}/{y}.png','https://c.tile.opentopomap.org/{z}/{x}/{y}.png'],attr:'© OpenTopoMap',max:17},
+  dark:{label:'تیره',tiles:['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png','https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],attr:'© CARTO',max:19},
+  none:{label:'ساده (بدون نقشه)',tiles:null}
+};
+function makePin(color,dot){
+  const W=64,H=84,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
+  g.shadowColor='rgba(0,0,0,.4)';g.shadowBlur=6;g.shadowOffsetY=3;
+  g.beginPath();g.moveTo(32,80);g.bezierCurveTo(32,80,6,52,6,30);g.arc(32,30,26,Math.PI,0,false);g.bezierCurveTo(58,52,32,80,32,80);g.closePath();
+  g.fillStyle=color;g.fill();g.shadowColor='transparent';g.lineWidth=3;g.strokeStyle='#fff';g.stroke();
+  g.beginPath();g.arc(32,30,14,0,Math.PI*2);g.fillStyle='#fff';g.fill();
+  g.beginPath();g.arc(32,30,9,0,Math.PI*2);g.fillStyle=dot;g.fill();
+  return g.getImageData(0,0,W,H);
+}
+const E_FC={type:'FeatureCollection',features:[]};
+function initMap(){
+  const sources={},layers=[{id:'bg',type:'background',paint:{'background-color':'#dfe6ee'}}];
+  Object.entries(BASES).forEach(([k,b])=>{
+    if(!b.tiles)return;
+    sources['bm-'+k]={type:'raster',tiles:b.tiles,tileSize:256,maxzoom:b.max,attribution:b.attr};
+    layers.push({id:'bm-'+k,type:'raster',source:'bm-'+k,layout:{visibility:k===state.basemap?'visible':'none'}});
+  });
+  map=new maplibregl.Map({container:'map',style:{version:8,sources,layers},center:CONFIG.CENTER,zoom:CONFIG.ZOOM,maxPitch:70,attributionControl:{compact:true}});
+  map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'bottom-left');
+  map.addControl(new maplibregl.ScaleControl({unit:'metric'}),'bottom-left');
+  popup=new maplibregl.Popup({closeButton:true,closeOnClick:false,offset:[0,-44],maxWidth:'none'});
+  popup.on('close',()=>{if(!$('#mIdentity').classList.contains('open')){state.sel=null;updateSel()}state.pp=null});
+  tipPopup=new maplibregl.Popup({closeButton:false,closeOnClick:false,className:'tip',offset:[0,-46]});
+  map.on('load',()=>{
+    LAYERS.forEach(L=>STATUS_KEYS.forEach(s=>map.addImage('pin-'+L.key+'-'+s,makePin(L.color,STATUS[s].color),{pixelRatio:2})));
+    ['polys','pins','clash','pair','sel'].forEach(s=>map.addSource(s,{type:'geojson',data:E_FC}));
+    LAYERS.forEach(L=>{
+      map.addLayer({id:'fill-'+L.key,type:'fill',source:'polys',filter:['==',['get','layer'],L.key],paint:{'fill-color':L.color,'fill-opacity':state.opacity[L.key]*.5}});
+      map.addLayer({id:'line-'+L.key,type:'line',source:'polys',filter:['==',['get','layer'],L.key],paint:{'line-color':L.color,'line-width':2.2,'line-opacity':.95}});
+    });
+    map.addLayer({id:'clash-fill',type:'fill',source:'clash',paint:{'fill-color':['match',['get','sev'],'high','#ef4444','medium','#f97316','low','#eab308','#3b82f6'],'fill-opacity':.55}});
+    map.addLayer({id:'clash-line',type:'line',source:'clash',paint:{'line-color':'#fff','line-width':1.2,'line-dasharray':[2,2]}});
+    map.addLayer({id:'pair-fill',type:'fill',source:'pair',filter:['==',['geometry-type'],'Polygon'],paint:{'fill-color':['match',['get','role'],'a','#00e5ff','b','#ff2bd6','#ef4444'],'fill-opacity':['match',['get','role'],'x',.7,.22]}});
+    map.addLayer({id:'pair-line',type:'line',source:'pair',filter:['==',['geometry-type'],'Polygon'],paint:{'line-color':['match',['get','role'],'a','#00e5ff','b','#ff2bd6','#ffffff'],'line-width':3.5}});
+    map.addLayer({id:'pair-pt',type:'circle',source:'pair',filter:['==',['geometry-type'],'Point'],paint:{'circle-radius':20,'circle-color':'rgba(0,0,0,0)','circle-stroke-width':4,'circle-stroke-color':['match',['get','role'],'a','#00e5ff','#ff2bd6']}});
+    map.addLayer({id:'sel-fill',type:'fill',source:'sel',filter:['==',['geometry-type'],'Polygon'],paint:{'fill-color':'#06b6d4','fill-opacity':.18}});
+    map.addLayer({id:'sel-line',type:'line',source:'sel',filter:['==',['geometry-type'],'Polygon'],paint:{'line-color':'#ffffff','line-width':5,'line-blur':.5}});
+    map.addLayer({id:'sel-line2',type:'line',source:'sel',filter:['==',['geometry-type'],'Polygon'],paint:{'line-color':'#06b6d4','line-width':2.5}});
+    map.addLayer({id:'sel-pt',type:'circle',source:'sel',filter:['==',['geometry-type'],'Point'],paint:{'circle-radius':26,'circle-color':'rgba(6,182,212,.18)','circle-stroke-width':3,'circle-stroke-color':'#06b6d4','circle-translate':[0,-16]}});
+    map.addLayer({id:'pins',type:'symbol',source:'pins',layout:{'icon-image':['concat','pin-',['get','layer'],'-',['get','st']],'icon-size':.9,'icon-anchor':'bottom','icon-allow-overlap':true,'symbol-sort-key':['get','z']}});
+    state.mapReady=true;
+    bindMapEvents();
+    scheduleRefresh();
+    if(state.items.length)fitAll(false);
+  });
+}
+const STATUS_KEYS=Object.keys(STATUS);
+function setBasemap(k){
+  state.basemap=k;
+  Object.keys(BASES).forEach(b=>{if(map.getLayer('bm-'+b))map.setLayoutProperty('bm-'+b,'visibility',b===k?'visible':'none')});
+  renderBaseMenu();
+}
+function renderBaseMenu(){
+  $('#bmenu').innerHTML=Object.entries(BASES).map(([k,b])=>`<button data-bm="${k}" class="${k===state.basemap?'on':''}">${b.label}</button>`).join('');
+}
+const QL=['pins','fill-region','fill-project','fill-operation'];
+function bindMapEvents(){
+  map.on('click',e=>{
+    const fs=map.queryRenderedFeatures(e.point,{layers:QL});
+    const seen=new Set(),pins=[],polys=[];
+    fs.forEach(f=>{const u=f.properties.uid;if(seen.has(u))return;seen.add(u);(f.layer.id==='pins'?pins:polys).push(u)});
+    polys.sort((x,y)=>(state.byUid.get(x).area||0)-(state.byUid.get(y).area||0));
+    const list=[...pins,...polys].filter(u=>state.byUid.has(u));
+    if(!list.length){popup.remove();clearPair();return}
+    const first=state.byUid.get(list[0]);
+    const ll=pins.length&&first.pin?first.pin:[e.lngLat.lng,e.lngLat.lat];
+    openPopup(list,0,ll);
+  });
+  map.on('mousemove',e=>{
+    const fs=map.queryRenderedFeatures(e.point,{layers:QL});
+    map.getCanvas().style.cursor=fs.length?'pointer':'';
+    if(!fs.length){tipPopup.remove();return}
+    const pin=fs.find(f=>f.layer.id==='pins')||fs[0];
+    const it=state.byUid.get(pin.properties.uid);
+    if(!it){tipPopup.remove();return}
+    tipPopup.setLngLat(pin.layer.id==='pins'&&it.pin?it.pin:e.lngLat).setHTML(`<b style="color:${LK[it.layer].color}">●</b> ${esc(it.title)}`).addTo(map);
+  });
+  map.getCanvas().addEventListener('mouseleave',()=>tipPopup.remove());
+}
+function fitAll(anim=true){
+  const its=state.items.filter(itemVisible).filter(i=>i.bbox);
+  if(!its.length)return;
+  let b=[Infinity,Infinity,-Infinity,-Infinity];
+  its.forEach(i=>{b=[Math.min(b[0],i.bbox[0]),Math.min(b[1],i.bbox[1]),Math.max(b[2],i.bbox[2]),Math.max(b[3],i.bbox[3])]});
+  // آیتم‌های بسیار بزرگ (مثل دهستان) نمای کلی را خراب نکنند
+  const small=its.filter(i=>!isAdmin(i)).filter(i=>i.bbox);
+  if(small.length){b=[Infinity,Infinity,-Infinity,-Infinity];small.forEach(i=>{b=[Math.min(b[0],i.bbox[0]),Math.min(b[1],i.bbox[1]),Math.max(b[2],i.bbox[2]),Math.max(b[3],i.bbox[3])]})}
+  fitBox(b,anim);
+}
+function fitBox(b,anim=true,pad=70){
+  if(b[0]===b[2]&&b[1]===b[3]){map.flyTo({center:[b[0],b[1]],zoom:14.5,duration:anim?900:0});return}
+  const mobile=innerWidth<=1100;
+  map.fitBounds([[b[0],b[1]],[b[2],b[3]]],{padding:{top:pad,bottom:pad,left:pad,right:pad},maxZoom:15.5,duration:anim?900:0});
+}
+function updateMap(){
+  if(!state.mapReady)return;
+  const polys=[],pins=[];
+  state.items.forEach(it=>{
+    if(!itemVisible(it))return;
+    const props={uid:it.uid,layer:it.layer,st:it.st,title:it.title};
+    if(it.feature&&state.polysVis[it.layer])polys.push({type:'Feature',properties:props,geometry:it.feature.geometry});
+    if(it.pin&&state.pinsVis[it.layer])pins.push({type:'Feature',properties:{...props,z:{region:1,project:2,operation:3}[it.layer]},geometry:{type:'Point',coordinates:it.pin}});
+  });
+  map.getSource('polys').setData({type:'FeatureCollection',features:polys});
+  map.getSource('pins').setData({type:'FeatureCollection',features:pins});
+  const cl=[];
+  if(state.showClash)visibleRels().forEach(r=>{if(r.inter&&(r.type==='overlap'||r.type==='contain'))cl.push({type:'Feature',properties:{sev:r.sev,id:r.id},geometry:r.inter.geometry})});
+  map.getSource('clash').setData({type:'FeatureCollection',features:cl});
+  LAYERS.forEach(L=>{
+    map.setPaintProperty('fill-'+L.key,'fill-opacity',state.opacity[L.key]*.5);
+    map.setPaintProperty('line-'+L.key,'line-opacity',Math.min(1,state.opacity[L.key]+.3));
+  });
+}
+function updateSel(){
+  if(!state.mapReady)return;
+  const fs=[];
+  const it=state.sel&&state.byUid.get(state.sel);
+  if(it){
+    if(it.feature)fs.push({type:'Feature',properties:{},geometry:it.feature.geometry});
+    if(it.pin&&!it.feature)fs.push({type:'Feature',properties:{},geometry:{type:'Point',coordinates:it.pin}});
+  }
+  map.getSource('sel').setData({type:'FeatureCollection',features:fs});
+}
+function clearPair(){
+  if(!state.mapReady)return;
+  map.getSource('pair').setData(E_FC);
+}
+
+/* ═════════════ پاپ‌آپ آیتم ═════════════ */
+function statusTag(it){return `<span class="tag" style="--cc:${STATUS[it.st].color}">${esc(it.status)}</span>`}
+function popupHTML(it,idx,n){
+  const L=LK[it.layer];
+  const rels=relsOf(it.uid,{all:true}).filter(r=>!r.linked&&(r.sev==='high'||r.sev==='medium'));
+  const warn=rels.length?`<div class="pp-warn" onclick="App.openIdentity('${it.uid}','rel')">⚠ ${fa(rels.length)} مورد تداخل / هم‌مرزی مهم — مشاهده</div>`:'';
+  const metas=[];
+  if(it.area)metas.push(`مساحت: <b>${fmtArea(it.area)}</b>`);
+  if(it.unit)metas.push(`واحد: <b>${esc(it.unit)}</b>`);
+  if(it.parents.length)metas.push(`وابسته به: <b>${esc(it.parents.map(p=>p.title).join('، '))}</b>`);
+  const doc=it.docUrl?`<a class="btn" href="${esc(it.docUrl)}" target="_blank" rel="noopener">📄 سند کامل</a>`:`<span class="btn disabled">📄 سند کامل</span>`;
+  const st=it.iframeUrl?`<button class="btn" onclick="App.openStatus('${it.uid}')">📡 وضعیت</button>`:`<span class="btn disabled">📡 وضعیت</span>`;
+  const nav=n>1?`<div class="pp-nav"><button class="btn sm" onclick="App.ppNav(-1)">‹ قبلی</button><span>${fa(idx+1)} از ${fa(n)} آیتم در این نقطه</span><button class="btn sm" onclick="App.ppNav(1)">بعدی ›</button></div>`:'';
+  return `<div class="pp" style="--lc:${L.color}">
+    <div class="pp-head"><span class="dot"></span><div><div class="pp-layer">${L.n} · ${L.name}</div><h3>${esc(it.title)}</h3></div></div>
+    <div class="pp-chips">${statusTag(it)}<span class="tag">${esc(it.kind)}</span>${it.code?`<span class="tag" style="direction:ltr">${esc(it.code)}</span>`:''}</div>
+    ${it.desc?`<p class="pp-desc">${esc(it.desc)}</p>`:''}
+    ${metas.length?`<div class="pp-meta">${metas.map(m=>`<span>${m}</span>`).join('')}</div>`:''}
+    ${warn}
+    <div class="pp-act">${doc}${st}<button class="btn primary full" onclick="App.openIdentity('${it.uid}')">🪪 شناسنامه آیتم</button></div>
+    ${nav}</div>`;
+}
+function openPopup(list,idx,ll){
+  state.pp={list,idx,ll};
+  const it=state.byUid.get(list[idx]);
+  state.sel=it.uid;updateSel();
+  popup.setLngLat(ll).setHTML(popupHTML(it,idx,list.length)).addTo(map);
+}
+function popupAtItem(it){
+  const ll=it.pin||[state.lng0,state.lat0];
+  openPopup([it.uid],0,ll);
+}
+
+/* ═════════════ مودال‌ها ═════════════ */
+const openModal=id=>$('#'+id).classList.add('open');
+const closeModals=()=>{$$('.modal-bd.open').forEach(m=>m.classList.remove('open'));$('#stBody').innerHTML='';if(!popup||!popup.isOpen()){state.sel=null;updateSel()}};
+function iframeBlock(url){
+  if(!url)return `<div class="empty neu-in" style="border-radius:18px">لینک صفحه وضعیت برای این آیتم ثبت نشده است.</div>`;
+  return `<div class="ifw"><iframe src="${esc(url)}" loading="lazy" referrerpolicy="no-referrer" allow="fullscreen" title="وضعیت آیتم"></iframe>
+    <div class="ifnote">اگر صفحه نمایش داده نشد (محدودیت امنیتی سایت مقصد)، آن را <a href="${esc(url)}" target="_blank" rel="noopener" style="color:var(--acc)">در تب جدید باز کنید</a>.</div></div>`;
+}
+function openStatus(uid){
+  const it=state.byUid.get(uid);if(!it)return;
+  $('#stTitle').innerHTML=`<span style="color:${LK[it.layer].color}">●</span> وضعیت: ${esc(it.title)}`;
+  $('#stHeadBtns').innerHTML=it.iframeUrl?`<a class="btn sm" href="${esc(it.iframeUrl)}" target="_blank" rel="noopener">باز کردن در تب جدید</a>`:'';
+  $('#stBody').innerHTML=iframeBlock(it.iframeUrl);
+  openModal('mStatus');
+}
+function fieldRows(it){
+  const rows=[];
+  (it.headers||[]).forEach(h=>{
+    const v=it.row[h];
+    if(v===undefined||String(v).trim()==='')return;
+    if(GEOM_COLS.includes(h)){
+      const f=parseGeometry(v);
+      rows.push([h,f?`دارد — ${fa(countVerts(f.geometry))} رأس · مساحت ${fmtArea(turf.area(f))}`:'<span style="color:var(--bad)">قابل‌خواندن نیست</span>',true]);
+      return;
+    }
+    const s=String(v).trim();
+    if(/^https?:\/\//i.test(s))rows.push([h,`<a href="${esc(s)}" target="_blank" rel="noopener" style="color:var(--acc);direction:ltr;display:inline-block;word-break:break-all">${esc(s.length>60?s.slice(0,57)+'…':s)}</a>`,true]);
+    else rows.push([h,esc(s),true]);
+  });
+  return rows;
+}
+function openIdentity(uid,focus){
+  const it=state.byUid.get(uid);if(!it)return;
+  const L=LK[it.layer];
+  state.sel=it.uid;updateSel();
+  $('#idTitle').innerHTML=`<span style="color:${L.color}">●</span> ${esc(it.title)} <small style="color:var(--muted);font-weight:400;font-size:12px">· شناسنامه آیتم</small>`;
+  $('#idHeadBtns').innerHTML=`${it.docUrl?`<a class="btn sm" href="${esc(it.docUrl)}" target="_blank" rel="noopener">📄 سند کامل</a>`:''}<button class="btn sm" onclick="App.flyTo('${it.uid}',true)">📍 نمایش روی نقشه</button>`;
+  const fr=fieldRows(it);
+  const rels=relsOf(it.uid,{all:true});
+  const relHtml=rels.length?rels.map(r=>{
+    const o=state.byUid.get(r.a===it.uid?r.b:r.a);
+    return `<div class="rel neu-sm" style="--cc:${SEV[r.sev].color}" onclick="App.focusRel(${r.id},true)">
+      <div class="rel-top"><b>${REL[r.type]}</b><span class="tag" style="--cc:${SEV[r.sev].color}">${SEV[r.sev].label}${r.linked?' · ساختاری':''}</span></div>
+      <div class="rel-pair"><i style="background:${LK[o.layer].color}"></i>${esc(o.title)}</div>
+      <div class="rel-meta">${esc(relText(r))}</div></div>`}).join(''):`<div class="empty neu-in" style="border-radius:16px">هیچ تداخل یا مجاورتی در آستانه‌ی ${fmtDist(state.rf.near)} یافت نشد${state.analysisDone?'':' (تحلیل هنوز در حال انجام است)'}.</div>`;
+  const hier=[];
+  if(it.parents.length)hier.push(`<div class="sub">وابسته به</div><div class="chips">${it.parents.map(p=>`<span class="chip" style="--cc:${LK[p.layer].color}" onclick="App.pick('${p.uid}')"><i style="background:${LK[p.layer].color}"></i>${esc(p.title)}</span>`).join('')}</div>`);
+  if(it.children.length)hier.push(`<div class="sub">زیرمجموعه‌ها (${fa(it.children.length)})</div><div class="chips">${it.children.map(p=>`<span class="chip" onclick="App.pick('${p.uid}')"><i style="background:${LK[p.layer].color}"></i>${esc(p.title)}</span>`).join('')}</div>`);
+  $('#idBody').innerHTML=`<div class="mgrid">
+    <div class="mcol">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"><span class="tag" style="--cc:${L.color}">${L.n} · ${L.short}</span>${statusTag(it)}<span class="tag">${esc(it.kind)}</span></div>
+      ${it.desc?`<p style="margin:0 0 12px;line-height:2;color:var(--muted)">${esc(it.desc)}</p>`:''}
+      <div class="sub" style="margin-top:6px">اطلاعات ثبت‌شده</div>
+      <table class="ftbl">${fr.map(r=>`<tr><th>${esc(r[0])}</th><td>${r[1]}</td></tr>`).join('')}</table>
+      ${hier.join('')}
+      <div class="sub" id="idRels">هماهنگی‌ها و تداخل‌ها (${fa(rels.length)})</div>
+      ${relHtml}
+    </div>
+    <div class="mcol" style="padding:0">${iframeBlock(it.iframeUrl)}</div></div>`;
+  openModal('mIdentity');
+  if(focus==='rel')setTimeout(()=>{const e=$('#idRels');e&&e.scrollIntoView({behavior:'smooth',block:'start'})},60);
+}
+
+/* ═════════════ حرکت به آیتم و جستجو ═════════════ */
+function ensureVisible(it){
+  let ch=false;
+  if(!state.layerVis[it.layer]){state.layerVis[it.layer]=true;ch=true}
+  if(!state.statusOn.has(it.st)){state.statusOn.add(it.st);ch=true}
+  if(state.kind&&it.kind!==state.kind){state.kind='';ch=true}
+  if(it.feature&&!state.polysVis[it.layer]){state.polysVis[it.layer]=true;ch=true}
+  if(!it.feature&&!state.pinsVis[it.layer]){state.pinsVis[it.layer]=true;ch=true}
+  if(ch){renderLayerPanel();refreshAll()}
+}
+function flyTo(uid,keepModal){
+  const it=state.byUid.get(uid);if(!it)return;
+  ensureVisible(it);
+  if(!keepModal)closeModals();else $$('.modal-bd.open').forEach(m=>m.classList.remove('open'));
+  if(innerWidth<=1100)closePanels();
+  if(it.bbox)fitBox(it.bbox,true,90);
+  setTimeout(()=>popupAtItem(it),it.bbox&&it.bbox[0]!==it.bbox[2]?950:700);
+}
+function pick(uid){$$('.modal-bd.open').forEach(m=>m.classList.remove('open'));$('#sres').classList.remove('show');flyTo(uid)}
+let sActive=-1,sList=[];
+function doSearch(){
+  const qv=normText($('#q').value);state.q=qv;
+  const box=$('#sres');
+  if(state.tab==='tb')renderTable();
+  if(!qv){box.classList.remove('show');return}
+  const toks=qv.split(' ');
+  sList=state.items.map(it=>{
+    const hay=normText([it.title,it.code,it.id,it.ext,it.desc,it.kind,it.recType,it.unit,it.status,it.parentRef].join(' '));
+    if(!toks.every(t=>hay.includes(t)))return null;
+    const t=normText(it.title);
+    return{it,score:(t.startsWith(qv)?3:t.includes(qv)?2:1)};
+  }).filter(Boolean).sort((a,b)=>b.score-a.score).slice(0,14);
+  sActive=sList.length?0:-1;
+  box.innerHTML=sList.length?sList.map((r,i)=>`<div class="sr ${i===0?'act':''}" data-uid="${r.it.uid}"><span class="dot" style="background:${LK[r.it.layer].color}"></span><div><b>${esc(r.it.title)}</b><small>${LK[r.it.layer].short} · ${esc(r.it.kind)} · ${esc(r.it.status)}${r.it.code?' · '+esc(r.it.code):''}</small></div></div>`).join(''):`<div class="sr-empty">نتیجه‌ای برای «${esc($('#q').value)}» یافت نشد.</div>`;
+  box.classList.add('show');
+}
+
+/* ═════════════ پنل لایه‌ها ═════════════ */
+function renderLayerPanel(){
+  $('#layerCards').innerHTML=LAYERS.map(L=>{
+    const tot=state.items.filter(i=>i.layer===L.key).length;
+    const vis=state.items.filter(i=>i.layer===L.key&&itemVisible(i)).length;
+    return `<div class="lcard neu-sm" style="--lc:${L.color}">
+      <div class="lh"><span class="ldot" style="background:${L.color}"></span>
+        <div class="ln"><b>${L.n} · ${L.name}</b><small>${fa(vis)} از ${fa(tot)} آیتم</small></div>
+        <label class="sw"><input type="checkbox" data-l="${L.key}" data-k="layer" ${state.layerVis[L.key]?'checked':''} aria-label="نمایش ${L.name}"><span></span></label></div>
+      <div class="lctl">
+        <div class="lrow"><span class="lbl">📍 پین‌ها</span><label class="sw"><input type="checkbox" data-l="${L.key}" data-k="pins" ${state.pinsVis[L.key]?'checked':''}><span></span></label></div>
+        <div class="lrow"><span class="lbl">⬠ محدوده‌ها</span><label class="sw"><input type="checkbox" data-l="${L.key}" data-k="polys" ${state.polysVis[L.key]?'checked':''}><span></span></label></div>
+        <div class="lrow"><span class="lbl" style="min-width:60px">شفافیت</span><input type="range" min="0.1" max="1" step="0.05" value="${state.opacity[L.key]}" data-l="${L.key}" data-k="op" aria-label="شفافیت"></div>
+        <div class="lbtns"><button class="btn sm" data-zoom="${L.key}">⤢ زوم به لایه</button><button class="btn sm" data-solo="${L.key}">فقط این لایه</button></div>
+      </div></div>`}).join('');
+  const cnt={};state.items.forEach(i=>cnt[i.st]=(cnt[i.st]||0)+1);
+  $('#statusChips').innerHTML=STATUS_KEYS.filter(k=>cnt[k]).map(k=>`<button class="chip ${state.statusOn.has(k)?'':'off'}" data-st="${k}" style="--cc:${STATUS[k].color}"><i></i>${STATUS[k].label} <b>${fa(cnt[k])}</b></button>`).join('')||'<span style="color:var(--muted)">—</span>';
+  const kinds=[...new Set(state.items.map(i=>i.kind))].sort((a,b)=>a.localeCompare(b,'fa'));
+  $('#kindSel').innerHTML=`<option value="">همه انواع</option>`+kinds.map(k=>`<option value="${esc(k)}" ${state.kind===k?'selected':''}>${esc(k)}</option>`).join('');
+}
+function renderLegend(){
+  $('#legend').innerHTML=LAYERS.map(L=>`<div class="lr"><i style="background:${L.color}"></i>${L.n} · ${L.short}</div>`).join('')
+    +'<div class="lg-sep"></div>'+STATUS_KEYS.map(k=>`<div class="lr"><i class="sq" style="background:${STATUS[k].color}"></i>${STATUS[k].label}</div>`).join('')
+    +'<div class="lg-sep"></div><div class="lr"><i class="sq" style="background:#ef4444"></i>ناحیه تداخل</div>';
+}
+
+/* ═════════════ نمای کلی: KPI و نمودارها ═════════════ */
+let charts={};
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function upsert(key,id,cfg){
+  Chart.defaults.font.family=getComputedStyle(document.body).fontFamily;
+  Chart.defaults.color=cssv('--muted');
+  if(charts[key]){charts[key].data=cfg.data;charts[key].options=cfg.options;charts[key].update('none');return}
+  charts[key]=new Chart($(id),cfg);
+}
+function destroyCharts(){Object.values(charts).forEach(c=>c.destroy());charts={}}
+const baseOpts=(extra={})=>({responsive:true,maintainAspectRatio:false,animation:false,
+  plugins:{legend:{rtl:true,labels:{usePointStyle:true,boxWidth:8,font:{size:11}}},tooltip:{rtl:true,textDirection:'rtl',titleAlign:'right',bodyAlign:'right'}},...extra});
+function regionStats(){
+  const out=[];
+  const regs=state.items.filter(i=>i.layer==='region'&&itemVisible(i));
+  const map=new Map(regs.map(r=>[r.uid,{r,proj:new Set(r.children.filter(c=>c.layer==='project'&&itemVisible(c)).map(c=>c.uid)),ops:new Set(),high:0}]));
+  state.rels.forEach(r=>{
+    const a=state.byUid.get(r.a),b=state.byUid.get(r.b);
+    if(!itemVisible(a)||!itemVisible(b))return;
+    let reg,oth;
+    if(a.layer==='region'&&b.layer!=='region'){reg=a;oth=b}else if(b.layer==='region'&&a.layer!=='region'){reg=b;oth=a}else return;
+    const s=map.get(reg.uid);if(!s)return;
+    if(oth.layer==='project'&&['overlap','contain','inside'].includes(r.type))s.proj.add(oth.uid);
+    if(oth.layer==='operation'&&['overlap','contain','inside','touch'].includes(r.type)&&!r.linked)s.ops.add(oth.uid);
+    if(!r.linked&&!isAdmin(reg)&&(r.sev==='high'||r.sev==='medium'))s.high++;
+  });
+  map.forEach(s=>out.push(s));
+  return out;
+}
+function renderOverview(){
+  const vis=state.items.filter(itemVisible);
+  const by=k=>vis.filter(i=>i.layer===k);
+  const cnt=s=>vis.filter(i=>i.st===s).length;
+  const pct=n=>vis.length?fa(n/vis.length*100)+'٪':'—';
+  const rels=visibleRels().filter(r=>!r.linked);
+  const hi=rels.filter(r=>r.sev==='high').length;
+  const projArea=by('project').reduce((s,i)=>s+i.area,0);
+  const stBar=STATUS_KEYS.map(k=>cnt(k)?`<span style="flex:${cnt(k)};background:${STATUS[k].color}"></span>`:'').join('');
+  $('#kpis').innerHTML=`
+    <div class="kpi neu-in"><b style="color:${LK.region.color}">${fa(by('region').length)}</b><small>منطقه / روستا</small></div>
+    <div class="kpi neu-in"><b style="color:${LK.project.color}">${fa(by('project').length)}</b><small>پروژه</small></div>
+    <div class="kpi neu-in"><b style="color:${LK.operation.color}">${fa(by('operation').length)}</b><small>فرایند / عملیات</small></div>
+    <div class="kpi neu-in"><b style="color:${STATUS.active.color}">${fa(cnt('active'))}</b><small>در حال اجرا · ${pct(cnt('active'))}</small></div>
+    <div class="kpi neu-in"><b style="color:${STATUS.done.color}">${fa(cnt('done'))}</b><small>تکمیل‌شده · ${pct(cnt('done'))}</small></div>
+    <div class="kpi neu-in"><b style="color:${STATUS.risk.color}">${fa(cnt('risk'))}</b><small>متوقف / نیازمند توجه</small></div>
+    <div class="kpi neu-in"><b style="color:${SEV.high.color}">${state.analysisDone?fa(hi):'…'}</b><small>تداخل بحرانی</small></div>
+    <div class="kpi neu-in"><b>${state.analysisDone?fa(rels.filter(r=>r.type==='touch').length):'…'}</b><small>هم‌مرزی</small></div>
+    <div class="kpi neu-in"><b>${fa(projArea/10000,projArea>=1e6?0:1)}</b><small>هکتار محدوده پروژه‌ها</small></div>
+    <div class="kpi wide neu-in" style="flex-direction:column;align-items:stretch;gap:2px"><small style="text-align:center">ترکیب وضعیت (${fa(vis.length)} آیتم نمایان)</small><div class="ks" style="margin-top:6px">${stBar}</div></div>`;
+  const g=$('#glance');
+  g.innerHTML=`<div class="gl neu-in"><i style="background:${LK.region.color}"></i>${fa(by('region').length)} <span>منطقه</span></div>
+    <div class="gl neu-in"><i style="background:${LK.project.color}"></i><b>${fa(by('project').length)}</b> <span>پروژه</span></div>
+    <div class="gl neu-in"><i style="background:${LK.operation.color}"></i>${fa(by('operation').length)} <span>عملیات</span></div>
+    <div class="gl neu-in"><i style="background:${STATUS.active.color}"></i>${fa(cnt('active'))} <span>در حال اجرا</span></div>
+    <div class="gl neu-in"><i style="background:${SEV.high.color}"></i>${state.analysisDone?fa(hi):'…'} <span>تداخل بحرانی</span></div>`;
+  g.querySelectorAll('.gl:not(:nth-child(2))').forEach(()=>{});
+  // نمودار وضعیت
+  const sk=STATUS_KEYS.filter(k=>cnt(k));
+  upsert('status','#chStatus',{type:'doughnut',data:{labels:sk.map(k=>STATUS[k].label),datasets:[{data:sk.map(cnt),backgroundColor:sk.map(k=>STATUS[k].color),borderColor:cssv('--bg'),borderWidth:3}]},options:baseOpts({cutout:'62%',plugins:{legend:{position:'right',rtl:true,labels:{usePointStyle:true,boxWidth:8,font:{size:11}}},tooltip:{rtl:true,textDirection:'rtl'}}})});
+  // وضعیت هر لایه
+  upsert('layer','#chLayer',{type:'bar',data:{labels:LAYERS.map(l=>l.short),datasets:STATUS_KEYS.filter(k=>cnt(k)).map(k=>({label:STATUS[k].label,data:LAYERS.map(l=>vis.filter(i=>i.layer===l.key&&i.st===k).length),backgroundColor:STATUS[k].color,borderRadius:6}))},
+    options:baseOpts({scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,ticks:{precision:0},grid:{color:'rgba(128,140,170,.15)'},position:'right'}}})});
+  // انواع
+  const kc={};vis.forEach(i=>{kc[i.kind]=(kc[i.kind]||0)+1});
+  const kl=Object.entries(kc).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  upsert('kind','#chKind',{type:'bar',data:{labels:kl.map(x=>x[0]),datasets:[{data:kl.map(x=>x[1]),backgroundColor:cssv('--acc'),borderRadius:8}]},
+    options:baseOpts({indexAxis:'y',plugins:{legend:{display:false},tooltip:{rtl:true,textDirection:'rtl'}},scales:{x:{beginAtZero:true,ticks:{precision:0},grid:{color:'rgba(128,140,170,.15)'}},y:{grid:{display:false},position:'right'}}})});
+  // مناطق
+  const rs=regionStats().filter(s=>!isAdmin(s.r)).sort((a,b)=>(b.proj.size+b.ops.size)-(a.proj.size+a.ops.size)).slice(0,8);
+  upsert('region','#chRegion',{type:'bar',data:{labels:rs.map(s=>s.r.title),datasets:[
+    {label:'پروژه‌ها',data:rs.map(s=>s.proj.size),backgroundColor:LK.project.color,borderRadius:6},
+    {label:'عملیات درگیر',data:rs.map(s=>s.ops.size),backgroundColor:LK.operation.color,borderRadius:6}]},
+    options:baseOpts({scales:{x:{grid:{display:false}},y:{beginAtZero:true,ticks:{precision:0},grid:{color:'rgba(128,140,170,.15)'},position:'right'}}})});
+  // کیفیت داده
+  const q={nogeom:vis.filter(i=>!i.pin&&!i.feature),nodoc:vis.filter(i=>!i.docUrl),noiframe:vis.filter(i=>!i.iframeUrl),bad:vis.filter(i=>i.badGeom)};
+  $('#quality').innerHTML=[['nogeom','بدون مختصات و محدوده',q.nogeom.length],['nodoc','بدون لینک سند کامل',q.nodoc.length],['noiframe','بدون لینک صفحه وضعیت',q.noiframe.length],['nogeom','هندسه‌ی نامعتبر / قابل‌خواندن نیست',q.bad.length]]
+    .map(r=>`<div class="qrow" data-q="${r[0]}"><span>${r[1]}</span><b style="color:${r[2]?'var(--warn)':'var(--ok)'}">${r[2]?fa(r[2]):'✓'}</b></div>`).join('');
+}
+
+/* ═════════════ هماهنگی ═════════════ */
+function renderCoord(){
+  const rels=visibleRels();
+  const base=visibleRels({ignorePairs:true});
+  const nr=rels.filter(r=>!r.linked||state.rf.linked);
+  $('#sevs').innerHTML=Object.entries(SEV).map(([k,s])=>`<div class="sev neu-in" style="--cc:${s.color}"><b>${state.analysisDone?fa(nr.filter(r=>r.sev===k).length):'…'}</b><small>${s.label}</small></div>`).join('');
+  // ماتریس
+  const keys=['region','project','operation'];
+  const cell=(i,j)=>{
+    if(i===0&&j===0)return '<td class="dis">—</td>';
+    const a=keys[i],b=keys[j];
+    const pk=a===b?'same':[a,b].sort().join('-');
+    const n=base.filter(r=>pairKey(state.byUid.get(r.a),state.byUid.get(r.b))===pk&&(a===b||[state.byUid.get(r.a).layer,state.byUid.get(r.b).layer].sort().join('-')===[a,b].sort().join('-'))).filter(r=>a===b?state.byUid.get(r.a).layer===a:true).length;
+    const mx=Math.max(1,...base.map(()=>1).length?[base.length]:[1]);
+    const on=Object.entries(state.rf.pairs).filter(([,v])=>v).length===1&&state.rf.pairs[pk];
+    return `<td data-pk="${pk}" class="${on?'act':''}" style="--k:${Math.min(1,n/Math.max(4,mx*.5))}">${fa(n)}</td>`;
+  };
+  $('#matrix').innerHTML=`<table class="mx"><tr><th></th>${LAYERS.map(l=>`<th>${l.short}</th>`).join('')}</tr>${keys.map((k,i)=>`<tr><th>${LK[k].short}</th>${keys.map((_,j)=>cell(i,j)).join('')}</tr>`).join('')}</table>`;
+  const cnt={};base.forEach(r=>cnt[r.type]=(cnt[r.type]||0)+1);
+  $('#relTypes').innerHTML=Object.entries(REL).map(([k,l])=>`<button class="chip ${state.rf.types[k]?'':'off'}" data-rt="${k}"><i style="background:${k==='overlap'?'#ef4444':k==='contain'?'#a855f7':k==='inside'?'#ec4899':k==='touch'?'#f97316':'#3b82f6'}"></i>${l} <b>${fa(cnt[k]||0)}</b></button>`).join('');
+  $('#relPairs').innerHTML=PAIRS.map(p=>`<button class="chip ${state.rf.pairs[p.k]?'':'off'}" data-rp="${p.k}">${p.l}</button>`).join('');
+  $('#nearVal').textContent=fmtDist(state.rf.near);
+  $('#nearRange').value=state.rf.near;
+  $('#swLinked').checked=state.rf.linked;
+  const sorted=rels.slice().sort((x,y)=>SEV[y.sev].rank-SEV[x.sev].rank||y.pct-x.pct||x.dist-y.dist);
+  $('#relCount').textContent=state.analysisDone?`${fa(sorted.length)} مورد هماهنگی`:'در حال تحلیل…';
+  const lim=120;
+  $('#relList').innerHTML=sorted.length?sorted.slice(0,lim).map(r=>{
+    const a=state.byUid.get(r.a),b=state.byUid.get(r.b);
+    return `<div class="rel neu-sm" style="--cc:${SEV[r.sev].color}" data-rel="${r.id}">
+      <div class="rel-top"><b>${REL[r.type]}</b><span class="tag" style="--cc:${SEV[r.sev].color}">${SEV[r.sev].label}${r.linked?' · ساختاری':''}</span></div>
+      <div class="rel-pair"><i style="background:${LK[a.layer].color}"></i>${esc(a.title)}<em>⟷</em><i style="background:${LK[b.layer].color}"></i>${esc(b.title)}</div>
+      <div class="rel-meta">${esc(relText(r))}</div></div>`}).join('')+(sorted.length>lim?`<div class="empty">${fa(sorted.length-lim)} مورد دیگر — برای دیدن، فیلترها را محدودتر کنید.</div>`:'')
+    :`<div class="empty neu-in" style="border-radius:16px">${state.analysisDone?'با فیلترهای فعلی، تداخل یا مجاورتی یافت نشد.':'تحلیل در حال انجام است…'}</div>`;
+}
+function focusRel(id,fromModal){
+  const r=state.relById.get(id);if(!r)return;
+  const a=state.byUid.get(r.a),b=state.byUid.get(r.b);
+  if(fromModal)$$('.modal-bd.open').forEach(m=>m.classList.remove('open'));
+  [a,b].forEach(ensureVisible);
+  popup.remove();
+  const fs=[];
+  [[a,'a'],[b,'b']].forEach(([it,role])=>{
+    if(it.feature)fs.push({type:'Feature',properties:{role},geometry:it.feature.geometry});
+    else if(it.pin)fs.push({type:'Feature',properties:{role},geometry:{type:'Point',coordinates:it.pin}});
+  });
+  if(r.inter)fs.push({type:'Feature',properties:{role:'x'},geometry:r.inter.geometry});
+  map.getSource('pair').setData({type:'FeatureCollection',features:fs});
+  const bb=[Math.min(a.bbox[0],b.bbox[0]),Math.min(a.bbox[1],b.bbox[1]),Math.max(a.bbox[2],b.bbox[2]),Math.max(a.bbox[3],b.bbox[3])];
+  if(innerWidth<=1100)closePanels();
+  fitBox(bb,true,90);
+  toast(`<b>${REL[r.type]}</b> · ${esc(relText(r))}<br><span style="color:var(--muted)">🔷 ${esc(a.title)} &nbsp;⟷&nbsp; 🟣 ${esc(b.title)}</span>`,'inf',6500);
+}
+
+/* ═════════════ مناطق و جدول ═════════════ */
+function renderRegions(){
+  const rs=regionStats().sort((a,b)=>a.r.title.localeCompare(b.r.title,'fa'));
+  $('#regions').innerHTML=rs.length?rs.map(s=>`<div class="rcard neu-sm" data-uid="${s.r.uid}">
+    <div class="rh"><b>${esc(s.r.title)}</b>${statusTag(s.r)}</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:9px">${esc(s.r.kind)}${s.r.area?' · '+fmtArea(s.r.area):''}${s.r.parents.length?' · '+esc(s.r.parents.map(p=>p.title).join('، ')):''}</div>
+    ${s.r.desc?`<div style="font-size:12.5px;line-height:1.9;margin-bottom:9px">${esc(s.r.desc.length>120?s.r.desc.slice(0,118)+'…':s.r.desc)}</div>`:''}
+    <div class="rs neu-in" style="padding:8px;border-radius:12px;display:flex;justify-content:space-around;flex-wrap:wrap"><span>پروژه: <b style="color:${LK.project.color}">${fa(s.proj.size)}</b></span><span>عملیات درگیر: <b style="color:${LK.operation.color}">${fa(s.ops.size)}</b></span><span>تداخل مهم: <b style="color:${s.high?SEV.high.color:'inherit'}">${fa(s.high)}</b></span></div></div>`).join(''):`<div class="empty">منطقه‌ای با فیلترهای فعلی نمایش داده نمی‌شود.</div>`;
+}
+const TCOLS=[
+  {k:'layer',l:'لایه',v:i=>LK[i.layer].short},{k:'code',l:'کد',v:i=>i.code},{k:'title',l:'عنوان',v:i=>i.title},{k:'kind',l:'نوع',v:i=>i.kind},
+  {k:'status',l:'وضعیت',v:i=>i.status},{k:'parent',l:'وابسته به',v:i=>i.parents.map(p=>p.title).join('، ')},{k:'conf',l:'تداخل',v:i=>confCount(i)},{k:'area',l:'مساحت (ha)',v:i=>+(i.area/10000).toFixed(2)}
+];
+const confCount=i=>relsOf(i.uid,{all:true}).filter(r=>!r.linked&&(r.sev==='high'||r.sev==='medium')).length;
+function tableItems(){
+  let its=state.items.filter(itemVisible);
+  if(state.q){const toks=state.q.split(' ');its=its.filter(it=>{const h=normText([it.title,it.code,it.id,it.desc,it.kind,it.unit,it.status].join(' '));return toks.every(t=>h.includes(t))})}
+  const q=state.tbl.quality;
+  if(q==='nogeom')its=its.filter(i=>!i.pin&&!i.feature);
+  if(q==='nodoc')its=its.filter(i=>!i.docUrl);
+  if(q==='noiframe')its=its.filter(i=>!i.iframeUrl);
+  if(q==='conf')its=its.filter(i=>confCount(i)>0);
+  const c=TCOLS.find(c=>c.k===state.tbl.sort)||TCOLS[2];
+  its.sort((a,b)=>{const x=c.v(a),y=c.v(b);return(typeof x==='number'&&typeof y==='number'?x-y:String(x).localeCompare(String(y),'fa'))*state.tbl.dir});
+  return its;
+}
+function renderTable(){
+  const its=tableItems();
+  $('#tblQuality').value=state.tbl.quality;
+  $('#tbl').innerHTML=`<thead><tr>${TCOLS.map(c=>`<th data-sort="${c.k}">${c.l}${state.tbl.sort===c.k?(state.tbl.dir>0?' ▲':' ▼'):''}</th>`).join('')}</tr></thead><tbody>${its.slice(0,400).map(i=>{
+    const cc=confCount(i);
+    return `<tr class="row" data-uid="${i.uid}"><td><span class="tag" style="--cc:${LK[i.layer].color}">${LK[i.layer].short}</span></td><td style="direction:ltr;text-align:right">${esc(i.code)}</td><td class="tdn"><b>${esc(i.title)}</b></td><td>${esc(i.kind)}</td><td>${statusTag(i)}</td><td>${esc(i.parents.map(p=>p.title).join('، '))||'—'}</td><td>${cc?`<span class="tag" style="--cc:${SEV.high.color}">${fa(cc)}</span>`:'—'}</td><td>${i.area?fa(i.area/10000,1):'—'}</td></tr>`}).join('')}</tbody>`;
+  $('#tblInfo').textContent=`${fa(its.length)} آیتم${its.length>400?' (۴۰۰ مورد اول نمایش داده شد)':''}`;
+}
+function exportCsv(){
+  const its=tableItems();
+  const head=['لایه','کد','عنوان','نوع','وضعیت','وابسته به','تعداد تداخل مهم','مساحت (متر‌مربع)','عرض','طول','لینک سند','لینک وضعیت'];
+  const rows=its.map(i=>[LK[i.layer].name,i.code,i.title,i.kind,i.status,i.parents.map(p=>p.title).join('، '),confCount(i),Math.round(i.area),i.pin?i.pin[1]:'',i.pin?i.pin[0]:'',i.docUrl,i.iframeUrl]);
+  const csv='\uFEFF'+[head,...rows].map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='daraloo-atlas-items.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+
+/* ═════════════ رفرش مرکزی ═════════════ */
+let rafP=0;
+function scheduleRefresh(){if(rafP)return;rafP=requestAnimationFrame(()=>{rafP=0;refreshAll()})}
+function refreshAll(){
+  updateMap();
+  renderLayerPanelLight();
+  renderOverview();
+  if(state.tab==='co')renderCoord();
+  if(state.tab==='rg')renderRegions();
+  if(state.tab==='tb')renderTable();
+}
+function renderLayerPanelLight(){
+  // فقط شمارنده‌ها را به‌روز می‌کند تا کنترل‌ها (مثل اسلایدر) در حین کشیدن از بین نروند
+  $$('.lcard').forEach((c,i)=>{
+    const L=LAYERS[i];const tot=state.items.filter(x=>x.layer===L.key).length,vis=state.items.filter(x=>x.layer===L.key&&itemVisible(x)).length;
+    const sm=$('.ln small',c);if(sm)sm.textContent=`${fa(vis)} از ${fa(tot)} آیتم`;
+  });
+  $$('#statusChips .chip').forEach(c=>c.classList.toggle('off',!state.statusOn.has(c.dataset.st)));
+}
+function setTab(t){
+  state.tab=t;
+  $$('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  $$('.tabpane').forEach(p=>p.classList.toggle('on',p.id==='tab-'+t));
+  if(t==='ov'){renderOverview();setTimeout(()=>Object.values(charts).forEach(c=>c.resize()),30)}
+  if(t==='co')renderCoord();if(t==='rg')renderRegions();if(t==='tb')renderTable();
+}
+
+/* ═════════════ بارگذاری داده ═════════════ */
+const getApiUrl=()=>new URLSearchParams(location.search).get('api')||localStorage.getItem('dsa_api')||CONFIG.API_URL;
+function jsonp(url){
+  return new Promise((res,rej)=>{
+    const cb='__dsa_'+Date.now();const s=document.createElement('script');
+    const t=setTimeout(()=>{cl();rej(new Error('مهلت دریافت (JSONP) تمام شد.'))},40000);
+    function cl(){clearTimeout(t);delete window[cb];s.remove()}
+    window[cb]=d=>{cl();res(d)};
+    s.onerror=()=>{cl();rej(new Error('بارگذاری JSONP ناموفق بود.'))};
+    s.src=url+(url.includes('?')?'&':'?')+'action=getDashboardData&prefix='+cb+'&_='+Date.now();
+    document.head.appendChild(s);
+  });
+}
+async function fetchApi(){
+  const url=getApiUrl();if(!url)throw new Error('NO_URL');
+  try{
+    const r=await fetch(url+(url.includes('?')?'&':'?')+'action=getDashboardData&_='+Date.now(),{method:'GET',redirect:'follow'});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    return await r.json();
+  }catch(e){return await jsonp(url)}
+}
+async function loadData(){
+  setLoading(true,'در حال دریافت داده‌ها از سرور…');
+  let payload=null,err=null;
+  try{
+    if(state.demo)payload=demoPayload();
+    else payload=await fetchApi();
+  }catch(e){
+    err=e;
+    if(String(e.message)==='NO_URL'){state.demo=true;payload=demoPayload();toast('آدرس API تنظیم نشده است؛ داده‌ی نمونه نمایش داده می‌شود. آدرس را از «⚙ تنظیمات» وارد کنید.','inf',7000);err=null}
+  }
+  if(payload&&payload.success===false&&!payload.sheets){err=new Error(payload.error||'خطا در پاسخ API')}
+  try{
+    if(!err)ingest(payload);
+  }catch(e){err=e}
+  if(err){toast('دریافت داده ناموفق بود: '+esc(err.message)+'<br>آدرس Web App و دسترسی «Anyone» را در تنظیمات بررسی کنید.','err',9000)}
+  else if(payload&&payload.success===false&&payload.warning)toast(esc(payload.warning),'err',7000);
+  $('#demoBadge').classList.toggle('show',state.demo);
+  popup&&popup.remove();clearPair&&state.mapReady&&clearPair();
+  renderLayerPanel();renderLegend();
+  scheduleRefresh();
+  if(state.mapReady)fitAll(true);
+  runAnalysis();
+  setLoading(false);
+}
+function setLoading(on,msg){
+  const l=$('#loading');if(msg)$('#loadingMsg').textContent=msg;
+  l.classList.toggle('hide',!on);
+}
+function toast(html,kind='ok',ms=4000){
+  const t=document.createElement('div');t.className='toast neu '+kind;t.innerHTML=html;$('#toasts').appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300)},ms);
+}
+
+/* ═════════════ داده‌ی نمونه ═════════════ */
+function demoPayload(){
+  const C=[57.55,29.16];
+  const kx=111320*Math.cos(C[1]*Math.PI/180),ky=110574;
+  const rect=(dx,dy,w,h,rot=0)=>{ // dx,dy بر حسب متر از مرکز
+    const r=rot*Math.PI/180,cx=C[0]+dx/kx,cy=C[1]+dy/ky;
+    return [[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]].map(([x,y])=>[cx+(x*Math.cos(r)-y*Math.sin(r))/kx,cy+(x*Math.sin(r)+y*Math.cos(r))/ky]);
+  };
+  const geojson=ring=>JSON.stringify({type:'Polygon',coordinates:[[...ring,ring[0]]]});
+  const wkt=ring=>'POLYGON(('+[...ring,ring[0]].map(p=>p[0].toFixed(6)+' '+p[1].toFixed(6)).join(', ')+'))';
+  const latlng=ring=>JSON.stringify(ring.map(p=>[+p[1].toFixed(6),+p[0].toFixed(6)]));
+  const pt=(dx,dy)=>[C[1]+dy/ky,C[0]+dx/kx]; // [lat,lng]
+  const ifr='https://example.com/',doc='https://example.com/document';
+  const H1=['شناسه رکورد','کد رکورد','نوع رکورد','عنوان','وضعیت','شرح کوتاه','عرض جغرافیایی','طول جغرافیایی','هندسه محدوده (Polygon)','لینک نمایش وضعیت','لینک سند کامل'];
+  const H=(extra)=>[...H1,...extra];
+  const mk=(h,o)=>{const r={};h.forEach(k=>r[k]=o[k]??'');return r};
+  const hR=H(['نوع منطقه','شناسه منطقه والد']),hP=H(['شناسه پروژه','نوع پروژه','شناسه منطقه مرتبط','هندسه محدوده پروژه']),hO=H(['شناسه عملیات','نوع عملیات','شناسه عملیات والد','نام واحد / فرآیند','هندسه محدوده عملیات']);
+  const reg=(id,code,title,st,desc,kind,parent,ring,fmt,p)=>mk(hR,{'شناسه رکورد':id,'کد رکورد':code,'نوع رکورد':'منطقه','عنوان':title,'وضعیت':st,'شرح کوتاه':desc,'عرض جغرافیایی':p?p[0]:'','طول جغرافیایی':p?p[1]:'','هندسه محدوده (Polygon)':fmt(ring),'لینک نمایش وضعیت':ifr,'لینک سند کامل':doc,'نوع منطقه':kind,'شناسه منطقه والد':parent});
+  const prj=(id,code,title,st,desc,kind,region,ring,fmt,p,noDoc)=>mk(hP,{'شناسه رکورد':id,'کد رکورد':code,'نوع رکورد':'پروژه','عنوان':title,'وضعیت':st,'شرح کوتاه':desc,'عرض جغرافیایی':p?p[0]:'','طول جغرافیایی':p?p[1]:'','هندسه محدوده پروژه':ring?fmt(ring):'','لینک نمایش وضعیت':ifr,'لینک سند کامل':noDoc?'':doc,'شناسه پروژه':id,'نوع پروژه':kind,'شناسه منطقه مرتبط':region});
+  const op=(id,code,title,st,desc,kind,parent,unit,ring,fmt,p)=>mk(hO,{'شناسه رکورد':id,'کد رکورد':code,'نوع رکورد':'عملیات','عنوان':title,'وضعیت':st,'شرح کوتاه':desc,'عرض جغرافیایی':p?p[0]:'','طول جغرافیایی':p?p[1]:'','هندسه محدوده عملیات':ring?fmt(ring):'','لینک نمایش وضعیت':ifr,'لینک سند کامل':doc,'شناسه عملیات':id,'نوع عملیات':kind,'شناسه عملیات والد':parent,'نام واحد / فرآیند':unit});
+  const regions=[
+    reg('R-001','REG-001','دهستان نمونه','فعال','محدوده اداری شامل روستاهای پیرامون مجتمع.','دهستان','',rect(0,0,12000,9000),geojson,pt(0,0)),
+    reg('R-002','REG-002','روستای نمونه الف','فعال','روستای دارای مدرسه و مرکز بهداشت؛ حدود ۱۲۰ خانوار.','روستا','R-001',rect(-2150,-1300,1100,800),wkt,pt(-2150,-1300)),
+    reg('R-003','REG-003','روستای نمونه ب','نیازمند توجه','کمبود آب شرب؛ پروژه آب‌رسانی در دست اجراست.','روستا','R-001',rect(2900,1100,900,700),latlng,pt(2900,1100)),
+    reg('R-004','REG-004','روستای نمونه ج','در حال پایش','مجاور باطله‌گاه؛ نیازمند پایش زیست‌محیطی.','روستا','R-001',rect(2050,-1050,1000,800),geojson,pt(2050,-1050))
+  ];
+  const projects=[
+    prj('P-001','PRJ-001','احداث مدرسه روستای الف','تکمیل شده','ساخت مدرسه ۶ کلاسه با مشارکت اهالی.','آموزشی','R-002',rect(-2150,-1300,160,160),geojson,pt(-2150,-1300)),
+    prj('P-002','PRJ-002','آب‌رسانی روستای ب','در حال اجرا','حفر چاه و احداث مخزن ۲۰۰ مترمکعبی.','زیرساخت','R-003',rect(2900,1100,600,300),wkt,pt(2900,1100)),
+    prj('P-003','PRJ-003','جاده دسترسی روستای ج','در حال اجرا','آسفالت مسیر ارتباطی روستا به جاده اصلی.','راه و ترابری','R-004',rect(1500,-1050,2500,80,8),latlng,pt(1500,-1050)),
+    prj('P-004','PRJ-004','مرکز بهداشت روستای الف','برنامه‌ریزی','احداث خانه بهداشت — مکان‌یابی نهایی نشده.','بهداشت و درمان','R-002',null,null,pt(-250,150),true),
+    prj('P-005','PRJ-005','پارک محله‌ای','در دست مطالعه','فضای سبز و بازی کودکان.','فضای عمومی','R-002',rect(-1160,1060,300,300),geojson,pt(-1160,1060)),
+    prj('P-006','PRJ-006','کارگاه اشتغال‌زایی','متوقف','کارگاه صنایع‌دستی؛ به‌دلیل مجوز زمین متوقف شده.','اشتغال','R-001',rect(700,60,600,300),wkt,pt(700,60))
+  ];
+  const ops=[
+    op('O-001','OPR-001','پیت اصلی معدن','در حال اجرا','استخراج روباز.','استخراج','','واحد معدن',rect(0,0,1800,1400,20),geojson,pt(0,0)),
+    op('O-002','OPR-002','باطله‌گاه','در حال اجرا','دپوی مواد باطله.','دپو','O-001','واحد معدن',rect(1950,-440,1600,1200),wkt,pt(1950,-440)),
+    op('O-003','OPR-003','کارخانه فرآوری','فعال','کانه‌آرایی و تولید کنسانتره.','فرآوری','','واحد فرآوری',rect(-1750,880,1000,900),latlng,pt(-1750,880)),
+    op('O-004','OPR-004','جاده حمل','فعال','مسیر حمل بار.','حمل‌ونقل','O-001','واحد حمل',rect(-800,110,3000,120,10),geojson,pt(-800,110)),
+    op('O-005','OPR-005','ایستگاه پمپاژ آب','برنامه‌ریزی','تأمین آب فرایند.','تأسیسات','O-003','واحد تأسیسات',null,null,pt(800,670))
+  ];
+  const wrap=(L,h,rows)=>({success:true,sheetName:L.sheet,headers:h,rows,count:rows.length});
+  return{success:true,apiName:'DEMO',sheets:{[LAYERS[0].sheet]:wrap(LAYERS[0],hR,regions),[LAYERS[1].sheet]:wrap(LAYERS[1],hP,projects),[LAYERS[2].sheet]:wrap(LAYERS[2],hO,ops)}};
+}
+
+/* ═════════════ رویدادها ═════════════ */
+function closePanels(){$('#panelLayers').classList.remove('open');$('#panelInsights').classList.remove('open')}
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  localStorage.setItem('dsa_theme',t);
+  if(state.mapReady){
+    if(t==='dark'&&state.basemap==='osm')setBasemap('dark');
+    if(t==='light'&&state.basemap==='dark')setBasemap('osm');
+  }
+  destroyCharts();
+  if(state.items.length)renderOverview();
+}
+function bind(){
+  $('#btnTheme').onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+  $('#btnRefresh').onclick=()=>loadData();
+  $('#btnSettings').onclick=()=>{$('#apiUrl').value=localStorage.getItem('dsa_api')||CONFIG.API_URL||'';$('#seMsg').textContent=state.demo?'اکنون داده‌ی نمونه نمایش داده می‌شود.':'';openModal('mSettings')};
+  $('#btnMobLayers').onclick=()=>{$('#panelInsights').classList.remove('open');$('#panelLayers').classList.toggle('open')};
+  $('#btnMobInsights').onclick=()=>{$('#panelLayers').classList.remove('open');$('#panelInsights').classList.toggle('open');setTimeout(()=>Object.values(charts).forEach(c=>c.resize()),320)};
+  $('#seSave').onclick=()=>{const v=$('#apiUrl').value.trim();if(v&&!/^https?:\/\//i.test(v)){$('#seMsg').textContent='آدرس باید با https:// شروع شود.';return}localStorage.setItem('dsa_api',v);state.demo=!v;closeModals();loadData()};
+  $('#seDemo').onclick=()=>{state.demo=true;closeModals();loadData()};
+  $('#seTest').onclick=async()=>{
+    const v=$('#apiUrl').value.trim();if(!v){$('#seMsg').textContent='ابتدا آدرس را وارد کنید.';return}
+    $('#seMsg').textContent='در حال آزمون اتصال…';
+    try{
+      const u=v+(v.includes('?')?'&':'?')+'action=testConnection&_='+Date.now();
+      const r=await fetch(u);const j=await r.json();
+      $('#seMsg').innerHTML=j.success?`✅ اتصال برقرار است — فایل: <b>${esc(j.spreadsheetName)}</b><br>`+(j.sheets||[]).map(s=>`${s.exists?'✔':'✘'} ${esc(s.name)} (${fa(s.rows)} ردیف)`).join('<br>'):'❌ '+esc(j.error||'پاسخ نامعتبر');
+    }catch(e){$('#seMsg').textContent='❌ اتصال ناموفق: '+e.message+' — Web App باید با دسترسی «Anyone» منتشر شده باشد.'}
+  };
+  document.addEventListener('click',e=>{
+    if(e.target.matches('[data-close]')||e.target.closest('[data-close]'))closeModals();
+    if(e.target.classList&&e.target.classList.contains('modal-bd'))closeModals();
+    if(!e.target.closest('.search'))$('#sres').classList.remove('show');
+    if(!e.target.closest('#bmenu')&&!e.target.closest('#mtBase'))$('#bmenu').classList.remove('show');
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){closeModals();$('#sres').classList.remove('show');$('#bmenu').classList.remove('show')}
+    if(e.key==='/'&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();$('#q').focus()}
+  });
+  // جستجو
+  $('#q').addEventListener('input',debounce(doSearch,120));
+  $('#q').addEventListener('focus',()=>{if($('#q').value)doSearch()});
+  $('#q').addEventListener('keydown',e=>{
+    const rows=$$('#sres .sr');
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();if(!rows.length)return;sActive=(sActive+(e.key==='ArrowDown'?1:-1)+rows.length)%rows.length;rows.forEach((r,i)=>r.classList.toggle('act',i===sActive));rows[sActive].scrollIntoView({block:'nearest'})}
+    if(e.key==='Enter'&&rows[sActive]){pick(rows[sActive].dataset.uid);$('#q').blur()}
+  });
+  $('#sres').addEventListener('click',e=>{const r=e.target.closest('.sr');if(r&&r.dataset.uid)pick(r.dataset.uid)});
+  // پنل لایه‌ها
+  $('#layerCards').addEventListener('input',e=>{
+    const t=e.target,l=t.dataset.l,k=t.dataset.k;if(!l)return;
+    if(k==='layer')state.layerVis[l]=t.checked;
+    if(k==='pins')state.pinsVis[l]=t.checked;
+    if(k==='polys')state.polysVis[l]=t.checked;
+    if(k==='op')state.opacity[l]=+t.value;
+    scheduleRefresh();
+  });
+  $('#layerCards').addEventListener('click',e=>{
+    const z=e.target.closest('[data-zoom]'),s=e.target.closest('[data-solo]');
+    if(z){const its=state.items.filter(i=>i.layer===z.dataset.zoom&&i.bbox);if(!its.length)return;let b=[Infinity,Infinity,-Infinity,-Infinity];its.forEach(i=>{b=[Math.min(b[0],i.bbox[0]),Math.min(b[1],i.bbox[1]),Math.max(b[2],i.bbox[2]),Math.max(b[3],i.bbox[3])]});fitBox(b)}
+    if(s){LAYERS.forEach(L=>state.layerVis[L.key]=L.key===s.dataset.solo);renderLayerPanel();scheduleRefresh()}
+  });
+  $('#allOn').onclick=()=>{LAYERS.forEach(L=>state.layerVis[L.key]=true);renderLayerPanel();scheduleRefresh()};
+  $('#allOff').onclick=()=>{LAYERS.forEach(L=>state.layerVis[L.key]=false);renderLayerPanel();scheduleRefresh()};
+  $('#statusChips').addEventListener('click',e=>{const c=e.target.closest('[data-st]');if(!c)return;const k=c.dataset.st;state.statusOn.has(k)?state.statusOn.delete(k):state.statusOn.add(k);scheduleRefresh()});
+  $('#kindSel').onchange=e=>{state.kind=e.target.value;scheduleRefresh()};
+  $('#resetFilters').onclick=()=>{
+    LAYERS.forEach(L=>{state.layerVis[L.key]=state.pinsVis[L.key]=state.polysVis[L.key]=true;state.opacity[L.key]=.7});
+    state.statusOn=new Set(STATUS_KEYS);state.kind='';
+    Object.keys(state.rf.types).forEach(k=>state.rf.types[k]=true);Object.keys(state.rf.pairs).forEach(k=>state.rf.pairs[k]=true);
+    state.rf.near=CONFIG.PROX_DEFAULT_M;state.rf.linked=false;state.tbl.quality='';
+    renderLayerPanel();scheduleRefresh();
+  };
+  $('#swClash').onchange=e=>{state.showClash=e.target.checked;scheduleRefresh()};
+  $('#swTilt').onchange=e=>map.easeTo({pitch:e.target.checked?58:0,bearing:e.target.checked?-15:0,duration:800});
+  // ابزار نقشه
+  $('#mtFit').onclick=()=>fitAll(true);
+  $('#mtBase').onclick=()=>$('#bmenu').classList.toggle('show');
+  $('#bmenu').addEventListener('click',e=>{const b=e.target.closest('[data-bm]');if(b){setBasemap(b.dataset.bm);$('#bmenu').classList.remove('show')}});
+  $('#mtFull').onclick=()=>{const w=$('.mapwrap');document.fullscreenElement?document.exitFullscreen():w.requestFullscreen&&w.requestFullscreen()};
+  $('#mtClear').onclick=()=>{clearPair();popup.remove();state.sel=null;updateSel()};
+  // تب‌ها
+  $('#tabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(t)setTab(t.dataset.tab)});
+  // نمای کلی
+  $('#quality').addEventListener('click',e=>{const r=e.target.closest('[data-q]');if(!r)return;state.tbl.quality=r.dataset.q;setTab('tb')});
+  // هماهنگی
+  $('#relTypes').addEventListener('click',e=>{const c=e.target.closest('[data-rt]');if(!c)return;state.rf.types[c.dataset.rt]=!state.rf.types[c.dataset.rt];scheduleRefresh()});
+  $('#relPairs').addEventListener('click',e=>{const c=e.target.closest('[data-rp]');if(!c)return;state.rf.pairs[c.dataset.rp]=!state.rf.pairs[c.dataset.rp];scheduleRefresh()});
+  $('#nearRange').addEventListener('input',e=>{state.rf.near=+e.target.value;$('#nearVal').textContent=fmtDist(state.rf.near);scheduleRefresh()});
+  $('#swLinked').onchange=e=>{state.rf.linked=e.target.checked;scheduleRefresh()};
+  $('#matrix').addEventListener('click',e=>{
+    const td=e.target.closest('[data-pk]');if(!td)return;
+    const k=td.dataset.pk;const onlyThis=Object.entries(state.rf.pairs).filter(([,v])=>v).length===1&&state.rf.pairs[k];
+    Object.keys(state.rf.pairs).forEach(x=>state.rf.pairs[x]=onlyThis?true:x===k);
+    scheduleRefresh();
+  });
+  $('#relList').addEventListener('click',e=>{const r=e.target.closest('[data-rel]');if(r)focusRel(+r.dataset.rel)});
+  // مناطق و جدول
+  $('#regions').addEventListener('click',e=>{const c=e.target.closest('[data-uid]');if(c)flyTo(c.dataset.uid)});
+  $('#tbl').addEventListener('click',e=>{
+    const th=e.target.closest('[data-sort]');
+    if(th){const k=th.dataset.sort;state.tbl.dir=state.tbl.sort===k?-state.tbl.dir:1;state.tbl.sort=k;renderTable();return}
+    const tr=e.target.closest('tr.row');if(tr)flyTo(tr.dataset.uid);
+  });
+  $('#tblQuality').onchange=e=>{state.tbl.quality=e.target.value;renderTable()};
+  $('#btnCsv').onclick=exportCsv;
+}
+
+/* ═════════════ API عمومی برای دکمه‌های پاپ‌آپ ═════════════ */
+window.App={
+  openStatus,openIdentity,flyTo,pick,focusRel,
+  ppNav(d){
+    const p=state.pp;if(!p)return;
+    const n=p.list.length;p.idx=(p.idx+d+n)%n;
+    const it=state.byUid.get(p.list[p.idx]);
+    state.sel=it.uid;updateSel();
+    popup.setHTML(popupHTML(it,p.idx,n));
+  }
+};
+
+/* ═════════════ شروع ═════════════ */
+(function start(){
+  const th=localStorage.getItem('dsa_theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme',th);
+  if(th==='dark')state.basemap='dark';
+  renderBaseMenu();
+  bind();
+  initMap();
+  loadData();
+})();
+})();
+</script>
+</body>
+</html>

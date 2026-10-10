@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>اطلس هوشمند مجتمع مس درآلو</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<style>
+:root{--bg:#090b0e;--p1:#151a20;--p2:#0e1217;--or:#ff7a1a;--or2:#ffa24d;--ink:#eef1f4;--mute:#8d97a3;--ok:#35d07f;--ln:rgba(255,122,26,.28)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Vazirmatn,Tahoma,sans-serif;font-size:13px;line-height:1.6}
+.top{display:flex;align-items:center;gap:22px;height:78px;padding-left:26px;background:linear-gradient(180deg,#1a130c,#0a0c0f);border-bottom:2px solid var(--or);box-shadow:0 2px 24px rgba(255,122,26,.35)}
+.logo{flex:none;width:178px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(270deg,rgba(255,122,26,.28),transparent);font-weight:800;font-size:12px}
+.logo small{font-size:8px;color:var(--mute);font-weight:400}
+.clock{flex:none;display:flex;gap:14px;align-items:center;font-size:12px}
+.clock b{font-size:22px;font-weight:600;color:var(--or2)}
+.ok{color:var(--ok);display:inline-flex;align-items:center;gap:6px}
+.ok i{width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.sub{flex:1;text-align:center;color:#d5dae0;font-size:12px;border-inline:1px solid #2a2a2a;padding:0 14px}
+.ttl{flex:none;text-align:left;direction:ltr}
+.ttl b{display:block;font-size:19px;letter-spacing:1.5px;font-weight:600}
+.ttl b span{color:var(--or)}
+.ttl em{font-style:normal;font-size:17px;font-weight:600}
+.app{display:grid;grid-template-columns:178px 268px minmax(0,1fr) 440px;gap:10px;padding:10px;height:calc(100vh - 124px);min-height:780px}
+.panel{background:linear-gradient(180deg,var(--p1),var(--p2));border:1px solid var(--ln);border-radius:10px;padding:12px;min-width:0;box-shadow:inset 0 0 22px rgba(255,122,26,.05)}
+h3{margin:0 0 10px;font-size:14px;font-weight:600}
+h4{margin:0 0 6px;font-size:12px;font-weight:600;color:#cfd5dc}
+.col{display:flex;flex-direction:column;gap:10px;min-height:0}
+.nav{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.nav a{display:flex;align-items:center;gap:10px;padding:11px 14px;color:#cfd5dc;text-decoration:none;border-bottom:1px solid #1d232a;cursor:pointer}
+.nav a.on{background:linear-gradient(270deg,rgba(255,122,26,.4),transparent);border-inline-start:3px solid var(--or);color:#fff}
+.nav a span{width:22px;text-align:center;filter:saturate(.7)}
+.brandcard{margin:auto 10px 10px;border:1px solid var(--ln);border-radius:10px;padding:48px 10px 10px;text-align:center;background:radial-gradient(circle at 50% 30%,rgba(255,122,26,.35),transparent 65%),#10141a}
+.brandcard b{display:block;font-size:15px}.brandcard small{color:var(--ok);font-size:11px}
+.layers{flex:none}
+.lr{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;margin-bottom:4px;background:rgba(255,255,255,.02)}
+.lr .ic{width:26px;height:26px;display:grid;place-items:center;border-radius:6px;border:1px solid var(--c);font-size:13px;flex:none}
+.lr label{flex:1;font-size:12px}
+.sw{appearance:none;width:34px;height:18px;border-radius:10px;background:#3a4048;position:relative;cursor:pointer;flex:none;margin:0}
+.sw::after{content:"";position:absolute;top:2px;inset-inline-end:2px;width:14px;height:14px;border-radius:50%;background:#aeb4bb;transition:.2s}
+.sw:checked{background:#6b3a14}.sw:checked::after{background:var(--or);inset-inline-end:auto;inset-inline-start:2px;box-shadow:0 0 8px var(--or)}
+.ai{flex:1;display:flex;flex-direction:column}
+.ai svg{width:100%;height:150px}
+.ai p{color:var(--mute);font-size:11px;margin:6px 0 0}
+.mapbox{position:relative;border:1px solid var(--ln);border-radius:10px;overflow:hidden;min-height:560px}
+#map{position:absolute;inset:0;background:#10141a}
+.ov{position:absolute;z-index:1000}
+.search{left:14px;top:14px;width:240px;background:rgba(10,12,15,.88);border:1px solid var(--ln);border-radius:8px;display:flex}
+.search input{flex:1;background:none;border:0;color:#fff;padding:9px 12px;font:inherit;outline:0}
+.vcard{right:14px;top:14px;width:268px;background:rgba(10,12,15,.92);border:1px solid var(--ln);border-radius:10px;padding:10px;max-height:calc(100% - 28px);overflow:auto}
+.vcard .hd{display:flex;justify-content:space-between;margin-bottom:8px;font-weight:600}
+.vimg{height:62px;border-radius:6px;margin-bottom:8px;background:linear-gradient(135deg,#5b3a22,#2a3a2a 60%,#1a2a3a);display:grid;place-items:center;font-size:26px}
+.row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #20262d;font-size:12px}
+.row span{color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chip{border:1px solid var(--or);border-radius:14px;padding:1px 10px;font-size:11px}
+.comp{left:14px;bottom:62px;width:46px;height:46px;border-radius:50%;background:rgba(10,12,15,.85);border:1px solid var(--ln);display:grid;place-items:center;font-weight:800;color:var(--or2)}
+.mini{right:14px;bottom:14px;width:176px;height:132px;border:1px solid var(--ln);border-radius:8px;overflow:hidden;z-index:1000}
+#mini{width:100%;height:100%}
+.d3{left:50%;bottom:14px;transform:translateX(-50%);background:rgba(10,12,15,.9);border:1px solid var(--ln);color:#fff;border-radius:22px;padding:8px 18px;text-decoration:none;font-size:12px}
+.pin{width:30px;height:30px;border-radius:50%;background:#0d1116;border:2px solid var(--c);box-shadow:0 0 10px var(--c);display:grid;place-items:center;font-size:15px}
+.pin{cursor:pointer}
+.mlbl{position:absolute;top:34px;left:50%;transform:translateX(-50%);white-space:nowrap;background:rgba(0,0,0,.72);color:#fff;border-radius:6px;padding:0 7px;font:600 12px Vazirmatn,Tahoma,sans-serif;pointer-events:none}
+.maplibregl-ctrl-top-left{top:60px}
+.maplibregl-ctrl-group{background:rgba(10,12,15,.9)!important;border:1px solid var(--ln);box-shadow:none!important}
+.maplibregl-ctrl-group button{border-color:#2a2a2a!important}
+.maplibregl-ctrl-icon{filter:invert(1)}
+.maplibregl-ctrl-attrib{background:rgba(0,0,0,.6)!important;color:#9aa!important;font-size:9px}
+.maplibregl-ctrl-attrib a{color:var(--or2)!important}
+.maplibregl-ctrl-scale{background:rgba(0,0,0,.6)!important;color:#ddd!important;border-color:#ddd!important}
+.bm{left:14px;top:156px;display:flex;flex-direction:column;gap:6px}
+.bm button,.d3{font:inherit;cursor:pointer;color:#fff;background:rgba(10,12,15,.9);border:1px solid var(--ln)}
+.bm button{width:29px;height:29px;border-radius:4px;padding:0}
+.d3[aria-pressed=true]{border-color:var(--or);box-shadow:0 0 12px rgba(255,122,26,.5)}
+.comp{cursor:pointer;line-height:1;font-size:11px;text-align:center}
+.stats{overflow:auto}
+.kg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.k{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid #232a32;border-radius:8px;background:rgba(255,255,255,.02)}
+.k small{display:block;color:#aab2bd;font-size:11px;line-height:1.4}
+.k b{font-size:22px;font-weight:600}
+.k i{font-style:normal;font-size:26px;color:var(--or);filter:drop-shadow(0 0 6px var(--or))}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.cb{border:1px solid #232a32;border-radius:8px;padding:8px;min-width:0;background:rgba(255,255,255,.015)}
+.ch{position:relative;height:150px}
+.dn{position:relative;height:120px}
+.dn div{position:absolute;inset:0;display:grid;place-items:center;text-align:center;line-height:1.1;pointer-events:none}
+.dn b{font-size:20px}.dn small{color:var(--or2);font-size:11px}
+.lg{display:flex;justify-content:space-between;font-size:11px;color:#bbc2ca;padding:2px 2px}
+.lg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-inline-end:6px}
+.foot{display:flex;justify-content:space-between;align-items:center;height:46px;padding:0 24px;border-top:2px solid var(--or);font-size:11px;color:#b7bec7;background:#0a0c0f}
+.foot span{display:inline-flex;align-items:center;gap:6px}
+@media(max-width:1250px){.app{grid-template-columns:1fr;height:auto}.nav{flex-direction:row;overflow-x:auto}.nav a{white-space:nowrap}.brandcard{display:none}.mapbox{height:640px}.top{flex-wrap:wrap;height:auto;padding:8px}.sub{display:none}.logo{width:auto;height:auto}}
+@media(max-width:700px){.vcard{width:200px}.mini{display:none}.cg,.kg{grid-template-columns:1fr}.foot{flex-wrap:wrap;height:auto;padding:8px;gap:6px}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo"><svg width="40" height="30" viewBox="0 0 40 30"><path d="M0 30 15 4 24 18 30 10 40 30z" fill="#ff7a1a"/><path d="M15 4 24 18 12 30 0 30z" fill="#b4500c"/></svg>مس درآلو<small>DARALOO COPPER COMPLEX</small></div>
+  <div class="clock"><div><b id="tm">--:--</b></div><div><div id="dt"></div><div class="ok"><i></i>سامانه در حال کار</div></div></div>
+  <div class="sub">نمایش، پایش و تحلیل اطلاعات منطقه پیرامون معدن<br>به منظور پشتیبانی از تصمیم‌گیری در حوزه مسئولیت‌های اجتماعی</div>
+  <div class="ttl"><b>DARALOO <span>SMART ATLAS</span></b><em>اطلس هوشمند مجتمع مس درآلو</em></div>
+</div>
+
+<div class="app">
+  <nav class="panel nav" id="nav"></nav>
+
+  <div class="col">
+    <div class="panel layers"><h3>لایه‌های مکانی</h3>
+      <div class="lr" style="border:1px solid var(--ln)"><label for="all"><b>همه لایه‌ها</b></label><input type="checkbox" class="sw" id="all"></div>
+      <div id="lays"></div>
+    </div>
+    <div class="panel ai"><h3>تحلیل هوشمند منطقه</h3><svg id="net" viewBox="0 0 300 150"></svg><h4>هوش مصنوعی</h4><p>در نسخه‌های آینده، این سامانه به دستیار هوشمند مدیریتی مجهز خواهد شد.</p></div>
+  </div>
+
+  <div class="mapbox">
+    <div id="map"></div>
+    <div class="ov search"><input id="q" placeholder="جستجوی مکان، روستا، محدوده و ..." autocomplete="off"></div>
+    <div class="ov vcard" id="vc"></div>
+    <div class="ov comp" id="cmp" title="بازگشت به شمال"><span id="cmpi" style="display:block">▲<br>N</span></div>
+    <div class="ov bm"><button id="bsat" title="ماهواره">🛰</button><button id="bosm" title="نقشه خیابانی">🗺</button></div>
+    <div class="ov mini"><div id="mini"></div></div>
+    <button class="ov d3" id="b3d" aria-pressed="true">نمایش سه‌بعدی و توپوگرافی</button>
+  </div>
+
+  <div class="panel stats">
+    <h3>شاخص‌های کلیدی منطقه</h3>
+    <div class="kg" id="kpi"></div>
+    <h3>تحلیل مسئولیت‌های اجتماعی</h3>
+    <div class="cg">
+      <div class="cb"><h4>توزیع پروژه‌ها بر اساس حوزه فعالیت</h4><div class="ch" style="height:170px"><canvas id="c1"></canvas></div></div>
+      <div class="cb"><h4>وضعیت پروژه‌ها</h4><div class="dn"><canvas id="c2"></canvas><div><span><b>42</b><br><small>پروژه</small></span></div></div>
+        <div class="lg"><span><i style="background:#ff7a1a"></i>تکمیل شده</span><b>62%</b></div>
+        <div class="lg"><span><i style="background:#c9ced4"></i>در حال اجرا</span><b>24%</b></div>
+        <div class="lg"><span><i style="background:#4a5058"></i>در حال طراحی</span><b>14%</b></div></div>
+      <div class="cb"><h4>مقایسه نیازهای زیرساختی روستاها</h4><div class="ch"><canvas id="c3"></canvas></div></div>
+      <div class="cb"><h4>روند اجرای پروژه‌ها</h4><div class="ch"><canvas id="c4"></canvas></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <span>منابع داده: GIS | Google Earth | Google Sheets | Google Drive | GitHub</span>
+  <span>آخرین به‌روزرسانی: <b id="up"></b></span>
+  <span>وضعیت انتشار: <span class="ok"><i></i>آنلاین</span> &nbsp; نسخه v1.0.0</span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+/* ===== داده‌ی نمونه: همه‌ی اعداد و مختصات را با داده‌ی واقعی جایگزین کنید ===== */
+const KPI=[['تعداد روستاهای محدوده مطالعاتی','18','⌂'],['جمعیت منطقه','24,680','☻'],['تعداد خانوارها','6,420','⌂'],['تعداد پروژه‌های مسئولیت اجتماعی','42','✚'],['تعداد گروه‌های عشایری شناسایی‌شده','7','▲'],['میزان پوشش اطلاعات مکانی','92%','▤']];
+const V=[
+ {n:'روستای درآلو',ll:[29.99,56.95],pop:1280,hh:324,d:12,acc:'جاده ماکی (قابل بهسازی)',needs:['آب شرب','راه دسترسی','بهداشت و درمان'],pr:6},
+ {n:'روستای جاملنک',ll:[30.10,56.88],pop:1840,hh:455,d:18,acc:'جاده آسفالته',needs:['برق','اینترنت'],pr:9},
+ {n:'روستای پاسه',ll:[30.03,57.18],pop:960,hh:240,d:21,acc:'جاده خاکی',needs:['آب شرب','راه دسترسی'],pr:4},
+ {n:'روستای گنجک',ll:[29.90,56.82],pop:1520,hh:380,d:15,acc:'جاده آسفالته',needs:['بهداشت و درمان','اینترنت'],pr:7},
+ {n:'روستای قلعه‌نو',ll:[29.78,57.30],pop:2100,hh:520,d:27,acc:'جاده شنی',needs:['آب شرب','برق','اینترنت'],pr:8},
+ {n:'روستای سرخون',ll:[29.72,57.02],pop:1130,hh:286,d:24,acc:'جاده ماکی',needs:['راه دسترسی','بهداشت و درمان'],pr:8}];
+const MINE=[29.95,57.02];
+const LAYERS=[
+ {id:'pop',n:'اطلاعات جمعیتی و روستایی',c:'#4aa3ff',e:'👥',on:1},
+ {id:'infra',n:'زیرساخت و لجستیک',c:'#ff7a1a',e:'🏗',on:1,pts:[['ایستگاه پمپاژ',[29.88,56.95]],['پست برق',[30.0,57.1]]],lines:[[MINE,[30.03,57.18]],[MINE,[29.72,57.02]],[MINE,[30.10,56.88]]]},
+ {id:'soc',n:'اطلاعات اجتماعی',c:'#ff7a1a',e:'🏫',on:0,pts:[['مدرسه',[30.01,56.98]],['خانه بهداشت',[30.06,57.2]]]},
+ {id:'eco',n:'اقتصاد و معیشت',c:'#7dd35c',e:'🌾',on:0,pts:[['تعاونی دامداران',[30.12,56.97]],['باغات',[29.8,57.25]]]},
+ {id:'nom',n:'عشایر و محدوده‌های کوچ',c:'#4aa3ff',e:'⛺',on:0,poly:[[30.15,57.1],[30.18,57.28],[30.05,57.32],[30.02,57.15]]},
+ {id:'geo',n:'زمین‌شناسی و معدن',c:'#4aa3ff',e:'⛏',on:1,circle:[MINE,2800]},
+ {id:'env',n:'محیط‌زیست',c:'#35d07f',e:'🌿',on:0,poly:[[29.7,56.8],[29.82,56.95],[29.66,56.98]]},
+ {id:'land',n:'اراضی و تملکات',c:'#ff5a5f',e:'📐',on:0,poly:[[29.9,57.08],[29.9,57.2],[29.84,57.2],[29.84,57.08]]},
+ {id:'prj',n:'پروژه‌های مسئولیت اجتماعی',c:'#b07cff',e:'🤝',on:1,pts:[['پروژه آب‌رسانی',[29.97,56.9]],['مدرسه جدید',[30.08,56.92]],['مرکز درمانی',[29.8,57.1]],['کارگاه اشتغال',[30.0,57.15]]]}];
+/* ============================================================================ */
+const $=id=>document.getElementById(id), N=n=>n.toLocaleString('en-US');
+
+/* ناوبری و شاخص‌ها */
+const NAV=[['داشبورد','⌂'],['نقشه و تحلیل','◫'],['گزارش‌ها','▥'],['پروژه‌های اجتماعی','✋'],['روستاها و جمعیت','☷'],['عشایر و کوچ','▲'],['زیرساخت‌ها','▦'],['محیط‌زیست','❦'],['مناطق معدنی','⛰'],['تنظیمات','⚙']];
+$('nav').innerHTML=NAV.map((a,i)=>`<a class="${i==1?'on':''}"><span>${a[1]}</span>${a[0]}</a>`).join('')+'<div class="brandcard"><b>مس درآلو</b><small>برای توسعه پایدار</small></div>';
+$('nav').onclick=e=>{const a=e.target.closest('a');if(!a)return;$('nav').querySelectorAll('a').forEach(x=>x.classList.remove('on'));a.classList.add('on')};
+$('kpi').innerHTML=KPI.map(k=>`<div class="k"><div><small>${k[0]}</small><b>${k[1]}</b></div><i>${k[2]}</i></div>`).join('');
+
+/* ساعت و تاریخ */
+function tick(){const d=new Date();$('tm').textContent=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+ $('dt').textContent=d.toLocaleDateString('fa-IR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ $('up').textContent=d.toLocaleDateString('fa-IR')+' - '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+tick();setInterval(tick,30000);
+
+/* شبکه‌ی تزئینی هوش مصنوعی */
+(function(){let s=11;const r=()=>(s=s*16807%2147483647)/2147483647,P=[];
+ for(let i=0;i<34;i++)P.push([15+r()*270,10+r()*130]);
+ let h='';P.forEach((p,i)=>P.forEach((q,j)=>{if(j>i&&Math.hypot(p[0]-q[0],p[1]-q[1])<48)h+=`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="#ff7a1a" stroke-opacity=".35"/>`}));
+ P.forEach(p=>h+=`<circle cx="${p[0]}" cy="${p[1]}" r="${1.5+r()*2}" fill="#ffa24d"/>`);
+ $('net').innerHTML=h})();
+
+/* نقشه‌ی سه‌بعدی WebGL با MapLibre GL (ماهواره + ارتفاع زمین + سایه‌روشن) */
+const ll=q=>[q[1],q[0]];
+const circ=(c,r)=>{const a=[];for(let i=0;i<=64;i++){const t=i/64*2*Math.PI;a.push([c[1]+r/(111320*Math.cos(c[0]*Math.PI/180))*Math.cos(t),c[0]+r/110540*Math.sin(t)])}return a};
+const mkEl=(c,e,t,fn)=>{const d=document.createElement('div');d.className='pin';d.style.setProperty('--c',c);d.innerHTML=e+(t?`<span class="mlbl">${t}</span>`:'');if(fn)d.onclick=fn;return d};
+const TERR={source:'dem',exaggeration:1.6};
+let map,p3=true;
+$('lays').innerHTML=LAYERS.map(l=>`<div class="lr" style="--c:${l.c}"><span class="ic">${l.e}</span><label for="l_${l.id}">${l.n}</label><input type="checkbox" class="sw" id="l_${l.id}" ${l.on?'checked':''}></div>`).join('');
+const MK={};
+function sync(){
+ LAYERS.forEach(l=>{const on=$('l_'+l.id).checked;
+  (MK[l.id]||[]).forEach(e=>e.style.display=on?'':'none');
+  if(map)['g_','f_','l_'].forEach(x=>map.getLayer(x+l.id)&&map.setLayoutProperty(x+l.id,'visibility',on?'visible':'none'))});
+ $('all').checked=LAYERS.every(l=>$('l_'+l.id).checked)}
+$('lays').onchange=sync;
+$('all').onchange=e=>{LAYERS.forEach(l=>$('l_'+l.id).checked=e.target.checked);sync()};
+try{
+ map=new maplibregl.Map({container:'map',center:ll(MINE),zoom:11.5,pitch:60,bearing:-20,maxPitch:80,
+  style:{version:8,
+   sources:{
+    sat:{type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:17,attribution:'Imagery © Esri'},
+    osm:{type:'raster',tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256,maxzoom:18,attribution:'© OpenStreetMap contributors'},
+    dem:{type:'raster-dem',tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],encoding:'terrarium',tileSize:256,maxzoom:14,attribution:'Terrain: Mapzen / AWS'}},
+   layers:[
+    {id:'bg',type:'background',paint:{'background-color':'#10141a'}},
+    {id:'sat',type:'raster',source:'sat',paint:{'raster-contrast':.18,'raster-saturation':-.15,'raster-brightness-max':.85}},
+    {id:'osm',type:'raster',source:'osm',layout:{visibility:'none'},paint:{'raster-brightness-max':.65,'raster-contrast':.2}},
+    {id:'hs',type:'hillshade',source:'dem',paint:{'hillshade-exaggeration':.6,'hillshade-shadow-color':'#000000','hillshade-highlight-color':'#ff9a40','hillshade-accent-color':'#ff7a1a'}}]}});
+ map.addControl(new maplibregl.NavigationControl({showCompass:false,visualizePitch:true}),'top-left');
+ map.addControl(new maplibregl.ScaleControl({unit:'metric'}),'bottom-left');
+ const add=(id,pt,el)=>{new maplibregl.Marker({element:el}).setLngLat(ll(pt)).addTo(map);(MK[id]=MK[id]||[]).push(el)};
+ LAYERS.forEach(l=>(l.pts||[]).forEach(q=>add(l.id,q[1],mkEl(l.c,l.e,q[0]))));
+ V.forEach(v=>add('pop',v.ll,mkEl('#4aa3ff','⌂',v.n,()=>{show(v);map.flyTo({center:ll(v.ll),zoom:13.5,pitch:62,duration:1800})})));
+ new maplibregl.Marker({element:mkEl('#ff7a1a','⛏','مجتمع مس درآلو')}).setLngLat(ll(MINE)).addTo(map);
+ map.on('load',()=>{
+  map.setTerrain(TERR);
+  LAYERS.forEach(l=>{
+   const f=[],P=(t,c)=>f.push({type:'Feature',properties:{},geometry:{type:t,coordinates:c}});
+   (l.lines||[]).forEach(q=>P('LineString',q.map(ll)));
+   if(l.poly)P('Polygon',[[...l.poly.map(ll),ll(l.poly[0])]]);
+   if(l.circle)P('Polygon',[circ(l.circle[0],l.circle[1])]);
+   if(!f.length)return;
+   const src='s_'+l.id;map.addSource(src,{type:'geojson',data:{type:'FeatureCollection',features:f}});
+   map.addLayer({id:'g_'+l.id,type:'line',source:src,paint:{'line-color':l.c,'line-width':9,'line-blur':8,'line-opacity':.55}});
+   map.addLayer({id:'f_'+l.id,type:'fill',source:src,filter:['==',['geometry-type'],'Polygon'],paint:{'fill-color':l.c,'fill-opacity':.16}});
+   map.addLayer({id:'l_'+l.id,type:'line',source:src,paint:{'line-color':l.c,'line-width':2.5}});
+  });
+  sync();
+ });
+ map.on('rotate',()=>$('cmpi').style.transform=`rotate(${-map.getBearing()}deg)`);
+ $('cmp').onclick=()=>map.easeTo({bearing:0,duration:800});
+ $('bsat').onclick=()=>{map.setLayoutProperty('sat','visibility','visible');map.setLayoutProperty('osm','visibility','none')};
+ $('bosm').onclick=()=>{map.setLayoutProperty('osm','visibility','visible');map.setLayoutProperty('sat','visibility','none')};
+ $('b3d').onclick=()=>{p3=!p3;$('b3d').setAttribute('aria-pressed',p3);map.setTerrain(p3?TERR:null);map.easeTo({pitch:p3?60:0,bearing:p3?-20:0,duration:1200})};
+}catch(err){$('map').innerHTML='<div style="padding:24px;color:#8d97a3">اجرای WebGL ممکن نشد. مرورگر یا کارت گرافیک باید از WebGL پشتیبانی کند و اینترنت متصل باشد.</div>'}
+sync();
+
+/* کارت اطلاعات روستا */
+function show(v){
+ $('vc').innerHTML=`<div class="hd"><span>اطلاعات روستا</span><span style="cursor:pointer" onclick="this.closest('.vcard').style.display='none'">✕</span></div>
+ <div class="vimg">🏘</div><h3 style="margin-bottom:6px">${v.n}</h3>
+ <div class="row"><span>جمعیت</span>${N(v.pop)} نفر</div><div class="row"><span>تعداد خانوار</span>${v.hh} خانوار</div>
+ <div class="row"><span>فاصله تا مجتمع</span>${v.d} کیلومتر</div><div class="row"><span>وضعیت دسترسی</span>${v.acc}</div>
+ <h4 style="margin-top:10px">مهم‌ترین نیازهای زیرساختی</h4><div class="chips">${v.needs.map(x=>`<span class="chip">${x}</span>`).join('')}</div>
+ <div class="row"><span>تعداد پروژه‌های مسئولیت اجتماعی</span>${v.pr} پروژه</div>`;
+ $('vc').style.display='block'}
+show(V[0]);
+
+/* جستجو */
+$('q').addEventListener('keydown',e=>{if(e.key!=='Enter'||!map)return;const t=$('q').value.trim();
+ const v=V.find(x=>x.n.includes(t));
+ if(v){map.flyTo({center:ll(v.ll),zoom:13.5,pitch:62,duration:1800});show(v)}
+ else if(t.includes('مجتمع')||t.includes('معدن'))map.flyTo({center:ll(MINE),zoom:13,pitch:62,duration:1800})});
+
+/* نقشه‌ی کوچک */
+try{const mini=new maplibregl.Map({container:'mini',center:[54,31.5],zoom:3.2,interactive:false,attributionControl:false,
+ style:{version:8,sources:{o:{type:'raster',tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256}},layers:[{id:'o',type:'raster',source:'o',paint:{'raster-brightness-max':.6}}]}});
+ new maplibregl.Marker({color:'#ff7a1a'}).setLngLat(ll(MINE)).addTo(mini)}catch(e){}
+
+/* نمودارها */
+Chart.defaults.font.family='Vazirmatn,Tahoma,sans-serif';Chart.defaults.color='#aab2bd';Chart.defaults.font.size=10;
+const OR='#ff7a1a',grid={color:'rgba(255,255,255,.06)'},base={responsive:true,maintainAspectRatio:false};
+new Chart($('c1'),{type:'bar',data:{labels:['آموزش','بهداشت و درمان','زیرساخت','اقتصاد و معیشت','محیط‌زیست','فرهنگی و ورزشی'],datasets:[{data:[18,12,12,9,5,3],backgroundColor:['#ff7a1a','#e0904d','#cf9c70','#b9a590','#9fa4ab','#8a8f96'],borderRadius:3}]},
+ options:{...base,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid},y:{grid:{display:false},position:'right'}}}});
+new Chart($('c2'),{type:'doughnut',data:{labels:['تکمیل شده','در حال اجرا','در حال طراحی'],datasets:[{data:[62,24,14],backgroundColor:[OR,'#c9ced4','#4a5058'],borderColor:'#10141a',borderWidth:3}]},
+ options:{...base,cutout:'68%',plugins:{legend:{display:false}}}});
+new Chart($('c3'),{type:'bar',data:{labels:['آب','برق','راه','اینترنت','بهداشت'],datasets:[{label:'نیاز موجود',data:[38,45,30,32,26],backgroundColor:'#7b8089'},{label:'پوشش فعلی',data:[22,30,18,12,14],backgroundColor:OR}]},
+ options:{...base,plugins:{legend:{position:'bottom',labels:{boxWidth:9}}},scales:{y:{grid},x:{grid:{display:false}}}}});
+new Chart($('c4'),{type:'line',data:{labels:['1400','1401','1402','1403','1404'],datasets:[{data:[12,17,19,27,32],borderColor:OR,backgroundColor:'rgba(255,122,26,.22)',fill:true,tension:.3,pointBackgroundColor:OR}]},
+ options:{...base,plugins:{legend:{display:false}},scales:{y:{min:0,max:40,grid},x:{grid:{display:false}}}}});
+</script>
+</body>
+</html>
