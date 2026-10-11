@@ -437,7 +437,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
 <div class="modal-bd" id="mSettings"><div class="modal sm neu" role="dialog" aria-modal="true" aria-labelledby="seTitle">
   <div class="mh"><h2 id="seTitle">تنظیمات اتصال</h2><button class="btn icon" data-close aria-label="بستن">✕</button></div>
   <div class="mb">
-    <div class="fld"><label for="apiUrl">آدرس Web App در Google Apps Script</label>
+    <div class="fld"><label for="apiUrl">آدرس Web App</label>
       <input type="url" id="apiUrl" placeholder="https://script.google.com/macros/s/…/exec"></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
       <button class="btn primary" id="seSave">ذخیره و بارگذاری</button>
@@ -1555,7 +1555,7 @@ async function fetchApi(){
   }catch(e){return await jsonp(url)}
 }
 async function loadData(){
-  setLoading(true,'در حال دریافت داده‌ها از Google Sheets…');
+  setLoading(true,'در حال دریافت داده‌ها از سرور');
   let payload=null,err=null;
   try{
     if(state.demo)payload=demoPayload();
