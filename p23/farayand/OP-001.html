@@ -1,0 +1,275 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OP-001 | معدن مس درآلو</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
+:root{
+--bg:#f3f6fb;--card:#fff;--ink:#17243b;--muted:#718096;
+--line:#e7edf5;--blue:#2877b8;--teal:#159b91;
+--orange:#d99132;--copper:#b56a3b;--shadow:0 8px 28px rgba(31,55,88,.07)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Vazirmatn',Tahoma,sans-serif}
+.container{max-width:1440px;margin:auto;padding:28px}
+.hero{background:linear-gradient(120deg,#263342,#45596a 60%,#9a633d);border-radius:24px;padding:30px;color:white;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.hero:after{content:"";position:absolute;width:340px;height:340px;border:1px solid #ffffff20;border-radius:50%;left:-90px;top:-180px;box-shadow:0 0 0 35px #ffffff09,0 0 0 75px #ffffff07}
+.hero-top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;position:relative;z-index:1}
+.eyebrow{font-size:12px;letter-spacing:2px;color:#e8c6a8;font-weight:700}
+.hero h1{font-size:25px;margin:12px 0 8px;font-weight:800}
+.hero p{color:#e4eaf0;margin:0;line-height:2;font-size:13px;max-width:780px}
+.code{background:#ffffff20;border:1px solid #ffffff30;border-radius:12px;padding:10px 15px;font-size:13px;white-space:nowrap}
+.hero-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;position:relative;z-index:1}
+.pill{padding:7px 13px;border-radius:30px;font-size:11px;background:#ffffff20;color:#fff}
+.pill.status{background:#159b9138;color:#d3fff0}
+.section-title{font-size:16px;font-weight:800;margin:28px 0 14px}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(4,1fr);margin-top:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+.kpi-label{font-size:12px;color:var(--muted)}
+.kpi-value{font-size:25px;font-weight:800;margin:9px 0 4px}
+.kpi-foot{font-size:11px;color:var(--muted)}
+.kpi-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:18px;margin-bottom:12px;background:#f5eee9;color:var(--copper)}
+.content-grid{grid-template-columns:1.15fr .85fr}
+.two-col{grid-template-columns:1fr 1fr}
+.info-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-item{background:#f7f9fc;border:1px solid var(--line);padding:13px;border-radius:12px}
+.info-item small{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}
+.info-item strong{font-size:13px}
+.bar-row{margin:18px 0}
+.bar-head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px}
+.bar{height:9px;background:#edf1f6;border-radius:20px;overflow:hidden}
+.bar span{display:block;height:100%;border-radius:20px;background:var(--teal)}
+.map-box{min-height:300px;border-radius:14px;overflow:hidden;background:linear-gradient(145deg,#edf1ed,#e7ecef);position:relative;display:grid;place-items:center}
+.map-box svg{width:100%;height:300px}
+.map-caption{position:absolute;bottom:12px;right:12px;background:#fff;border-radius:9px;padding:8px 12px;font-size:10px;box-shadow:var(--shadow)}
+.notice{border:1px solid #f0dfbd;background:#fff9ed;border-radius:16px;padding:18px;margin-top:16px}
+.notice h3{margin:0 0 8px;font-size:14px;color:#95611d}
+.notice p{margin:0;font-size:12px;line-height:2.1;color:#725b38}
+.tag{display:inline-block;border-radius:20px;padding:5px 10px;font-size:10px;background:#f5eee9;color:#98613d}
+.related{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.related-item{padding:16px;border:1px solid var(--line);border-radius:13px;background:#f8fafc}
+.related-item strong{font-size:13px;display:block;margin-bottom:5px}
+.related-item span{font-size:11px;color:var(--muted)}
+.footer{text-align:center;color:#98a4b5;font-size:10px;padding:25px 0 5px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.content-grid,.two-col{grid-template-columns:1fr}}
+@media(max-width:560px){.container{padding:14px}.hero{padding:22px}.hero-top{flex-direction:column}.hero h1{font-size:20px}.kpis{gap:9px}.card{padding:15px}.kpi-value{font-size:20px}.info-list,.related{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="hero">
+  <div class="hero-top">
+    <div>
+      <div class="eyebrow">DARALOO SMART ATLAS | MINE INTELLIGENCE</div>
+      <h1>معدن مس درآلو</h1>
+      <p>
+        محدوده معدن مس درآلو بر اساس عارضه ثبت‌شده در OpenStreetMap،
+        با موقعیت مرجع و مرز جغرافیایی نمایشی. این رکورد به‌عنوان
+        محدوده اصلی معدن در ساختار اطلاعات مکانی مجتمع تعریف شده است.
+      </p>
+    </div>
+    <div class="code">OP-001</div>
+  </div>
+  <div class="hero-meta">
+    <span class="pill status">● ثبت‌شده در منبع عمومی</span>
+    <span class="pill">معدن</span>
+    <span class="pill">استخراج معدن</span>
+    <span class="pill">رکورد اصلی محدوده معدن</span>
+  </div>
+</header>
+
+<section class="grid kpis">
+  <div class="card">
+    <div class="kpi-icon">⌖</div>
+    <div class="kpi-label">موقعیت مکانی</div>
+    <div class="kpi-value">ثبت‌شده</div>
+    <div class="kpi-foot">دارای مختصات مرجع</div>
+  </div>
+  <div class="card">
+    <div class="kpi-icon">◷</div>
+    <div class="kpi-label">تاریخ ثبت در داده</div>
+    <div class="kpi-value">۱۳۹۹/۰۱/۰۱</div>
+    <div class="kpi-foot">تاریخ شروع ثبت‌شده</div>
+  </div>
+  <div class="card">
+    <div class="kpi-icon">▦</div>
+    <div class="kpi-label">شاخص اول</div>
+    <div class="kpi-value">۱۰۰</div>
+    <div class="kpi-foot">واحد در منبع مشخص نشده است</div>
+  </div>
+  <div class="card">
+    <div class="kpi-icon">◉</div>
+    <div class="kpi-label">شاخص چهارم</div>
+    <div class="kpi-value">۳٬۰۰۰</div>
+    <div class="kpi-foot">واحد در منبع مشخص نشده است</div>
+  </div>
+</section>
+
+<h2 class="section-title">شناسنامه محدوده معدن</h2>
+<section class="grid content-grid">
+  <div class="card">
+    <h3 style="font-size:14px;margin:0 0 18px">مشخصات ثبتی و ساختاری</h3>
+    <div class="info-list">
+      <div class="info-item"><small>شناسه رکورد</small><strong>OP-001</strong></div>
+      <div class="info-item"><small>کد محدوده</small><strong>OP-001</strong></div>
+      <div class="info-item"><small>عنوان</small><strong>معدن مس درآلو</strong></div>
+      <div class="info-item"><small>نوع رکورد</small><strong>معدن</strong></div>
+      <div class="info-item"><small>دسته‌بندی</small><strong>استخراج معدن</strong></div>
+      <div class="info-item"><small>عنوان محدوده</small><strong>محدوده استخراج معدن</strong></div>
+      <div class="info-item"><small>کد والد</small><strong>ندارد؛ رکورد اصلی</strong></div>
+      <div class="info-item"><small>وضعیت ثبتی</small><strong>ثبت‌شده در منبع عمومی</strong></div>
+      <div class="info-item"><small>تاریخ شروع ثبت‌شده</small><strong>۱۳۹۹/۰۱/۰۱</strong></div>
+      <div class="info-item"><small>تاریخ پایان</small><strong>درج نشده</strong></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:14px;margin:0 0 18px">شاخص‌های ثبت‌شده</h3>
+    <div class="bar-row">
+      <div class="bar-head"><span>شاخص اول</span><strong>۱۰۰</strong></div>
+      <div class="bar"><span style="width:100%"></span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-head"><span>شاخص دوم</span><strong>۰</strong></div>
+      <div class="bar"><span style="width:0%"></span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-head"><span>شاخص سوم</span><strong>۰</strong></div>
+      <div class="bar"><span style="width:0%"></span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-head"><span>شاخص چهارم</span><strong>۳٬۰۰۰</strong></div>
+      <div class="bar"><span style="width:100%;background:#b56a3b"></span></div>
+    </div>
+    <p style="font-size:10px;line-height:1.9;color:var(--muted)">
+      نمودارها صرفاً نمایش مقادیر خام هستند. واحد و مفهوم شاخص‌ها
+      در رکورد مشخص نشده و نباید به‌عنوان تناژ، ظرفیت یا درصد پیشرفت تفسیر شوند.
+    </p>
+  </div>
+</section>
+
+<h2 class="section-title">موقعیت و محدوده جغرافیایی معدن</h2>
+<section class="grid two-col">
+  <div class="card">
+    <h3 style="font-size:14px;margin:0 0 14px">موقعیت نقطه‌ای مرجع</h3>
+    <div class="map-box">
+      <svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1" fill="#b9c7c0"/>
+          </pattern>
+        </defs>
+        <rect width="500" height="300" fill="url(#dots)"/>
+        <path d="M0 220 Q100 160 190 195 T360 170 T500 185" fill="none" stroke="#c4d8d0" stroke-width="2"/>
+        <path d="M0 90 Q100 130 210 85 T400 95 T500 70" fill="none" stroke="#c4d8d0" stroke-width="2"/>
+        <polygon points="100,190 180,75 340,80 405,175 300,245 135,225"
+          fill="rgba(181,106,59,.15)" stroke="#a66b43" stroke-width="2" stroke-dasharray="6 4"/>
+        <circle cx="250" cy="165" r="9" fill="#b56a3b" stroke="white" stroke-width="3"/>
+        <circle cx="250" cy="165" r="23" fill="none" stroke="#b56a3b" stroke-opacity=".35" stroke-width="2"/>
+        <path d="M250 142 L250 115" stroke="#b56a3b" stroke-width="1.5"/>
+        <rect x="195" y="82" width="110" height="28" rx="7" fill="white"/>
+        <text x="250" y="101" text-anchor="middle" font-size="12" fill="#72552b" font-weight="bold">معدن مس درآلو</text>
+        <text x="250" y="278" text-anchor="middle" font-size="10" fill="#657d8d">نمای شماتیک موقعیت محدوده معدن</text>
+      </svg>
+      <div class="map-caption">موقعیت نقطه‌ای مرجع</div>
+    </div>
+    <div class="info-list" style="margin-top:13px">
+      <div class="info-item"><small>عرض جغرافیایی</small><strong>29.41493</strong></div>
+      <div class="info-item"><small>طول جغرافیایی</small><strong>57.10569</strong></div>
+    </div>
+    <p style="font-size:11px;margin-top:12px">
+      <a target="_blank" rel="noopener" href="https://www.google.com/maps?q=29.41493,57.10569" style="color:#a66b43;text-decoration:none">
+        مشاهده موقعیت در Google Maps ↗
+      </a>
+    </p>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:14px;margin:0 0 14px">مرز نمایشی محدوده معدن</h3>
+    <div class="map-box">
+      <svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">
+            <path d="M25 0H0V25" fill="none" stroke="#d0d9d4" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <rect width="500" height="300" fill="#edf2ee"/>
+        <rect width="500" height="300" fill="url(#grid)"/>
+        <polygon points="90,205 90,105 280,105 370,65 410,165 280,245 90,205"
+          fill="rgba(181,106,59,.2)" stroke="#a66b43" stroke-width="3"/>
+        <circle cx="250" cy="155" r="7" fill="#2877b8" stroke="white" stroke-width="3"/>
+        <text x="250" y="40" text-anchor="middle" font-size="12" fill="#72552b">محدوده مرجع معدن</text>
+        <text x="250" y="275" text-anchor="middle" font-size="10" fill="#657d8d">نمای شماتیک هندسه ثبت‌شده</text>
+      </svg>
+      <div class="map-caption">Polygon مرجع</div>
+    </div>
+    <div class="notice">
+      <h3>ملاحظه دقت مرز</h3>
+      <p>
+        مرز نمایش‌داده‌شده بر اساس هندسه مرجع ثبت‌شده است و لزوماً
+        معادل محدوده پروانه بهره‌برداری، محدوده ثبتی حقوقی یا محدوده
+        دقیق عملیات استخراج نیست. برای استفاده رسمی، نقشه مصوب و
+        برداشت GIS معتبر باید ملاک قرار گیرد.
+      </p>
+    </div>
+  </div>
+</section>
+
+<h2 class="section-title">ساختار ارتباطی تأسیسات</h2>
+<section class="card">
+  <h3 style="font-size:14px;margin:0 0 8px">رکوردهای مرتبط با محدوده اصلی معدن</h3>
+  <p style="font-size:11px;color:var(--muted);line-height:1.9;margin:0">
+    دو رکورد زیر در ساختار اطلاعاتی به‌عنوان زیرمجموعه OP-001 معرفی شده‌اند.
+    این ارتباط، ارتباط اطلاعاتی و ساختاری رکوردهاست و به‌تنهایی تأییدکننده
+    رابطه مالکیت، بهره‌برداری یا مجاورت دقیق نیست.
+  </p>
+  <div class="related">
+    <div class="related-item">
+      <strong>OP-002 | دامپ زردآلو</strong>
+      <span>دپو و انباشت · ثبت‌شده در منبع عمومی</span>
+    </div>
+    <div class="related-item">
+      <strong>OP-003 | ایستگاه هواشناسی معدن درآلو</strong>
+      <span>پایش هواشناسی · ثبت‌شده در منبع عمومی</span>
+    </div>
+  </div>
+  <div class="notice">
+    <h3>ملاحظه مدیریتی | یکپارچگی اطلاعات مکانی</h3>
+    <p>
+      پیشنهاد می‌شود محدوده اصلی معدن به‌عنوان لایه مرجع برای ارتباط
+      با تأسیسات، دپوها، زیرساخت‌ها، محدوده‌های محیط‌زیستی و پروژه‌های
+      مسئولیت اجتماعی استفاده شود. هم‌پوشانی مکانی هر یک از این عوارض
+      با محدوده معدن باید با توجه به نوع عارضه، دقت هندسه و اعتبار منبع
+      بررسی شود.
+    </p>
+  </div>
+</section>
+
+<h2 class="section-title">داده هندسی خام</h2>
+<section class="card">
+  <span class="tag">GEOJSON | OP-001</span>
+  <pre style="white-space:pre-wrap;direction:ltr;text-align:left;font-family:Consolas,monospace;font-size:11px;line-height:1.9;color:#52647a;background:#f7f9fc;padding:14px;border-radius:10px;overflow-wrap:anywhere">{
+  "type": "Polygon",
+  "coordinates": [[
+    [57.10269, 29.41293],
+    [57.10869, 29.41293],
+    [57.10969, 29.41693],
+    [57.10569, 29.41893],
+    [57.10269, 29.41693],
+    [57.10269, 29.41293]
+  ]]
+}</pre>
+</section>
+
+<footer class="footer">
+DARALOO SMART ATLAS · MINE INTELLIGENCE · OP-001
+<br>سامانه هوشمند مدیریت راهبردی مسئولیت‌های اجتماعی و اطلاعات مکانی مجتمع مس درآلو
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,260 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OP-002 | دامپ زردآلو</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
+:root{
+--bg:#f3f6fb;--card:#fff;--ink:#17243b;--muted:#718096;
+--line:#e7edf5;--blue:#2877b8;--teal:#159b91;
+--orange:#d99132;--shadow:0 8px 28px rgba(31,55,88,.07)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Vazirmatn',Tahoma,sans-serif}
+.container{max-width:1440px;margin:auto;padding:28px}
+.hero{background:linear-gradient(120deg,#49351f,#815c2e 65%,#a47c3e);border-radius:24px;padding:30px;color:white;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.hero:after{content:"";position:absolute;width:340px;height:340px;border:1px solid #ffffff20;border-radius:50%;left:-90px;top:-180px;box-shadow:0 0 0 35px #ffffff09,0 0 0 75px #ffffff07}
+.hero-top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;position:relative;z-index:1}
+.eyebrow{font-size:12px;letter-spacing:2px;color:#f0d8ad;font-weight:700}
+.hero h1{font-size:25px;margin:12px 0 8px;font-weight:800}
+.hero p{color:#f1e5d1;margin:0;line-height:2;font-size:13px;max-width:780px}
+.code{background:#ffffff20;border:1px solid #ffffff30;border-radius:12px;padding:10px 15px;font-size:13px;white-space:nowrap}
+.hero-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;position:relative;z-index:1}
+.pill{padding:7px 13px;border-radius:30px;font-size:11px;background:#ffffff20;color:#fff8ec}
+.pill.status{background:#159b9138;color:#d3fff0}
+.section-title{font-size:16px;font-weight:800;margin:28px 0 14px}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(4,1fr);margin-top:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+.kpi-label{font-size:12px;color:var(--muted)}
+.kpi-value{font-size:25px;font-weight:800;margin:9px 0 4px}
+.kpi-foot{font-size:11px;color:var(--muted)}
+.kpi-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:18px;margin-bottom:12px;background:#f7f0e5;color:#986c2f}
+.content-grid{grid-template-columns:1.15fr .85fr}
+.two-col{grid-template-columns:1fr 1fr}
+.info-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-item{background:#f7f9fc;border:1px solid var(--line);padding:13px;border-radius:12px}
+.info-item small{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}
+.info-item strong{font-size:13px}
+.bar-row{margin:18px 0}
+.bar-head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px}
+.bar{height:9px;background:#edf1f6;border-radius:20px;overflow:hidden}
+.bar span{display:block;height:100%;border-radius:20px;background:var(--teal)}
+.map-box{min-height:300px;border-radius:14px;overflow:hidden;background:linear-gradient(145deg,#f0eee5,#e6edf0);position:relative;display:grid;place-items:center}
+.map-box svg{width:100%;height:300px}
+.map-caption{position:absolute;bottom:12px;right:12px;background:#fff;border-radius:9px;padding:8px 12px;font-size:10px;box-shadow:var(--shadow)}
+.notice{border:1px solid #f0dfbd;background:#fff9ed;border-radius:16px;padding:18px;margin-top:16px}
+.notice h3{margin:0 0 8px;font-size:14px;color:#95611d}
+.notice p{margin:0;font-size:12px;line-height:2.1;color:#725b38}
+.tag{display:inline-block;border-radius:20px;padding:5px 10px;font-size:10px;background:#f7f0e5;color:#986c2f}
+.footer{text-align:center;color:#98a4b5;font-size:10px;padding:25px 0 5px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.content-grid,.two-col{grid-template-columns:1fr}}
+@media(max-width:560px){.container{padding:14px}.hero{padding:22px}.hero-top{flex-direction:column}.hero h1{font-size:20px}.kpis{gap:9px}.card{padding:15px}.kpi-value{font-size:20px}.info-list{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="hero">
+  <div class="hero-top">
+    <div>
+      <div class="eyebrow">DARALOO SMART ATLAS | OPERATIONAL INTELLIGENCE</div>
+      <h1>دامپ زردآلو</h1>
+      <p>
+        عارضه معدنی با عنوان دامپ زردآلو در نزدیکی محدوده معدن درآلو،
+        ثبت‌شده در داده‌های نقشه‌ای عمومی. موقعیت مرجع و هندسه تقریبی
+        محدوده برای شناسایی مکانی و مدیریت اطلاعات تأسیسات ثبت شده‌اند.
+      </p>
+    </div>
+    <div class="code">OP-002</div>
+  </div>
+  <div class="hero-meta">
+    <span class="pill status">● ثبت‌شده در منبع عمومی</span>
+    <span class="pill">دپو</span>
+    <span class="pill">دپو و انباشت</span>
+    <span class="pill">زیرمجموعه: OP-001</span>
+  </div>
+</header>
+
+<section class="grid kpis">
+  <div class="card">
+    <div class="kpi-icon">⌖</div>
+    <div class="kpi-label">موقعیت مکانی</div>
+    <div class="kpi-value">ثبت‌شده</div>
+    <div class="kpi-foot">دارای مختصات مرجع</div>
+  </div>
+  <div class="card">
+    <div class="kpi-icon">◷</div>
+    <div class="kpi-label">تاریخ ثبت در داده</div>
+    <div class="kpi-value">۱۴۰۰/۰۱/۰۱</div>
+    <div class="kpi-foot">تاریخ ثبت رکورد</div>
+  </div>
+  <div class="card">
+    <div class="kpi-icon">▦</div>
+    <div class="kpi-label">شاخص اول</div>
+    <div class="kpi-value">۱۰۰</div>
+    <div class="kpi-foot">واحد در منبع مشخص نشده است</div>
+  </div>
+  <div class="card">
+    <div class="kpi-icon">◉</div>
+    <div class="kpi-label">شاخص چهارم</div>
+    <div class="kpi-value">۲٬۰۰۰</div>
+    <div class="kpi-foot">واحد در منبع مشخص نشده است</div>
+  </div>
+</section>
+
+<h2 class="section-title">مشخصات و اطلاعات ثبتی</h2>
+<section class="grid content-grid">
+  <div class="card">
+    <h3 style="font-size:14px;margin:0 0 18px">شناسنامه تأسیسات</h3>
+    <div class="info-list">
+      <div class="info-item"><small>شناسه رکورد</small><strong>OP-002</strong></div>
+      <div class="info-item"><small>کد تأسیسات</small><strong>OP-002</strong></div>
+      <div class="info-item"><small>عنوان</small><strong>دامپ زردآلو</strong></div>
+      <div class="info-item"><small>نوع رکورد</small><strong>دپو</strong></div>
+      <div class="info-item"><small>دسته‌بندی</small><strong>دپو و انباشت</strong></div>
+      <div class="info-item"><small>کد والد</small><strong>OP-001</strong></div>
+      <div class="info-item"><small>عنوان والد</small><strong>دامپ زردآلو</strong></div>
+      <div class="info-item"><small>وضعیت ثبتی</small><strong>ثبت‌شده در منبع عمومی</strong></div>
+      <div class="info-item"><small>تاریخ شروع ثبت‌شده</small><strong>۱۴۰۰/۰۱/۰۱</strong></div>
+      <div class="info-item"><small>تاریخ پایان</small><strong>درج نشده</strong></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:14px;margin:0 0 18px">شاخص‌های ثبت‌شده</h3>
+    <div class="bar-row">
+      <div class="bar-head"><span>شاخص اول</span><strong>۱۰۰</strong></div>
+      <div class="bar"><span style="width:100%;background:#159b91"></span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-head"><span>شاخص دوم</span><strong>۰</strong></div>
+      <div class="bar"><span style="width:0%"></span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-head"><span>شاخص سوم</span><strong>۰</strong></div>
+      <div class="bar"><span style="width:0%"></span></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-head"><span>شاخص چهارم</span><strong>۲٬۰۰۰</strong></div>
+      <div class="bar"><span style="width:100%;background:#d99132"></span></div>
+    </div>
+    <p style="font-size:10px;line-height:1.9;color:var(--muted)">
+      نمودارها صرفاً نمایش مقادیر خام هستند و به دلیل مشخص نبودن
+      واحد و ماهیت شاخص‌ها، بیانگر ظرفیت واقعی یا حجم انباشت دپو نیستند.
+    </p>
+  </div>
+</section>
+
+<h2 class="section-title">موقعیت جغرافیایی دپو</h2>
+<section class="grid two-col">
+  <div class="card">
+    <h3 style="font-size:14px;margin:0 0 14px">موقعیت نقطه‌ای</h3>
+    <div class="map-box">
+      <svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1" fill="#c9c1ad"/>
+          </pattern>
+        </defs>
+        <rect width="500" height="300" fill="url(#dots)"/>
+        <path d="M0 220 Q100 160 190 195 T360 170 T500 185" fill="none" stroke="#cbbd9d" stroke-width="2"/>
+        <path d="M0 90 Q100 130 210 85 T400 95 T500 70" fill="none" stroke="#cbbd9d" stroke-width="2"/>
+        <polygon points="120,180 200,105 320,110 390,190 300,235 165,225"
+          fill="rgba(217,145,50,.16)" stroke="#a87932" stroke-width="2" stroke-dasharray="6 4"/>
+        <circle cx="250" cy="165" r="9" fill="#b67a2c" stroke="white" stroke-width="3"/>
+        <circle cx="250" cy="165" r="22" fill="none" stroke="#b67a2c" stroke-opacity=".35" stroke-width="2"/>
+        <path d="M250 143 L250 118" stroke="#b67a2c" stroke-width="1.5"/>
+        <rect x="195" y="83" width="110" height="28" rx="7" fill="white"/>
+        <text x="250" y="102" text-anchor="middle" font-size="12" fill="#72552b" font-weight="bold">دامپ زردآلو</text>
+        <text x="250" y="278" text-anchor="middle" font-size="10" fill="#7e7566">نمای شماتیک موقعیت دپو</text>
+      </svg>
+      <div class="map-caption">موقعیت نقطه‌ای مرجع</div>
+    </div>
+    <div class="info-list" style="margin-top:13px">
+      <div class="info-item"><small>عرض جغرافیایی</small><strong>29.40839</strong></div>
+      <div class="info-item"><small>طول جغرافیایی</small><strong>57.0997</strong></div>
+    </div>
+    <p style="font-size:11px;margin-top:12px">
+      <a target="_blank" rel="noopener" href="https://www.google.com/maps?q=29.40839,57.0997" style="color:#a87932;text-decoration:none">
+        مشاهده موقعیت در Google Maps ↗
+      </a>
+    </p>
+  </div>
+
+  <div class="card">
+    <h3 style="font-size:14px;margin:0 0 14px">محدوده تقریبی دپو</h3>
+    <div class="map-box">
+      <svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">
+            <path d="M25 0H0V25" fill="none" stroke="#d8d1c1" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <rect width="500" height="300" fill="#f2f0e8"/>
+        <rect width="500" height="300" fill="url(#grid)"/>
+        <polygon points="95,180 165,70 370,78 410,170 280,245 120,225"
+          fill="rgba(217,145,50,.22)" stroke="#a87932" stroke-width="3"/>
+        <circle cx="250" cy="155" r="7" fill="#2877b8" stroke="white" stroke-width="3"/>
+        <text x="250" y="48" text-anchor="middle" font-size="12" fill="#72552b">هندسه تقریبی محدوده</text>
+        <text x="250" y="275" text-anchor="middle" font-size="10" fill="#7e7566">چندضلعی ثبت‌شده در رکورد</text>
+      </svg>
+      <div class="map-caption">Polygon تقریبی</div>
+    </div>
+    <div class="notice">
+      <h3>ملاحظه دقت مکانی</h3>
+      <p>
+        چندضلعی ثبت‌شده بر اساس داده نقشه‌ای عمومی و به‌صورت تقریبی
+        تهیه شده است. این محدوده نباید به‌عنوان مرز قطعی دپو،
+        سطح واقعی انباشت، حریم ایمنی یا محدوده مالکیت استفاده شود.
+        برای تحلیل دقیق، برداشت میدانی و تأیید واحد معدن و نقشه‌برداری ضروری است.
+      </p>
+    </div>
+  </div>
+</section>
+
+<h2 class="section-title">توضیحات و ملاحظات مدیریتی</h2>
+<section class="card">
+  <h3 style="font-size:14px;margin:0 0 10px">شرح رکورد</h3>
+  <p style="font-size:12px;line-height:2.2;color:var(--muted);margin:0">
+    عارضه معدنی با نام دامپ زردآلو در نزدیکی معدن؛ مختصات مرجع از
+    داده نقشه‌ای عمومی و چندضلعی تقریبی است.
+  </p>
+  <div class="notice">
+    <h3>ملاحظه مدیریتی | اعتبارسنجی وضعیت دپو</h3>
+    <p>
+      ثبت دپو در منبع عمومی به‌تنهایی بیانگر وضعیت فعلی بهره‌برداری،
+      نوع مواد انباشته‌شده، تناژ، ارتفاع، پایداری شیب یا وضعیت ایمنی آن نیست.
+      پیش از استفاده از اطلاعات در تصمیم‌گیری‌های عملیاتی و محیط‌زیستی،
+      لازم است نوع ماده، ظرفیت و حجم انباشت، وضعیت ژئوتکنیکی،
+      مسیرهای دسترسی و مسئولیت بهره‌برداری با واحدهای تخصصی معدن تطبیق داده شود.
+    </p>
+  </div>
+</section>
+
+<h2 class="section-title">داده هندسی خام</h2>
+<section class="card">
+  <span class="tag">GEOJSON | OP-002</span>
+  <pre style="white-space:pre-wrap;direction:ltr;text-align:left;font-family:Consolas,monospace;font-size:11px;line-height:1.9;color:#52647a;background:#f7f9fc;padding:14px;border-radius:10px;overflow-wrap:anywhere">{
+  "type": "Polygon",
+  "coordinates": [[
+    [57.09770, 29.40740],
+    [57.10090, 29.40730],
+    [57.10120, 29.40910],
+    [57.09920, 29.41010],
+    [57.09740, 29.40920],
+    [57.09770, 29.40740]
+  ]]
+}</pre>
+</section>
+
+<footer class="footer">
+DARALOO SMART ATLAS · OPERATIONAL INTELLIGENCE · OP-002
+<br>سامانه هوشمند مدیریت راهبردی مسئولیت‌های اجتماعی و اطلاعات مکانی مجتمع مس درآلو
+</footer>
+</div>
+</body>
+</html>

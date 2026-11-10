@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>گزارش وضعیت فرایند | OP-004</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap');
+
+:root{
+  --bg:#f3f6fa;
+  --card:#ffffff;
+  --ink:#172b43;
+  --muted:#7d8da2;
+  --line:#e7edf4;
+  --blue:#3275bd;
+  --cyan:#28a6b5;
+  --green:#269b78;
+  --gold:#d39b3c;
+  --navy:#172f4c;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:'Vazirmatn',Tahoma,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+}
+.container{max-width:1450px;margin:auto;padding:28px}
+.hero{
+  background:linear-gradient(120deg,#142c47,#245477);
+  color:#fff;border-radius:22px;padding:30px;
+  position:relative;overflow:hidden;
+  box-shadow:0 12px 35px #193d5b20;
+}
+.hero:after{
+  content:"";position:absolute;width:300px;height:300px;
+  border:45px solid #ffffff0b;border-radius:50%;
+  left:-70px;top:-150px;
+}
+.hero-top{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.eyebrow{font-size:12px;letter-spacing:1px;color:#b7d3e8}
+.hero h1{font-size:27px;margin:10px 0 5px;font-weight:900}
+.hero p{margin:0;color:#d2e2ef;font-size:13px}
+.status{
+  background:#ffffff18;border:1px solid #ffffff38;
+  border-radius:30px;padding:9px 17px;font-size:12px;
+  display:flex;align-items:center;gap:8px
+}
+.dot{width:8px;height:8px;background:#65d4a7;border-radius:50%}
+.hero-bottom{display:flex;gap:35px;flex-wrap:wrap;margin-top:28px}
+.hero-info small{display:block;color:#b8d0e2;font-size:11px}
+.hero-info strong{display:block;font-size:14px;margin-top:4px}
+.section-title{font-size:16px;font-weight:800;margin:27px 0 14px}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(4,1fr)}
+.card{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:17px;padding:20px;
+  box-shadow:0 5px 20px #233c5708;
+}
+.kpi-label{font-size:12px;color:var(--muted)}
+.kpi-value{font-size:27px;font-weight:900;margin:9px 0 3px}
+.kpi-note{font-size:10px;color:var(--muted)}
+.kpi-icon{
+  width:38px;height:38px;border-radius:12px;
+  display:grid;place-items:center;font-size:18px;margin-bottom:13px
+}
+.blue{background:#eaf2fc;color:#3275bd}
+.teal{background:#e6f7f5;color:#269b91}
+.gold{background:#fbf3e4;color:#bd8830}
+.purple{background:#f0edfb;color:#7661bd}
+.two{grid-template-columns:1.15fr .85fr}
+.chart-card{min-height:320px}
+.card-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;gap:10px}
+.card-heading strong{font-size:14px}
+.card-heading span{font-size:10px;color:var(--muted)}
+.chart-wrap{height:235px;position:relative}
+.details{grid-template-columns:repeat(3,1fr)}
+.detail-item{padding:12px 0;border-bottom:1px solid var(--line)}
+.detail-item:last-child{border:0}
+.detail-item small{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}
+.detail-item strong{font-size:12px;font-weight:700;overflow-wrap:anywhere}
+.mapbox{
+  min-height:300px;border-radius:14px;position:relative;overflow:hidden;
+  background:
+    linear-gradient(25deg,transparent 47%,#d8e4dc 48%,#d8e4dc 50%,transparent 51%),
+    linear-gradient(110deg,transparent 47%,#d8e4dc 48%,#d8e4dc 50%,transparent 51%),
+    #edf3ed;
+  background-size:90px 75px,120px 100px,auto;
+  display:flex;align-items:center;justify-content:center;
+}
+.map-grid{
+  position:absolute;inset:0;opacity:.3;
+  background-image:radial-gradient(#94a99c 1px,transparent 1px);
+  background-size:17px 17px;
+}
+.building{
+  width:125px;height:100px;position:relative;z-index:1;
+  background:#d9b77d;border:3px solid #987342;
+  transform:rotate(-8deg);border-radius:5px;
+  box-shadow:0 8px 18px #3d514b25;
+}
+.building:before,.building:after{
+  content:"";position:absolute;background:#f4e3bd;
+  border:2px solid #987342;width:24px;height:25px;top:30px;
+}
+.building:before{right:17px}
+.building:after{left:17px}
+.pin{
+  position:absolute;z-index:2;top:calc(50% - 75px);
+  left:calc(50% - 8px);width:17px;height:17px;
+  background:#2877b9;border:3px solid white;border-radius:50%;
+  box-shadow:0 2px 8px #23435a66;
+}
+.map-caption{
+  position:absolute;bottom:12px;right:12px;z-index:3;
+  background:#fff;padding:8px 12px;border-radius:9px;
+  font-size:10px;box-shadow:0 2px 8px #0001
+}
+.map-link{
+  display:inline-block;margin-top:13px;padding:9px 15px;
+  background:#eaf2fc;color:#2865a1;border-radius:9px;
+  text-decoration:none;font-size:11px;font-weight:700
+}
+.note{
+  background:#fff9ec;border:1px solid #f1e3c4;
+  border-radius:13px;padding:15px 17px;
+  font-size:11px;line-height:2;color:#755d30;
+}
+.timeline{display:flex;gap:12px;align-items:flex-start}
+.timeline-icon{
+  width:34px;height:34px;flex:none;border-radius:50%;
+  background:#e9f1fa;color:#3275bd;display:grid;place-items:center
+}
+.timeline-text strong{font-size:12px}
+.timeline-text p{font-size:10px;color:var(--muted);margin:4px 0 0;line-height:1.9}
+.footer{
+  text-align:center;color:#9aa7b5;font-size:10px;padding:25px 0 5px
+}
+@media(max-width:900px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .two{grid-template-columns:1fr}
+  .details{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:550px){
+  .container{padding:14px}
+  .hero{padding:22px}
+  .hero h1{font-size:21px}
+  .kpis{grid-template-columns:1fr 1fr;gap:9px}
+  .card{padding:14px}
+  .kpi-value{font-size:23px}
+  .details{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="hero">
+  <div class="hero-top">
+    <div>
+      <div class="eyebrow">DARALOO SMART ATLAS | PROCESS INTELLIGENCE</div>
+      <h1>گزارش وضعیت فرایند</h1>
+      <p>گزارش تحلیلی ساختمان کارفرما معدن مس درآلو</p>
+    </div>
+    <div class="status"><span class="dot"></span> ثبت‌شده در منبع عمومی</div>
+  </div>
+  <div class="hero-bottom">
+    <div class="hero-info">
+      <small>شناسه فرایند</small>
+      <strong>OP-004</strong>
+    </div>
+    <div class="hero-info">
+      <small>عنوان دارایی</small>
+      <strong>ساختمان کارفرما معدن مس درآلو</strong>
+    </div>
+    <div class="hero-info">
+      <small>گروه فرایندی</small>
+      <strong>مدیریت و پشتیبانی</strong>
+    </div>
+    <div class="hero-info">
+      <small>تاریخ ثبت مرجع</small>
+      <strong>۱۳۹۹/۰۱/۰۱</strong>
+    </div>
+  </div>
+</header>
+
+<h2 class="section-title">نمای کلی شاخص‌های ثبت‌شده</h2>
+<div class="grid kpis">
+  <div class="card">
+    <div class="kpi-icon blue">▦</div>
+    <div class="kpi-label">شاخص اول</div>
+    <div class="kpi-value">100</div>
+    <div class="kpi-note">مقدار ثبت‌شده در منبع</div>
+  </div>
+  <div class="card">
+    <div class="kpi-icon teal">◉</div>
+    <div class="kpi-label">شاخص دوم</div>
+    <div class="kpi-value">0</div>
+    <div class="kpi-note">مقدار ثبت‌شده در منبع</div>
+  </div>
+  <div class="card">
+    <div class="kpi-icon gold">◇</div>
+    <div class="kpi-label">شاخص سوم</div>
+    <div class="kpi-value">0</div>
+    <div class="kpi-note">مقدار ثبت‌شده در منبع</div>
+  </div>
+  <div class="card">
+    <div class="kpi-icon purple">▤</div>
+    <div class="kpi-label">شاخص چهارم</div>
+    <div class="kpi-value">300</div>
+    <div class="kpi-note">مقدار ثبت‌شده در منبع</div>
+  </div>
+</div>
+
+<h2 class="section-title">تحلیل نموداری وضعیت</h2>
+<div class="grid two">
+  <div class="card chart-card">
+    <div class="card-heading">
+      <strong>مقایسه مقادیر شاخص‌ها</strong>
+      <span>بر اساس داده خام</span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="barChart"></canvas>
+    </div>
+  </div>
+  <div class="card chart-card">
+    <div class="card-heading">
+      <strong>سهم نسبی شاخص‌های غیرصفر</strong>
+      <span>نمایش توزیع مقادیر</span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="doughnutChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<h2 class="section-title">مشخصات و اطلاعات پایه</h2>
+<div class="card">
+  <div class="grid details">
+    <div class="detail-item">
+      <small>شناسه رکورد</small><strong>OP-004</strong>
+    </div>
+    <div class="detail-item">
+      <small>کد رکورد</small><strong>OP-004</strong>
+    </div>
+    <div class="detail-item">
+      <small>نوع رکورد</small><strong>ساختمان</strong>
+    </div>
+    <div class="detail-item">
+      <small>عنوان</small><strong>ساختمان کارفرما معدن مس درآلو</strong>
+    </div>
+    <div class="detail-item">
+      <small>گروه فعالیت</small><strong>مدیریت و پشتیبانی</strong>
+    </div>
+    <div class="detail-item">
+      <small>شناسه والد</small><strong>OP-001</strong>
+    </div>
+    <div class="detail-item">
+      <small>عنوان والد</small><strong>ساختمان کارفرما</strong>
+    </div>
+    <div class="detail-item">
+      <small>تاریخ ثبت</small><strong>۱۳۹۹/۰۱/۰۱</strong>
+    </div>
+    <div class="detail-item">
+      <small>وضعیت منبع</small><strong>ثبت‌شده در منبع عمومی</strong>
+    </div>
+  </div>
+</div>
+
+<h2 class="section-title">موقعیت مکانی و محدوده</h2>
+<div class="grid two">
+  <div class="card">
+    <div class="card-heading">
+      <strong>نمای شماتیک موقعیت ساختمان</strong>
+      <span>تصویر نمایشی</span>
+    </div>
+    <div class="mapbox">
+      <div class="map-grid"></div>
+      <div class="building"></div>
+      <div class="pin"></div>
+      <div class="map-caption">ساختمان کارفرما | OP-004</div>
+    </div>
+    <a class="map-link" target="_blank"
+       href="https://www.google.com/maps?q=29.41288,57.09804">
+       مشاهده موقعیت نقطه‌ای در نقشه
+    </a>
+  </div>
+  <div class="card">
+    <div class="card-heading">
+      <strong>اطلاعات جغرافیایی</strong>
+      <span>مختصات مرجع</span>
+    </div>
+    <div class="detail-item">
+      <small>عرض جغرافیایی (Latitude)</small>
+      <strong dir="ltr">29.41288</strong>
+    </div>
+    <div class="detail-item">
+      <small>طول جغرافیایی (Longitude)</small>
+      <strong dir="ltr">57.09804</strong>
+    </div>
+    <div class="detail-item">
+      <small>نوع هندسه</small><strong>Polygon</strong>
+    </div>
+    <div class="detail-item">
+      <small>شناسه مرجع مرتبط</small><strong>OP-001</strong>
+    </div>
+    <div class="detail-item">
+      <small>وضعیت محدوده</small><strong>تقریبی و نمایشی</strong>
+    </div>
+  </div>
+</div>
+
+<h2 class="section-title">شرح و ملاحظات مدیریتی</h2>
+<div class="grid two">
+  <div class="card">
+    <div class="timeline">
+      <div class="timeline-icon">⌖</div>
+      <div class="timeline-text">
+        <strong>معرفی دارایی</strong>
+        <p>موقعیت ساختمان اداری کارفرما بر اساس عارضه ثبت‌شده در OpenStreetMap معرفی شده است. محدوده چندضلعی در اطلاعات این رکورد تقریبی است.</p>
+      </div>
+    </div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:17px 0">
+    <div class="timeline">
+      <div class="timeline-icon">↗</div>
+      <div class="timeline-text">
+        <strong>ارتباط ساختاری</strong>
+        <p>این رکورد دارای شناسه والد OP-001 است. این ارتباط، رابطه ساختاری ثبت‌شده در داده‌ها را نشان می‌دهد و به‌تنهایی اثبات‌کننده وضعیت مالکیت یا بهره‌برداری نیست.</p>
+      </div>
+    </div>
+  </div>
+  <div class="note">
+    <strong>ملاحظات اعتبارسنجی</strong>
+    <p>۱. وضعیت «ثبت‌شده در منبع عمومی» به معنی تأیید فعالیت جاری یا بهره‌برداری فعلی ساختمان نیست.</p>
+    <p>۲. محدوده Polygon ارائه‌شده تقریبی است و نباید به‌عنوان مرز ثبتی یا نقشه دقیق معماری استفاده شود.</p>
+    <p>۳. برای تحلیل عملکردی، لازم است نوع، واحد و تعریف شاخص‌های عددی از منبع اصلی دریافت شود.</p>
+    <p>۴. بازدید میدانی و تطبیق با نقشه‌های تأسیسات و اسناد کارفرما برای تأیید نهایی پیشنهاد می‌شود.</p>
+  </div>
+</div>
+
+<div class="footer">
+  DARALOO SMART ATLAS · گزارش تحلیلی فرایند OP-004 · نسخه نمایشی
+</div>
+</div>
+
+<script>
+Chart.defaults.font.family = 'Vazirmatn, Tahoma, sans-serif';
+Chart.defaults.color = '#718198';
+
+new Chart(document.getElementById('barChart'), {
+  type: 'bar',
+  data: {
+    labels: ['شاخص اول', 'شاخص دوم', 'شاخص سوم', 'شاخص چهارم'],
+    datasets: [{
+      label: 'مقدار ثبت‌شده',
+      data: [100, 0, 0, 300],
+      backgroundColor: ['#3275bd','#28a6b5','#d39b3c','#7661bd'],
+      borderRadius: 8,
+      maxBarThickness: 48
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {legend: {display: false}},
+    scales: {
+      y: {beginAtZero: true, grid: {color: '#edf1f5'}},
+      x: {grid: {display: false}}
+    }
+  }
+});
+
+new Chart(document.getElementById('doughnutChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['شاخص اول', 'شاخص چهارم'],
+    datasets: [{
+      data: [100, 300],
+      backgroundColor: ['#3275bd','#7661bd'],
+      borderWidth: 0,
+      hoverOffset: 7
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '70%',
+    plugins: {
+      legend: {position: 'bottom', labels: {usePointStyle: true, padding: 18}}
+    }
+  }
+});
+</script>
+</body>
+</html>
