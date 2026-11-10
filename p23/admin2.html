@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مدیریت داده‌ها</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#e6eaee;--sd:#c3c9d1;--sl:#fff;--tx:#26303a;--mut:#66727f;--line:rgba(120,135,150,.22);
+  --pri:#d9480f;--pri2:#f58a3c;--on:#fff;--teal:#1f7a70;--danger:#b42318;--hl:rgba(245,138,60,.14);
+  --out:6px 6px 14px var(--sd),-6px -6px 14px var(--sl);
+  --outs:3px 3px 8px var(--sd),-3px -3px 8px var(--sl);
+  --in:inset 3px 3px 7px var(--sd),inset -3px -3px 7px var(--sl);
+  --r:16px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1e2329;--sd:#13171b;--sl:#2a3139;--tx:#e8ecef;--mut:#98a3ad;--line:rgba(160,175,190,.16);
+  --pri:#ff8a4c;--pri2:#ffb27a;--on:#2a1204;--teal:#4fc3b4;--danger:#ff8f85;--hl:rgba(255,138,76,.13);
+}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.7 Vazirmatn,Tahoma,"Segoe UI",sans-serif;min-height:100vh;
+  padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--pri);outline-offset:3px}
+
+.app{display:grid;grid-template-columns:270px 1fr;gap:22px;padding:22px;max-width:1500px;margin:auto}
+aside{position:sticky;top:22px;align-self:start;max-height:calc(100vh - 44px);display:flex;flex-direction:column;
+  background:var(--bg);box-shadow:var(--out);border-radius:var(--r);padding:18px}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.mark{width:42px;height:42px;border-radius:14px;flex:none;background:linear-gradient(145deg,var(--pri2),var(--pri));
+  box-shadow:var(--outs);display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px}
+.brand b{display:block;font-size:15px;line-height:1.4}
+.brand small{color:var(--mut);font-size:12px}
+nav{display:flex;flex-direction:column;gap:10px;overflow-y:auto;padding:6px 4px 10px;margin:-6px -4px}
+nav button{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:start;border:0;cursor:pointer;
+  background:var(--bg);box-shadow:var(--outs);border-radius:12px;padding:10px 14px;transition:box-shadow .15s}
+nav button span.c{font-size:12px;color:var(--mut);background:var(--bg);box-shadow:var(--in);border-radius:20px;padding:0 9px;min-width:30px;text-align:center}
+nav button.on{box-shadow:var(--in);color:var(--pri);font-weight:700}
+.skel{height:42px;border-radius:12px;box-shadow:var(--in);opacity:.6}
+
+main{min-width:0}
+.top{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:18px}
+h1{margin:0;font-size:22px;line-height:1.4}
+.meta{display:flex;gap:10px;flex-wrap:wrap}
+.chip{background:var(--bg);box-shadow:var(--in);border-radius:20px;padding:2px 14px;font-size:13px;color:var(--mut)}
+.chip b{color:var(--pri)}
+.bar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.search{flex:1;min-width:200px;position:relative}
+.search input{width:100%;border:0;background:var(--bg);box-shadow:var(--in);border-radius:14px;padding:11px 44px 11px 14px}
+.search svg{position:absolute;inset-inline-start:auto;right:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--mut)}
+.btn{border:0;cursor:pointer;border-radius:14px;padding:10px 20px;background:var(--bg);box-shadow:var(--outs);font-weight:500;transition:box-shadow .15s}
+.btn:active{box-shadow:var(--in)}
+.btn.p{background:linear-gradient(145deg,var(--pri2),var(--pri));color:var(--on);font-weight:700}
+.btn.d{color:var(--danger)}
+.btn[disabled]{opacity:.55;cursor:wait}
+
+.panel{background:var(--bg);box-shadow:var(--out);border-radius:var(--r);overflow:hidden}
+.scroll{overflow:auto;max-height:calc(100vh - 250px)}
+table{border-collapse:collapse;width:100%}
+th,td{padding:11px 14px;text-align:right;white-space:nowrap;max-width:280px;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid var(--line)}
+th{position:sticky;top:0;z-index:1;background:var(--bg);cursor:pointer;user-select:none;font-weight:700;font-size:13px;color:var(--mut);box-shadow:0 2px 0 var(--line)}
+th:hover{color:var(--pri)}
+th .ar{color:var(--pri);margin-inline-start:4px}
+td.n{width:1%;color:var(--pri);font-weight:700}
+tbody tr{cursor:pointer;transition:background .12s}
+tbody tr:hover{background:var(--hl)}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 6px 0;color:var(--mut);font-size:13px}
+.empty{padding:50px 20px;text-align:center;color:var(--mut)}
+.empty .btn{margin-top:14px}
+
+dialog{border:0;border-radius:20px;background:var(--bg);color:var(--tx);box-shadow:var(--out);padding:0;width:min(760px,94vw);max-height:92vh;overflow:hidden}
+dialog[open]{display:flex;flex-direction:column;animation:pop .18s ease-out}
+dialog::backdrop{background:rgba(15,20,25,.5);backdrop-filter:blur(3px)}
+@keyframes pop{from{opacity:0;transform:scale(.97)}}
+.dh{padding:16px 22px;display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+.dh b{font-size:16px}
+.dh small{color:var(--mut)}
+.badge{border-radius:20px;padding:0 12px;font-size:12px;box-shadow:var(--in);color:var(--teal)}
+.badge.e{color:var(--pri)}
+.db{padding:18px 22px;overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.db .w{grid-column:1/-1}
+.db label{display:block;font-size:12.5px;color:var(--mut);margin:0 4px 5px}
+.db input,.db select,.db textarea{width:100%;border:0;border-radius:12px;background:var(--bg);box-shadow:var(--in);padding:9px 13px}
+.db textarea{resize:vertical;min-height:96px}
+.db :disabled{box-shadow:none;border:1px dashed var(--line);opacity:1;-webkit-text-fill-color:var(--tx)}
+.df{padding:14px 22px;display:flex;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line)}
+.sp{flex:1}
+.cf{padding:22px;width:min(420px,92vw)}
+.cf p{margin:0 0 18px}
+
+#toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:50;display:none;
+  max-width:92vw;padding:11px 22px;border-radius:14px;background:var(--bg);box-shadow:var(--out);border-inline-start:4px solid var(--teal)}
+#toast.err{border-color:var(--danger);color:var(--danger)}
+
+@media(max-width:960px){
+  .app{grid-template-columns:1fr;padding:14px;gap:16px}
+  aside{position:static;max-height:none;padding:12px}
+  .brand{margin-bottom:10px}
+  nav{flex-direction:row;overflow-x:auto;overflow-y:hidden;padding:6px 4px 12px}
+  nav button{white-space:nowrap}
+  .scroll{max-height:none}
+}
+@media(max-width:640px){
+  h1{font-size:19px}
+  .btn.p,.bar .btn{flex:1}
+  .db{grid-template-columns:1fr}
+  .df .btn{flex:1}
+  /* جدول به کارت تبدیل می‌شود */
+  table,tbody,tr,td{display:block}
+  thead{display:none}
+  tbody{padding:10px;display:grid;gap:12px}
+  tbody tr{background:var(--bg);box-shadow:var(--outs);border-radius:14px;padding:8px 14px}
+  td{max-width:none;white-space:normal;border:0;padding:4px 0;display:flex;gap:10px;justify-content:space-between}
+  td::before{content:attr(data-l);color:var(--mut);font-size:12.5px;flex:none}
+  td.n{width:auto}
+  td:nth-child(n+7){display:none}
+  .scroll{overflow:visible}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ================================
+   MAP ACCORDION
+================================ */
+
+.map-accordion {
+  width: 100%;
+  margin: 18px auto 24px;
+  background: var(--bg);
+  box-shadow: var(--out);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+
+.map-accordion-header {
+  width: 100%;
+  min-height: 76px;
+  padding: 12px 20px;
+  border: 0;
+  background: transparent;
+  color: var(--tx);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  text-align: right;
+  font: inherit;
+}
+
+.map-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.map-title strong {
+  display: block;
+  font-size: 15px;
+}
+
+.map-title small {
+  display: block;
+  color: var(--mut);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.map-icon {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: var(--pri);
+  background: var(--bg);
+  box-shadow: var(--outs);
+  font-size: 25px;
+}
+
+.map-arrow {
+  font-size: 23px;
+  color: var(--pri);
+  transition: transform .3s ease;
+}
+
+.map-accordion.open .map-arrow {
+  transform: rotate(180deg);
+}
+
+.map-accordion-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .35s ease;
+}
+
+.map-accordion.open .map-accordion-content {
+  grid-template-rows: 1fr;
+}
+
+.map-accordion-content iframe {
+  width: 100%;
+  height: 0;
+  min-height: 0;
+  border: 0;
+  display: block;
+  background: var(--bg);
+  transition: height .25s ease;
+}
+
+.map-accordion.open .map-accordion-content iframe {
+  height: 75vh;
+  min-height: 450px;
+}
+
+@media(max-width:640px) {
+  .map-accordion-header {
+    min-height: 68px;
+    padding: 10px 14px;
+  }
+
+  .map-accordion.open .map-accordion-content iframe {
+    height: 75vh;
+    min-height: 400px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside>
+    <div class="brand"><div class="mark">د</div><div><b>مدیریت داده‌ها</b><small>اطلس هوشمند درآلو</small></div></div>
+	
+	
+	  <button
+    class="map-accordion-header"
+    id="mapToggle"
+    type="button"
+    aria-expanded="false"
+    aria-controls="mapContent">
+
+    <span class="map-title">
+      <span class="map-icon">⌖</span>
+      <span>
+        <strong>MAP</strong>
+        
+      </span>
+    </span>
+
+    <span class="map-arrow">⌄</span>
+  </button>
+  
+    <nav id="menu" aria-label="شیت‌ها"></nav>
+  </aside>
+
+  <main>
+    <div class="top">
+      <h1 id="title">در حال بارگذاری…</h1>
+      <div class="meta" id="meta"></div>
+    </div>
+    <div class="bar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="جست‌وجو در ردیف‌های این شیت" aria-label="جست‌وجو">
+      </div>
+      <button class="btn p" id="add" type="button">ردیف جدید</button>
+      <button class="btn" id="reload" type="button">بارگذاری دوباره</button>
+    </div>
+    <div class="panel"><div class="scroll"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div></div>
+    <div class="foot"><span id="info"></span><button class="btn" id="more" type="button" hidden>نمایش بیشتر</button></div>
+  </main>
+</div>
+
+<dialog id="dlg">
+  <div class="dh"><div><b id="dt"></b><br><small id="ds"></small></div><span class="badge" id="mode"></span></div>
+  <div class="db" id="df"></div>
+  <div class="df" id="da"></div>
+</dialog>
+<dialog id="cfm"><div class="cf"><p id="cm"></p><div class="df" style="padding:0;border:0"><button class="btn d" id="cy" type="button">حذف شود</button><button class="btn" id="cn" type="button">انصراف</button></div></div></dialog>
+<div id="toast" role="status"></div>
+<!-- MAP ACCORDION -->
+<section class="map-accordion" id="mapAccordion">
+
+
+
+  <div class="map-accordion-content" id="mapContent">
+    <iframe
+      id="mapFrame"
+      src="./map5.html"
+      title="نقشه هوشمند"
+      loading="lazy">
+    </iframe>
+  </div>
+
+</section>
+<script>
+// آدرس Web App (پایان‌یافته با /exec) را اینجا بگذارید
+const API_URL = 'https://script.google.com/macros/s/AKfycbyPxEPIwfQlQ7BWjw_d5oKwcu7SI7OoV1grbySYbM3j8rv3n9pHElgtrTHiH0txXrv4wg/exec';
+const PAGE = 100;
+let S = { sheet: '', headers: [], lists: {}, wide: [], ints: [], rows: [] };
+let M = null, shown = PAGE, sort = { i: -1, dir: 1 };
+const $ = id => document.getElementById(id);
+
+
+/* ================================
+   MAP ACCORDION CONTROLLER
+================================ */
+
+(function () {
+
+  const accordion = document.getElementById('mapAccordion');
+  const toggle = document.getElementById('mapToggle');
+  const frame = document.getElementById('mapFrame');
+
+  if (!accordion || !toggle || !frame) return;
+
+  toggle.addEventListener('click', function () {
+
+    const isOpen = accordion.classList.toggle('open');
+
+    toggle.setAttribute('aria-expanded', String(isOpen));
+
+    if (isOpen) {
+
+      // بارگذاری نقشه هنگام باز شدن پنل
+      if (frame.dataset.loaded !== 'true') {
+        frame.dataset.loaded = 'true';
+      }
+
+    }
+
+  });
+
+})();
+
+const el = (t, p, kids) => {
+  const e = document.createElement(t), { dataset, ...rest } = p || {};
+  Object.assign(e, rest);
+  if (dataset) Object.assign(e.dataset, dataset);
+  (kids || []).forEach(k => e.append(k));
+  return e;
+};
+const fa = n => Number(n).toLocaleString('fa-IR');
+
+function toast(msg, err, ms) {
+  const t = $('toast'); t.textContent = msg; t.className = err ? 'err' : ''; t.style.display = 'block';
+  clearTimeout(toast.h); toast.h = setTimeout(() => t.style.display = 'none', ms || (err ? 5500 : 2600));
+}
+
+async function api(params, body) {
+  const res = body
+    ? await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+    : await fetch(API_URL + '?' + new URLSearchParams(params));
+  const j = await res.json();
+  if (!j.ok) throw new Error(j.error || 'خطای ناشناخته');
+  return j;
+}
+
+function confirmBox(msg, okText) {
+  return new Promise(res => {
+    $('cm').textContent = msg; $('cy').textContent = okText || 'تأیید';
+    const d = $('cfm'), done = v => { d.close(); res(v); };
+    $('cy').onclick = () => done(true); $('cn').onclick = () => done(false); d.oncancel = () => res(false);
+    d.showModal();
+  });
+}
+
+async function loadMenu(keep) {
+  const menu = $('menu');
+  if (!menu.children.length) for (let i = 0; i < 4; i++) menu.append(el('div', { className: 'skel' }));
+  try {
+    const j = await api({ action: 'sheets' });
+    menu.textContent = '';
+    j.sheets.forEach(s => {
+      const b = el('button', { type: 'button' }, [el('span', { textContent: s.name }), el('span', { className: 'c', textContent: fa(s.rows) })]);
+      b.dataset.name = s.name; b.onclick = () => openSheet(s.name);
+      menu.append(b);
+    });
+    if (!j.sheets.length) { $('title').textContent = 'شیتی پیدا نشد'; return; }
+    let want = keep || S.sheet || localStorage.getItem('adm_sheet');
+    if (!j.sheets.some(s => s.name === want)) want = j.sheets[0].name;
+    openSheet(want);
+  } catch (e) { menu.textContent = ''; $('title').textContent = 'اتصال برقرار نشد'; toast(e.message, true); }
+}
+
+async function openSheet(name) {
+  try { localStorage.setItem('adm_sheet', name); } catch (x) {}
+  document.querySelectorAll('#menu button').forEach(b => b.classList.toggle('on', b.dataset.name === name));
+  $('title').textContent = name; $('info').textContent = 'در حال بارگذاری…'; $('tb').textContent = ''; $('meta').textContent = '';
+  try {
+    const j = await api({ action: 'rows', sheet: name });
+    S = { sheet: name, headers: j.headers, lists: j.lists || {}, wide: j.wide || [], ints: j.ints || [], rows: j.rows };
+    $('q').value = ''; shown = PAGE; sort = { i: -1, dir: 1 }; render();
+  } catch (e) { $('info').textContent = ''; toast(e.message, true); }
+}
+
+function render() {
+  const q = $('q').value.trim().toLowerCase();
+  const cols = S.headers.map((h, i) => ({ h, i })).filter(c => c.h);
+  $('meta').replaceChildren(
+    el('span', { className: 'chip' }, ['ردیف: ', el('b', { textContent: fa(S.rows.length) })]),
+    el('span', { className: 'chip' }, ['ستون: ', el('b', { textContent: fa(cols.length) })]));
+  $('th').replaceChildren(el('tr', {}, [el('th', { textContent: 'ردیف' })].concat(cols.map(c => {
+    const th = el('th', { textContent: c.h, title: 'مرتب‌سازی' });
+    if (sort.i === c.i) th.append(el('span', { className: 'ar', textContent: sort.dir > 0 ? '▲' : '▼' }));
+    th.onclick = () => { sort = sort.i === c.i ? { i: c.i, dir: -sort.dir } : { i: c.i, dir: 1 }; render(); };
+    return th;
+  }))));
+  let list = S.rows.filter(r => !q || r.v.join(' ').toLowerCase().includes(q));
+  if (sort.i >= 0) {
+    const num = S.ints.includes(S.headers[sort.i]);
+    const key = r => num ? (parseFloat(String(r.v[sort.i]).replace(/[^\d.\-]/g, '')) || 0) : r.v[sort.i];
+    list = list.slice().sort((a, b) => {
+      const x = key(a), y = key(b);
+      return (num ? x - y : String(x).localeCompare(String(y), 'fa')) * sort.dir;
+    });
+  }
+  const tb = $('tb'); tb.textContent = '';
+  list.slice(0, shown).forEach(r => {
+    const tr = el('tr', {}, [el('td', { className: 'n', textContent: r.r })].concat(
+      cols.map(c => el('td', { textContent: r.v[c.i], title: r.v[c.i], dataset: { l: c.h } }))));
+    tr.tabIndex = 0;
+    tr.onclick = () => openRow(r.r);
+    tr.onkeydown = e => { if (e.key === 'Enter') openRow(r.r); };
+    tb.append(tr);
+  });
+  if (!list.length) {
+    const b = el('button', { className: 'btn p', type: 'button', textContent: 'ردیف جدید' }); b.onclick = () => openRow(null);
+    const box = el('div', { className: 'empty' }, [q ? 'ردیفی با این عبارت پیدا نشد.' : 'این شیت هنوز ردیفی ندارد.', ...(q ? [] : [el('br'), b])]);
+    tb.append(el('tr', {}, [el('td', { colSpan: cols.length + 1 }, [box])]));
+  }
+  $('info').textContent = list.length ? fa(Math.min(shown, list.length)) + ' از ' + fa(list.length) + ' ردیف' : '';
+  $('more').hidden = list.length <= shown;
+}
+
+async function openRow(r) {
+  let vals = {};
+  if (r) {
+    try { const j = await api({ action: 'row', sheet: S.sheet, row: r }); S.headers.forEach((h, i) => vals[h] = j.values[i]); }
+    catch (e) { return toast(e.message, true); }
+  }
+  M = { r, ctl: {}, orig: vals };
+  const box = $('df'); box.textContent = '';
+  S.headers.filter(Boolean).forEach(h => {
+    let c, wide = false;
+    if (S.lists[h]) {
+      c = el('select'); c.append(el('option', { value: '', textContent: '— انتخاب کنید —' }));
+      const opts = S.lists[h].slice();
+      if (vals[h] && !opts.includes(vals[h])) opts.push(vals[h]);
+      opts.forEach(o => c.append(el('option', { value: o, textContent: o })));
+    } else if (S.wide.includes(h)) { c = el('textarea', { rows: 4 }); wide = true; }
+    else { c = el('input', { type: 'text' }); if (S.ints.includes(h)) c.inputMode = 'decimal'; }
+    c.value = vals[h] || ''; c.id = 'f' + Object.keys(M.ctl).length; M.ctl[h] = c;
+    box.append(el('div', { className: wide ? 'w' : '' }, [el('label', { htmlFor: c.id, textContent: h }), c]));
+  });
+  $('dt').textContent = r ? 'ردیف ' + fa(r) : 'ردیف جدید';
+  $('ds').textContent = S.sheet;
+  setMode(!r);
+  $('dlg').showModal();
+}
+
+function setMode(edit) {
+  M.edit = edit;
+  Object.values(M.ctl).forEach(c => c.disabled = !edit);
+  const bd = $('mode'); bd.textContent = edit ? (M.r ? 'ویرایش' : 'افزودن') : 'مشاهده'; bd.className = 'badge' + (edit ? ' e' : '');
+  const a = $('da'); a.textContent = '';
+  const btn = (t, cls, fn) => { const b = el('button', { type: 'button', className: 'btn ' + cls, textContent: t }); b.onclick = fn; a.append(b); return b; };
+  if (edit) {
+    btn('ذخیره', 'p', function () { save(this); });
+    btn('انصراف', '', () => M.r ? (Object.keys(M.ctl).forEach(h => M.ctl[h].value = M.orig[h] || ''), setMode(false)) : $('dlg').close());
+  } else {
+    btn('ویرایش', 'p', () => setMode(true));
+    a.append(el('span', { className: 'sp' }));
+    btn('حذف', 'd', del);
+    btn('بستن', '', () => $('dlg').close());
+  }
+}
+
+async function save(b) {
+  const data = {};
+  Object.keys(M.ctl).forEach(h => {
+    const v = M.ctl[h].value;
+    if (M.r ? v !== (M.orig[h] || '') : v !== '') data[h] = v;
+  });
+  if (!Object.keys(data).length) return toast('تغییری وجود ندارد.');
+  b.disabled = true;
+  try {
+    await api(null, M.r ? { action: 'update', sheet: S.sheet, row: M.r, data } : { action: 'add', sheet: S.sheet, data });
+    $('dlg').close(); toast('ذخیره شد.'); await loadMenu(S.sheet);
+  } catch (e) { toast(e.message, true); b.disabled = false; }
+}
+
+async function del() {
+  if (!await confirmBox('ردیف ' + fa(M.r) + ' برای همیشه حذف شود؟ شماره‌ی ردیف‌های بعدی یکی کم می‌شود.', 'حذف شود')) return;
+  try { await api(null, { action: 'delete', sheet: S.sheet, row: M.r }); $('dlg').close(); toast('حذف شد.'); await loadMenu(S.sheet); }
+  catch (e) { toast(e.message, true); }
+}
+
+$('q').oninput = () => { shown = PAGE; render(); };
+$('more').onclick = () => { shown += PAGE; render(); };
+$('add').onclick = () => openRow(null);
+$('reload').onclick = () => loadMenu(S.sheet);
+loadMenu();
+</script>
+</body>
+</html>
