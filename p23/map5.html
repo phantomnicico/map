@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ابزار نقشه: مختصات و محدوده</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#e6eaee;--sd:#c3c9d1;--sl:#fff;--tx:#26303a;--mut:#66727f;--line:rgba(120,135,150,.25);
+  --pri:#d9480f;--pri2:#f58a3c;--on:#fff;--teal:#1f7a70;--danger:#b42318;
+  --out:6px 6px 14px var(--sd),-6px -6px 14px var(--sl);
+  --outs:3px 3px 8px var(--sd),-3px -3px 8px var(--sl);
+  --in:inset 3px 3px 7px var(--sd),inset -3px -3px 7px var(--sl);
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1e2329;--sd:#13171b;--sl:#2a3139;--tx:#e8ecef;--mut:#98a3ad;--line:rgba(160,175,190,.18);
+  --pri:#ff8a4c;--pri2:#ffb27a;--on:#2a1204;--teal:#4fc3b4;--danger:#ff8f85;
+}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.7 Vazirmatn,Tahoma,"Segoe UI",sans-serif;overflow:hidden}
+.app{height:100vh;height:100dvh;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:10px;padding:10px;
+  padding-top:max(10px,env(safe-area-inset-top));padding-bottom:max(10px,env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--pri);outline-offset:3px}
+
+.panel{order:2;background:var(--bg);box-shadow:var(--out);border-radius:18px;padding:12px 14px;display:grid;gap:10px;
+  align-content:start;min-height:0;max-height:44vh;max-height:44dvh;overflow:auto;overscroll-behavior:contain}
+.panel.min .box{display:none!important}
+.box{display:grid;gap:10px}
+details.help summary{cursor:pointer;font-size:12.5px;color:var(--mut);margin:0 4px}
+details.help .hint{margin-top:6px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.row h1{margin:0;font-size:17px;flex:1;min-width:140px}
+.stat{font-size:13px;color:var(--mut);box-shadow:var(--in);border-radius:20px;padding:0 14px}
+.stat b{color:var(--pri)}
+
+.btn{border:0;cursor:pointer;border-radius:12px;padding:9px 16px;background:var(--bg);box-shadow:var(--outs);font-weight:500;white-space:nowrap;transition:box-shadow .15s}
+.btn:active:not(:disabled),.btn[aria-pressed=true]{box-shadow:var(--in)}
+.btn.p{background:linear-gradient(145deg,var(--pri2),var(--pri));color:var(--on);font-weight:700}
+.btn.d{color:var(--danger)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn[aria-pressed=true]{color:var(--pri);font-weight:700}
+.tabs{display:flex;gap:10px}
+.tabs .btn{flex:1}
+.tabs .tgl{flex:0 0 auto;padding:9px 14px}
+select{border:0;background:var(--bg);box-shadow:var(--in);border-radius:12px;padding:8px 10px}
+
+/* جست‌وجوی مکان */
+.searchbox{display:grid;gap:8px;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--bg);box-shadow:var(--outs)}
+.searchline{display:flex;gap:8px;align-items:stretch}
+.searchline input{flex:1;min-width:0;border:0;background:var(--bg);box-shadow:var(--in);border-radius:12px;padding:10px 12px}
+.searchline .btn{padding-inline:14px}
+.searchstatus{font-size:12px;color:var(--mut);margin:0 3px}
+.searchresults{display:grid;gap:6px;max-height:190px;overflow:auto}
+.searchresult{width:100%;text-align:right;white-space:normal;line-height:1.6;border:0;border-radius:10px;padding:9px 11px;background:var(--bg);box-shadow:var(--outs);cursor:pointer;color:var(--tx)}
+.searchresult:active{box-shadow:var(--in)}
+.searchresult small{display:block;color:var(--mut);font-size:11px;direction:ltr;text-align:right}
+.searchpin{background:none;border:0}
+.searchpin i{display:block;width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#2563eb;border:3px solid #fff;box-shadow:0 3px 9px rgba(0,0,0,.45);position:relative}
+.searchpin i:after{content:"";position:absolute;inset:7px;border-radius:50%;background:#fff}
+
+.fields{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end}
+.fld label,.out label{display:block;font-size:12.5px;color:var(--mut);margin:0 4px 4px}
+.fld .in{display:flex;gap:8px}
+.fld input{flex:1;min-width:0;border:0;background:var(--bg);box-shadow:var(--in);border-radius:12px;padding:9px 13px;
+  direction:ltr;text-align:left;font-variant-numeric:tabular-nums;font-size:16px}
+.fld input.bad,textarea.bad{box-shadow:var(--in),0 0 0 2px var(--danger)}
+textarea{width:100%;min-height:78px;resize:vertical;border:0;background:var(--bg);box-shadow:var(--in);border-radius:12px;
+  padding:10px 13px;direction:ltr;text-align:left;font:13px/1.5 ui-monospace,Consolas,monospace;word-break:break-all}
+
+.mapwrap{min-height:180px;height:100%;border-radius:18px;box-shadow:var(--out);padding:6px;background:var(--bg)}
+#map{height:100%;width:100%;border-radius:14px;z-index:0;cursor:crosshair}
+.hint{font-size:12.5px;color:var(--mut);margin:0 4px}
+.lock,.lock *{pointer-events:none!important}
+
+.pin{background:none;border:0}
+.pin i{display:block;width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);
+  background:var(--teal);border:3px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.4);position:relative}
+.pin i::after{content:"";position:absolute;inset:6px;border-radius:50%;background:#fff}
+.pin.on i{background:var(--pri)}
+.vtx{background:none;border:0}
+.vtx i{display:block;width:16px;height:16px;border-radius:50%;background:var(--pri);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.45);cursor:grab}
+.vtx.first i{background:var(--teal);width:20px;height:20px;margin:-2px}
+.leaflet-control-layers,.leaflet-bar a{font-family:inherit}
+
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:2000;display:none;
+  max-width:92vw;padding:10px 22px;border-radius:14px;background:var(--bg);box-shadow:var(--out);border-inline-start:4px solid var(--teal)}
+#toast.err{border-color:var(--danger);color:var(--danger)}
+
+.fields{grid-template-columns:1fr}
+.fields>.btn{width:100%}
+textarea{min-height:64px}
+@media(max-width:899px){
+  .fields{grid-template-columns:1fr 1fr;gap:8px}
+  .fields>.btn{grid-column:1/-1}
+  .fld .in{gap:6px}
+  .fld .in .btn{padding:9px 10px}
+  .box .row .btn{flex:1;padding:8px 10px}
+  .row h1{font-size:15px}
+}
+@media(min-width:900px){
+  .app{grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(320px,380px) minmax(0,1fr);gap:14px;padding:14px}
+  .panel{order:0;max-height:none;padding:14px 16px;gap:14px}
+  .box{gap:12px}
+  .tgl{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="panel" id="panel">
+  <div class="searchbox" id="placeSearchBox">
+    <div class="row"><strong>جست‌وجوی نام منطقه</strong><span class="hint">روستا، شهر یا عارضه جغرافیایی</span></div>
+    <div class="searchline">
+      <input id="placeQuery" type="search" autocomplete="off" placeholder="مثلاً سرمشک، جواران، رابر…" aria-label="نام منطقه برای جست‌وجو">
+      <button class="btn p" id="placeSearchBtn" type="button">جست‌وجو</button>
+    </div>
+    <p class="searchstatus" id="placeSearchStatus" aria-live="polite">نام منطقه را وارد و جست‌وجو کنید.</p>
+    <div class="searchresults" id="placeSearchResults" hidden></div>
+  </div>
+  <div class="tabs" role="group" aria-label="حالت ابزار">
+    <button class="btn" id="tabPin" type="button" aria-pressed="true">پین (مختصات)</button>
+    <button class="btn" id="tabPoly" type="button" aria-pressed="false">پولی‌گان (محدوده)</button>
+    <button class="btn tgl" id="tgl" type="button" aria-expanded="true" aria-label="جمع‌کردن یا باز‌کردن پنل ابزار">▾</button>
+  </div>
+
+  <!-- حالت پین -->
+  <div class="box" id="pinBox">
+    <div class="row">
+      <h1>انتخاب موقعیت روی نقشه</h1>
+      <span class="stat">نشانگرها: <b id="count">0</b></span>
+    </div>
+    <div class="row">
+      <button class="btn p" id="locBtn" type="button">موقعیت من</button>
+      <button class="btn d" id="delBtn" type="button" disabled>حذف نشانگر</button>
+      <button class="btn" id="clrBtn" type="button" disabled>پاک‌کردن همه</button>
+    </div>
+    <div class="fields">
+      <div class="fld">
+        <label for="lat">عرض جغرافیایی (Latitude)</label>
+        <div class="in"><input id="lat" inputmode="decimal" autocomplete="off" placeholder="مثلاً 30.285500">
+          <button class="btn" id="cpLat" type="button" disabled>کپی</button></div>
+      </div>
+      <div class="fld">
+        <label for="lon">طول جغرافیایی (Longitude)</label>
+        <div class="in"><input id="lon" inputmode="decimal" autocomplete="off" placeholder="مثلاً 57.076800">
+          <button class="btn" id="cpLon" type="button" disabled>کپی</button></div>
+      </div>
+      <button class="btn" id="cpBoth" type="button" disabled>کپی هر دو</button>
+    </div>
+    <details class="help"><summary>راهنما</summary>
+      <p class="hint">روی نقشه کلیک کنید تا نشانگر اضافه شود. نشانگر را بکشید تا جابه‌جا شود. می‌توانید مختصات را تایپ کنید و Enter بزنید.</p></details>
+  </div>
+
+  <!-- حالت پولی‌گان -->
+  <div class="box" id="polyBox" hidden>
+    <div class="row">
+      <h1>ترسیم محدوده (پولی‌گان)</h1>
+      <span class="stat">نقاط: <b id="pcount">0</b></span>
+      <span class="stat">مساحت: <b id="area">—</b></span>
+      <span class="stat">محیط: <b id="peri">—</b></span>
+    </div>
+    <div class="row">
+      <button class="btn" id="undoBtn" type="button" disabled>برگرداندن آخرین نقطه</button>
+      <button class="btn" id="fitBtn" type="button" disabled>نمایش کل محدوده</button>
+      <button class="btn d" id="pclrBtn" type="button" disabled>پاک‌کردن پولی‌گان</button>
+      <label class="stat" style="display:flex;gap:8px;align-items:center">اعشار
+        <select id="dig"><option>4</option><option>5</option><option>6</option></select></label>
+    </div>
+    <div class="out">
+      <label for="geo">خروجی GeoJSON (می‌توانید یک پولی‌گان را اینجا بچسبانید و «اعمال» بزنید)</label>
+      <textarea id="geo" spellcheck="false" placeholder='{"type":"Polygon","coordinates":[[[57.1378,29.4942],...]]}'></textarea>
+    </div>
+    <div class="row">
+      <button class="btn p" id="cpBtn" type="button" disabled>کپی GeoJSON</button>
+      <button class="btn" id="applyBtn" type="button">اعمال متن به نقشه</button>
+    </div>
+    <details class="help"><summary>راهنما</summary>
+      <p class="hint">روی نقشه کلیک کنید تا رأس اضافه شود (حداقل ۳ نقطه). رأس‌ها را بکشید. کلیک نزدیک یک ضلع، رأس را همان‌جا درج می‌کند. دابل‌کلیک روی رأس آن را حذف می‌کند.</p></details>
+  </div>
+</section>
+
+<div class="mapwrap"><div id="map" role="application" aria-label="نقشه"></div></div>
+</main>
+<div id="toast" role="status"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function () {
+  'use strict';
+  var DEFAULT_CENTER = [29.42, 57.16];
+  var DIGITS = 6;
+  var mode = 'pin';
+  var markers = [], sel = null;   // پین‌ها
+  var pts = [];                   // رأس‌های پولی‌گان
+  var searchMarker = null, searchCoords = null, searchRequest = 0; // نتیجه‌ی مستقل جست‌وجوی مکان
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ---------- نقشه ----------
+  var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  });
+  var sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19, attribution: 'Tiles &copy; Esri'
+  });
+  var map = L.map('map', { layers: [osm], doubleClickZoom: false }).setView(DEFAULT_CENTER, 11);
+  L.control.layers({ 'نقشه': osm, 'ماهواره': sat }, null, { position: 'topleft' }).addTo(map);
+  L.control.scale({ imperial: false }).addTo(map);
+  map.createPane('pins').style.zIndex = 620;
+  map.createPane('vtx').style.zIndex = 640;
+  map.createPane('searchPin').style.zIndex = 630;
+  var shape = L.polygon([], { color: '#d9480f', weight: 3, fillColor: '#f58a3c', fillOpacity: .25, interactive: false }).addTo(map);
+
+  // ---------- ابزارهای مشترک ----------
+  function toast(msg, err) {
+    var t = $('toast'); t.textContent = msg; t.className = err ? 'err' : ''; t.style.display = 'block';
+    clearTimeout(toast.h); toast.h = setTimeout(function () { t.style.display = 'none'; }, err ? 5000 : 2200);
+  }
+  function fa(s) { return String(s).replace(/\d/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[d]; }); }
+  function fmt(n) { return n.toFixed(DIGITS); }
+  function parse(s) {   // ارقام فارسی/عربی و جداکننده‌ی اعشار فارسی
+    var t = String(s).replace(/[۰-۹]/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); })
+      .replace(/[٠-٩]/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'.indexOf(d); })
+      .replace(/[٫,،]/g, '.').replace(/\s/g, '');
+    return t === '' ? NaN : Number(t);
+  }
+  function copy(text, label) {
+    var ok = function () { toast(label + ' کپی شد' + (text.length < 60 ? ': ' + text : '.')); };
+    var fallback = function () {
+      var ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.append(ta); ta.select();
+      try { document.execCommand('copy') ? ok() : toast('کپی انجام نشد.', true); } catch (e) { toast('کپی انجام نشد.', true); }
+      ta.remove();
+    };
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(ok, fallback);
+    else fallback();
+  }
+
+  // ---------- جست‌وجوی نام مکان (Nominatim / OpenStreetMap) ----------
+  function normalizeDigits(s) {
+    return String(s).replace(/[۰-۹]/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); })
+      .replace(/[٠-٩]/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'.indexOf(d); }).trim();
+  }
+  function runPlaceSearch() {
+    var q = $('placeQuery').value.trim();
+    if (!q) { toast('نام منطقه را وارد کنید.', true); $('placeQuery').focus(); return; }
+    var req = ++searchRequest, btn = $('placeSearchBtn'), status = $('placeSearchStatus'), list = $('placeSearchResults');
+    btn.disabled = true; btn.textContent = 'در حال جست‌وجو…';
+    status.textContent = 'در حال جست‌وجوی مکان…'; list.replaceChildren(); list.hidden = true;
+    var url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=7&accept-language=fa&q=' + encodeURIComponent(q);
+    fetch(url, { headers: { 'Accept': 'application/json' } }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status); return r.json();
+    }).then(function (data) {
+      if (req !== searchRequest) return;
+      if (!Array.isArray(data) || !data.length) { status.textContent = 'مکانی با این نام پیدا نشد. نام را دقیق‌تر یا همراه شهرستان وارد کنید.'; return; }
+      status.textContent = data.length + ' نتیجه پیدا شد؛ مکان موردنظر را انتخاب کنید.';
+      data.forEach(function (item) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'searchresult';
+        var title = document.createElement('span'); title.textContent = item.name || item.display_name.split(',')[0] || 'مکان بدون نام';
+        var detail = document.createElement('small'); detail.textContent = item.display_name;
+        b.append(title, detail);
+        b.addEventListener('click', function () { choosePlace(item); list.hidden = true; });
+        list.appendChild(b);
+      });
+      list.hidden = false;
+    }).catch(function (err) {
+      if (req !== searchRequest) return;
+      status.textContent = 'جست‌وجو انجام نشد؛ اتصال اینترنت یا دسترسی سرویس نقشه را بررسی کنید.';
+      toast('خطا در دریافت نتایج جست‌وجوی مکان.', true);
+    }).finally(function () {
+      if (req === searchRequest) { btn.disabled = false; btn.textContent = 'جست‌وجو'; }
+    });
+  }
+  function choosePlace(item) {
+    var lat = Number(item.lat), lon = Number(item.lon);
+    if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return toast('مختصات نتیجه معتبر نیست.', true);
+    if (searchMarker) map.removeLayer(searchMarker);
+    searchCoords = { lat: lat, lng: lon };
+    searchMarker = L.marker([lat, lon], {
+      pane: 'searchPin', keyboard: false,
+      icon: L.divIcon({ className: 'searchpin', html: '<i></i>', iconSize: [30, 38], iconAnchor: [15, 38] })
+    }).addTo(map);
+    searchMarker.bindPopup('<strong>' + escapeHtml(item.name || 'مکان انتخاب‌شده') + '</strong><br>' + fmt(lat) + ', ' + fmt(lon)).openPopup();
+    // نتایج جست‌وجو مستقل از پین‌های دستی و رأس‌های پولی‌گان باقی می‌مانند.
+    setMode('pin');
+    select(null);
+    $('lat').value = fmt(lat); $('lon').value = fmt(lon);
+    ['cpLat', 'cpLon', 'cpBoth'].forEach(function (id) { $(id).disabled = false; });
+    $('placeSearchStatus').textContent = 'مکان انتخاب شد: ' + (item.display_name || item.name || '');
+    map.setView([lat, lon], Math.max(map.getZoom(), 15));
+    toast('مکان پیدا شد؛ مختصات در فیلدها قرار گرفت.');
+  }
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, function (c) { return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]; });
+  }
+  $('placeSearchBtn').addEventListener('click', runPlaceSearch);
+  $('placeQuery').addEventListener('keydown', function (e) { if (e.key === 'Enter') runPlaceSearch(); });
+
+  // ---------- تب‌ها ----------
+  function setMode(m) {
+    mode = m;
+    $('pinBox').hidden = m !== 'pin'; $('polyBox').hidden = m !== 'poly';
+    $('tabPin').setAttribute('aria-pressed', m === 'pin'); $('tabPoly').setAttribute('aria-pressed', m === 'poly');
+    map.getPane('pins').classList.toggle('lock', m !== 'pin');
+    map.getPane('vtx').classList.toggle('lock', m !== 'poly');
+    setMin(false);
+  }
+  function setMin(min) {
+    $('panel').classList.toggle('min', min);
+    $('tgl').setAttribute('aria-expanded', !min);
+    $('tgl').textContent = min ? '▴' : '▾';
+  }
+  $('tabPin').onclick = function () { setMode('pin'); };
+  $('tabPoly').onclick = function () { setMode('poly'); };
+  $('tgl').onclick = function () { setMin(!$('panel').classList.contains('min')); };
+  // هر تغییر اندازه‌ی نقشه (جمع‌شدن پنل، چرخش گوشی، تغییر اندازه‌ی پنجره)
+  if (window.ResizeObserver) new ResizeObserver(function () { map.invalidateSize(); }).observe($('map'));
+  else window.addEventListener('resize', function () { map.invalidateSize(); });
+
+  /* =================== پین =================== */
+  function pinIcon(on) {
+    return L.divIcon({ className: 'pin' + (on ? ' on' : ''), html: '<i></i>', iconSize: [26, 34], iconAnchor: [13, 34] });
+  }
+  function refreshPin() {
+    var has = !!sel, hasCoords = has || !!searchCoords;
+    ['delBtn'].forEach(function (id) { $(id).disabled = !has; });
+    ['cpLat', 'cpLon', 'cpBoth'].forEach(function (id) { $(id).disabled = !hasCoords; });
+    $('clrBtn').disabled = !markers.length;
+    $('count').textContent = markers.length;
+    $('lat').classList.remove('bad'); $('lon').classList.remove('bad');
+    if (has) { var p = sel.getLatLng(); $('lat').value = fmt(p.lat); $('lon').value = fmt(p.lng); }
+    else if (searchCoords) { $('lat').value = fmt(searchCoords.lat); $('lon').value = fmt(searchCoords.lng); }
+    else { $('lat').value = ''; $('lon').value = ''; }
+  }
+  function select(m) {
+    if (sel) sel.setIcon(pinIcon(false));
+    sel = m;
+    if (m) { m.setIcon(pinIcon(true)); searchCoords = null; }
+    refreshPin();
+  }
+  function addMarker(lat, lon) {
+    searchCoords = null;
+    var m = L.marker([lat, lon], { icon: pinIcon(false), draggable: true, keyboard: false, pane: 'pins' }).addTo(map);
+    markers.push(m);
+    m.on('click', function () { select(m); });
+    m.on('dragstart', function () { select(m); });
+    m.on('drag', function () { var p = m.getLatLng().wrap(); $('lat').value = fmt(p.lat); $('lon').value = fmt(p.lng); });
+    m.on('dragend', function () { m.setLatLng(m.getLatLng().wrap()); refreshPin(); });
+    select(m);
+    return m;
+  }
+  function removeSelected() {
+    if (!sel) return;
+    map.removeLayer(sel);
+    markers.splice(markers.indexOf(sel), 1);
+    sel = null; refreshPin();
+  }
+  function applyTyped() {
+    var la = parse($('lat').value), lo = parse($('lon').value);
+    var badLat = !(la >= -90 && la <= 90), badLon = !(lo >= -180 && lo <= 180);
+    $('lat').classList.toggle('bad', badLat); $('lon').classList.toggle('bad', badLon);
+    if (badLat || badLon) {
+      if ($('lat').value.trim() || $('lon').value.trim()) toast('عرض باید بین منفی ۹۰ و ۹۰ و طول بین منفی ۱۸۰ و ۱۸۰ باشد.', true);
+      return;
+    }
+    if (sel) sel.setLatLng([la, lo]); else addMarker(la, lo);
+    refreshPin();
+    map.setView([la, lo], Math.max(map.getZoom(), 15));
+  }
+  ['lat', 'lon'].forEach(function (id) {
+    $(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') applyTyped(); });
+    $(id).addEventListener('change', applyTyped);
+  });
+  $('cpLat').onclick = function () { copy($('lat').value, 'عرض جغرافیایی'); };
+  $('cpLon').onclick = function () { copy($('lon').value, 'طول جغرافیایی'); };
+  $('cpBoth').onclick = function () { copy($('lat').value + ', ' + $('lon').value, 'مختصات'); };
+  $('delBtn').onclick = removeSelected;
+  $('clrBtn').onclick = function () {
+    if (!confirm('همه‌ی نشانگرها حذف شوند؟')) return;
+    markers.forEach(function (m) { map.removeLayer(m); });
+    markers = []; sel = null; refreshPin();
+  };
+  $('locBtn').onclick = function () {
+    if (!navigator.geolocation) return toast('مرورگر شما موقعیت‌یابی را پشتیبانی نمی‌کند.', true);
+    var b = $('locBtn'); b.disabled = true; b.textContent = 'در حال یافتن…';
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      b.disabled = false; b.textContent = 'موقعیت من';
+      var c = pos.coords;
+      addMarker(c.latitude, c.longitude);
+      map.setView([c.latitude, c.longitude], 17);
+      toast('دقت تقریبی: ' + Math.round(c.accuracy) + ' متر');
+    }, function (err) {
+      b.disabled = false; b.textContent = 'موقعیت من';
+      toast(err.code === 1 ? 'دسترسی به موقعیت مکانی رد شد. در تنظیمات مرورگر اجازه دهید.'
+        : err.code === 3 ? 'یافتن موقعیت زمان زیادی برد. دوباره تلاش کنید.'
+        : 'موقعیت در دسترس نیست.', true);
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+  };
+
+  /* =================== پولی‌گان =================== */
+  function vtxIcon(first) { return L.divIcon({ className: 'vtx' + (first ? ' first' : ''), html: '<i></i>', iconSize: [16, 16], iconAnchor: [8, 8] }); }
+  function latlngs() { return pts.map(function (m) { return m.getLatLng().wrap(); }); }
+  function areaOf(ll) {   // مساحت کروی (متر مربع)
+    var R = 6378137, s = 0, n = ll.length, rad = Math.PI / 180;
+    for (var i = 0; i < n; i++) {
+      var a = ll[i], b = ll[(i + 1) % n];
+      s += (b.lng - a.lng) * rad * (2 + Math.sin(a.lat * rad) + Math.sin(b.lat * rad));
+    }
+    return Math.abs(s * R * R / 2);
+  }
+  function perimeter(ll) {
+    var d = 0;
+    for (var i = 0; i < ll.length; i++) d += map.distance(ll[i], ll[(i + 1) % ll.length]);
+    return d;
+  }
+  function fmtArea(m2) { return m2 >= 1e6 ? fa((m2 / 1e6).toFixed(3)) + ' کم²' : fa((m2 / 1e4).toFixed(2)) + ' هکتار'; }
+  function fmtLen(m) { return m >= 1000 ? fa((m / 1000).toFixed(2)) + ' کیلومتر' : fa(Math.round(m)) + ' متر'; }
+
+  // GeoJSON فشرده: حلقه‌ی خلاف جهت عقربه‌ها، نقطه‌ی اول در انتها تکرار
+  function buildGeo() {
+    var ll = latlngs(); if (ll.length < 3) return '';
+    var d = +$('dig').value;
+    var ring = ll.map(function (p) { return [+p.lng.toFixed(d), +p.lat.toFixed(d)]; });
+    var s = 0;
+    for (var i = 0; i < ring.length; i++) { var a = ring[i], b = ring[(i + 1) % ring.length]; s += a[0] * b[1] - b[0] * a[1]; }
+    if (s < 0) ring.reverse();
+    ring.push(ring[0].slice());
+    return JSON.stringify({ type: 'Polygon', coordinates: [ring] });
+  }
+  function refreshPoly() {
+    var ll = latlngs(), n = ll.length;
+    shape.setLatLngs(ll);
+    pts.forEach(function (m, i) { m.setIcon(vtxIcon(i === 0)); });
+    $('pcount').textContent = fa(n);
+    $('undoBtn').disabled = !n; $('pclrBtn').disabled = !n; $('fitBtn').disabled = !n;
+    $('area').textContent = n >= 3 ? fmtArea(areaOf(ll)) : '—';
+    $('peri').textContent = n >= 3 ? fmtLen(perimeter(ll)) : '—';
+    $('geo').value = buildGeo(); $('geo').classList.remove('bad');
+    $('cpBtn').disabled = n < 3;
+  }
+  function addVertex(latlng, index) {
+    var m = L.marker(latlng, { icon: vtxIcon(false), draggable: true, keyboard: false, pane: 'vtx' }).addTo(map);
+    m.on('drag', refreshPoly);
+    m.on('dragend', function () { m.setLatLng(m.getLatLng().wrap()); refreshPoly(); });
+    m.on('dblclick', function (e) { L.DomEvent.stopPropagation(e); removeVertex(m); });
+    if (index == null) pts.push(m); else pts.splice(index, 0, m);
+    return m;
+  }
+  function removeVertex(m) { map.removeLayer(m); pts.splice(pts.indexOf(m), 1); refreshPoly(); }
+  function clearPoly() { pts.forEach(function (m) { map.removeLayer(m); }); pts = []; }
+
+  $('undoBtn').onclick = function () { if (pts.length) removeVertex(pts[pts.length - 1]); };
+  $('pclrBtn').onclick = function () { if (confirm('همه‌ی نقاط پولی‌گان حذف شوند؟')) { clearPoly(); refreshPoly(); } };
+  $('fitBtn').onclick = function () {
+    var ll = latlngs();
+    if (ll.length > 1) map.fitBounds(L.latLngBounds(ll), { padding: [30, 30] }); else if (ll.length) map.setView(ll[0], 16);
+  };
+  $('dig').onchange = refreshPoly;
+  $('cpBtn').onclick = function () { copy($('geo').value, 'GeoJSON'); };
+  $('applyBtn').onclick = function () {
+    var ta = $('geo'), obj;
+    try { obj = JSON.parse(ta.value); } catch (e) { ta.classList.add('bad'); return toast('متن، JSON معتبر نیست.', true); }
+    if (obj && obj.type === 'Feature') obj = obj.geometry;
+    var ring = obj && obj.type === 'Polygon' && obj.coordinates && obj.coordinates[0];
+    if (!ring || ring.length < 4) { ta.classList.add('bad'); return toast('یک GeoJSON از نوع Polygon لازم است.', true); }
+    var ok = ring.every(function (c) { return c.length >= 2 && Math.abs(c[0]) <= 180 && Math.abs(c[1]) <= 90; });
+    if (!ok) { ta.classList.add('bad'); return toast('مختصات نامعتبر است (ترتیب باید [طول، عرض] باشد).', true); }
+    var a = ring[0], b = ring[ring.length - 1];
+    if (a[0] === b[0] && a[1] === b[1]) ring = ring.slice(0, -1);
+    clearPoly();
+    ring.forEach(function (c) { addVertex([c[1], c[0]]); });
+    refreshPoly();
+    map.fitBounds(L.latLngBounds(latlngs()), { padding: [30, 30] });
+    toast('پولی‌گان بارگذاری شد.');
+  };
+
+  /* =================== رویدادهای نقشه و کیبورد =================== */
+  map.on('click', function (e) {
+    var p = e.latlng.wrap();
+    if (mode === 'pin') { addMarker(p.lat, p.lng); return; }
+    var n = pts.length, idx = null;
+    if (n >= 3) {   // اگر نزدیک ضلعی بود، درج در همان ضلع
+      var cp = map.latLngToLayerPoint(e.latlng), best = 10;
+      for (var i = 0; i < n; i++) {
+        var a = map.latLngToLayerPoint(pts[i].getLatLng()), b = map.latLngToLayerPoint(pts[(i + 1) % n].getLatLng());
+        var d = L.LineUtil.pointToSegmentDistance(cp, a, b);
+        if (d < best) { best = d; idx = i + 1; }
+      }
+    }
+    addVertex(p, idx); refreshPoly();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || ''))) return;
+    if (mode === 'pin') {
+      if (e.key === 'Delete') removeSelected();
+      if (e.key === 'Escape') select(null);
+    } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); $('undoBtn').click(); }
+  });
+
+  refreshPin(); refreshPoly();
+})();
+</script>
+</body>
+</html>

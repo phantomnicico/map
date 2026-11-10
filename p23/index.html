@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101a2b">
+  <title>درگاه یکپارچه سامانه‌ها</title>
+  <style>
+    :root {
+      --sidebar-width: 320px;
+      --bg: #0b1423;
+      --panel: rgba(17, 29, 48, .96);
+      --panel-2: rgba(25, 41, 64, .92);
+      --line: rgba(255,255,255,.10);
+      --text: #eef4ff;
+      --muted: #a9b8ce;
+      --accent: #56a8ff;
+      --accent-2: #287bd0;
+      --shadow: 0 20px 55px rgba(0,0,0,.35);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body {
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Tahoma, Arial, sans-serif;
+    }
+
+    .app { position: relative; width: 100%; height: 100%; overflow: hidden; }
+    .main-frame {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #f4f7fb;
+    }
+
+    .sidebar {
+      position: absolute;
+      z-index: 10;
+      top: 16px;
+      right: 16px;
+      bottom: 16px;
+      width: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      transform: translateX(0);
+      transition: transform .28s ease, opacity .28s ease;
+    }
+    .sidebar.is-closed {
+      transform: translateX(calc(100% + 24px));
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .sidebar-header {
+      padding: 23px 20px 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(49,119,190,.23), rgba(17,29,48,0));
+    }
+    .brand-row { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      width: 44px; height: 44px; flex: 0 0 44px;
+      display: grid; place-items: center;
+      border-radius: 14px;
+      color: #fff; font-size: 23px;
+      background: linear-gradient(145deg, #58b2ff, #2468bd);
+      box-shadow: 0 8px 22px rgba(48,137,220,.28);
+    }
+    .brand-title { margin: 0; font-size: 15px; font-weight: 700; line-height: 1.8; }
+    .brand-subtitle { margin-top: 2px; color: var(--muted); font-size: 10px; letter-spacing: 1.2px; direction: ltr; text-align: right; }
+    .sidebar-caption { margin: 17px 0 0; color: var(--muted); font-size: 11px; line-height: 1.9; }
+
+    .groups {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 13px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,.2) transparent;
+    }
+    .group {
+      margin-bottom: 10px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: rgba(255,255,255,.025);
+    }
+    .group-toggle {
+      width: 100%;
+      min-height: 54px;
+      padding: 0 13px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      border: 0;
+      color: var(--text);
+      background: transparent;
+      cursor: pointer;
+      text-align: right;
+      font: inherit;
+    }
+    .group-toggle:hover, .group-toggle[aria-expanded="true"] { background: rgba(86,168,255,.10); }
+    .group-icon {
+      width: 30px; height: 30px; flex: 0 0 30px;
+      display: grid; place-items: center;
+      border-radius: 9px;
+      color: #8fc8ff;
+      background: rgba(86,168,255,.13);
+      font-size: 19px;
+    }
+    .group-name { flex: 1; font-size: 13px; font-weight: 700; }
+    .chevron { color: #9eb2ca; font-size: 19px; transition: transform .2s ease; }
+    .group-toggle[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+
+    .group-content {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows .25s ease;
+    }
+    .group.is-open .group-content { grid-template-rows: 1fr; }
+    .group-inner { min-height: 0; overflow: hidden; }
+    .link-list { display: grid; gap: 7px; padding: 2px 12px 13px 12px; }
+    .link-btn {
+      width: 100%;
+      min-height: 42px;
+      padding: 9px 12px;
+      border: 1px solid rgba(255,255,255,.075);
+      border-radius: 10px;
+      color: #dce9f8;
+      background: var(--panel-2);
+      cursor: pointer;
+      text-align: right;
+      font: inherit;
+      font-size: 12px;
+      transition: .18s ease;
+    }
+    .link-btn::before {
+      content: "›";
+      display: inline-block;
+      margin-left: 9px;
+      color: #70baff;
+      font-size: 17px;
+      vertical-align: -1px;
+    }
+    .link-btn:hover {
+      color: #fff;
+      border-color: rgba(86,168,255,.48);
+      background: rgba(48,119,190,.25);
+      transform: translateX(-2px);
+    }
+    .link-btn.is-active {
+      color: #fff;
+      border-color: rgba(86,168,255,.65);
+      background: rgba(48,119,190,.32);
+    }
+
+    .sidebar-footer {
+      padding: 13px 18px 16px;
+      border-top: 1px solid var(--line);
+      color: #8fa3bd;
+      font-size: 10px;
+      line-height: 1.9;
+    }
+
+    .sidebar-toggle {
+      position: absolute;
+      z-index: 20;
+      top: 25px;
+      right: calc(var(--sidebar-width) + 29px);
+      width: 43px; height: 43px;
+      display: grid; place-items: center;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 13px;
+      color: #fff;
+      background: rgba(17,29,48,.94);
+      box-shadow: 0 8px 25px rgba(0,0,0,.25);
+      cursor: pointer;
+      font-size: 21px;
+      transition: right .28s ease, background .2s ease;
+    }
+    .sidebar-toggle:hover { background: #1d3d60; }
+    .sidebar-toggle.is-closed { right: 18px; }
+
+    .scrim {
+      position: absolute;
+      z-index: 5;
+      inset: 0;
+      display: none;
+      background: rgba(3,9,18,.45);
+    }
+    .scrim.is-visible { display: block; }
+
+    .empty-state {
+      position: absolute;
+      z-index: 2;
+      left: 50%; top: 50%;
+      transform: translate(-50%,-50%);
+      width: min(420px, calc(100% - 36px));
+      padding: 22px;
+      border: 1px solid rgba(20,40,65,.12);
+      border-radius: 18px;
+      color: #34465d;
+      background: rgba(255,255,255,.94);
+      text-align: center;
+      box-shadow: 0 14px 45px rgba(0,0,0,.12);
+      pointer-events: none;
+    }
+    .empty-state strong { display: block; margin-bottom: 8px; font-size: 16px; }
+    .empty-state span { font-size: 12px; line-height: 2; }
+
+    @media (max-width: 700px) {
+      :root { --sidebar-width: min(86vw, 340px); }
+      .sidebar { top: 10px; right: 10px; bottom: 10px; }
+      .sidebar-toggle { top: 17px; right: calc(var(--sidebar-width) + 20px); }
+      .sidebar-toggle.is-closed { right: 12px; }
+      .sidebar.is-closed { transform: translateX(calc(100% + 18px)); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <iframe
+      id="mainFrame"
+      class="main-frame"
+      title="محتوای سامانه انتخاب‌شده"
+      src="about:blank"
+      loading="eager"
+      referrerpolicy="strict-origin-when-cross-origin">
+    </iframe>
+
+    <div class="empty-state" id="emptyState">
+      <strong>به درگاه یکپارچه سامانه‌ها خوش آمدید</strong>
+      <span>برای نمایش سامانه موردنظر، یکی از گزینه‌های منوی کناری را انتخاب کنید.</span>
+    </div>
+
+    <div class="scrim" id="scrim" aria-hidden="true"></div>
+
+    <aside class="sidebar" id="sidebar" aria-label="منوی سامانه‌ها">
+      <header class="sidebar-header">
+        <div class="brand-row">
+          <div class="brand-mark">⌘</div>
+          <div>
+            <h1 class="brand-title">درگاه یکپارچه سامانه‌ها</h1>
+            <div class="brand-subtitle">INTEGRATED SYSTEMS PORTAL</div>
+          </div>
+        </div>
+        <p class="sidebar-caption">برای دسترسی به هر سامانه، گروه مربوطه را باز کرده و گزینه موردنظر را انتخاب کنید.</p>
+      </header>
+
+      <nav class="groups" aria-label="گروه‌بندی سامانه‌ها">
+        <!-- گروه اول -->
+        <section class="group">
+          <button class="group-toggle" type="button" aria-expanded="false">
+            <span class="group-icon">⌖</span>
+            <span class="group-name">گروه اول</span>
+            <span class="chevron">⌄</span>
+          </button>
+          <div class="group-content">
+            <div class="group-inner">
+              <div class="link-list">
+                <button class="link-btn" type="button" data-title="اطلس هوشمند" data-url="001.html">اطلس هوشمند</button>
+                <button class="link-btn" type="button" data-title="پنل ادمین" data-url="admin.html">پنل ادمین</button>
+                <button class="link-btn" type="button" data-title="نقشه ادمین" data-url="map5.html">نقشه ادمین</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- گروه دوم: نشانی نمونه را با فایل/نشانی واقعی جایگزین کنید -->
+        <section class="group">
+          <button class="group-toggle" type="button" aria-expanded="false">
+            <span class="group-icon">▦</span>
+            <span class="group-name">گروه دوم</span>
+            <span class="chevron">⌄</span>
+          </button>
+          <div class="group-content">
+            <div class="group-inner">
+              <div class="link-list">
+                <button class="link-btn" type="button" data-title="سامانه چهارم" data-url="https://example.com">سامانه چهارم</button>
+                <button class="link-btn" type="button" data-title="سامانه پنجم" data-url="https://example.org">سامانه پنجم</button>
+                <button class="link-btn" type="button" data-title="سامانه ششم" data-url="https://www.openstreetmap.org">سامانه ششم</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- گروه سوم: نشانی نمونه را با فایل/نشانی واقعی جایگزین کنید -->
+        <section class="group">
+          <button class="group-toggle" type="button" aria-expanded="false">
+            <span class="group-icon">◇</span>
+            <span class="group-name">گروه سوم</span>
+            <span class="chevron">⌄</span>
+          </button>
+          <div class="group-content">
+            <div class="group-inner">
+              <div class="link-list">
+                <button class="link-btn" type="button" data-title="سامانه هفتم" data-url="https://example.com">سامانه هفتم</button>
+                <button class="link-btn" type="button" data-title="سامانه هشتم" data-url="https://example.org">سامانه هشتم</button>
+                <button class="link-btn" type="button" data-title="سامانه نهم" data-url="https://www.openstreetmap.org">سامانه نهم</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </nav>
+
+      <footer class="sidebar-footer">
+        درگاه دسترسی متمرکز به سامانه‌ها
+      </footer>
+    </aside>
+
+    <button class="sidebar-toggle" id="sidebarToggle" type="button"
+      aria-label="بستن منو" aria-expanded="true" title="باز/بسته کردن منو">‹</button>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const sidebar = document.getElementById('sidebar');
+      const toggleButton = document.getElementById('sidebarToggle');
+      const scrim = document.getElementById('scrim');
+      const frame = document.getElementById('mainFrame');
+      const emptyState = document.getElementById('emptyState');
+      const groupSections = Array.from(document.querySelectorAll('.group'));
+      const groupToggles = Array.from(document.querySelectorAll('.group-toggle'));
+      const linkButtons = Array.from(document.querySelectorAll('.link-btn'));
+
+      // اعتبارسنجی هم نشانی کامل و هم مسیر نسبی مانند 001.html را می‌پذیرد.
+      function isValidUrl(value) {
+        if (typeof value !== 'string' || !value.trim()) return false;
+
+        try {
+          const parsed = new URL(value.trim(), document.baseURI);
+          return ['http:', 'https:', 'file:'].includes(parsed.protocol);
+        } catch (error) {
+          return false;
+        }
+      }
+
+      function setSidebarOpen(open) {
+        sidebar.classList.toggle('is-closed', !open);
+        toggleButton.classList.toggle('is-closed', !open);
+        scrim.classList.toggle('is-visible', open && window.innerWidth <= 700);
+        toggleButton.setAttribute('aria-expanded', String(open));
+        toggleButton.setAttribute('aria-label', open ? 'بستن منو' : 'باز کردن منو');
+        toggleButton.textContent = open ? '‹' : '☰';
+      }
+
+      toggleButton.addEventListener('click', () => {
+        setSidebarOpen(sidebar.classList.contains('is-closed'));
+      });
+
+      scrim.addEventListener('click', () => setSidebarOpen(false));
+
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') setSidebarOpen(false);
+      });
+
+      // فقط یک گروه در هر لحظه باز می‌ماند.
+      groupToggles.forEach(button => {
+        button.addEventListener('click', () => {
+          const parent = button.closest('.group');
+          const shouldOpen = !parent.classList.contains('is-open');
+
+          groupSections.forEach(section => {
+            section.classList.remove('is-open');
+            const trigger = section.querySelector('.group-toggle');
+            trigger.setAttribute('aria-expanded', 'false');
+          });
+
+          if (shouldOpen) {
+            parent.classList.add('is-open');
+            button.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+
+      // بارگذاری لینک در iframe؛ مسیرهای نسبی مانند 001.html معتبر هستند.
+      linkButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const url = (button.dataset.url || '').trim();
+          const title = button.dataset.title || button.textContent.trim();
+
+          if (!isValidUrl(url)) {
+            alert('نشانی واردشده معتبر نیست.');
+            return;
+          }
+
+          try {
+            const resolvedUrl = new URL(url, document.baseURI);
+            frame.src = resolvedUrl.href;
+            frame.title = title;
+            emptyState.hidden = true;
+
+            linkButtons.forEach(item => item.classList.remove('is-active'));
+            button.classList.add('is-active');
+
+            // در نمایشگرهای کوچک پس از انتخاب، منو بسته می‌شود.
+            if (window.innerWidth <= 700) setSidebarOpen(false);
+          } catch (error) {
+            alert('امکان باز کردن این نشانی وجود ندارد.');
+          }
+        });
+      });
+
+      window.addEventListener('resize', () => {
+        const isOpen = !sidebar.classList.contains('is-closed');
+        scrim.classList.toggle('is-visible', isOpen && window.innerWidth <= 700);
+      });
+
+      setSidebarOpen(true);
+    })();
+  </script>
+</body>
+</html>
