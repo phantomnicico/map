@@ -1,0 +1,343 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>داشبورد پروژه PRJ-005 | توانمندسازی اقتصادی خانوارهای سرمشک</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --bg:#f3f6fb;
+  --card:#fff;
+  --ink:#17243b;
+  --muted:#718096;
+  --line:#e7edf5;
+  --primary:#2463a6;
+  --blue:#3985d6;
+  --teal:#159b91;
+  --orange:#d99132;
+  --red:#d65b5b;
+  --shadow:0 8px 28px rgba(31,55,88,.07);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Vazirmatn',Tahoma,sans-serif;
+}
+.container{max-width:1440px;margin:auto;padding:28px}
+.hero{
+  background:linear-gradient(120deg,#142c4c,#1c5483 65%,#247b91);
+  border-radius:24px;padding:30px;color:#fff;
+  position:relative;overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.hero:after{
+  content:"";position:absolute;width:340px;height:340px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:50%;left:-90px;top:-180px;
+  box-shadow:0 0 0 35px rgba(255,255,255,.035),
+  0 0 0 75px rgba(255,255,255,.025);
+}
+.hero-top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;position:relative;z-index:1}
+.eyebrow{font-size:12px;letter-spacing:2px;color:#b8d9f5;font-weight:700}
+.hero h1{font-size:25px;margin:12px 0 8px;font-weight:800}
+.hero p{color:#d4e5f4;margin:0;line-height:2;font-size:13px;max-width:780px}
+.code{
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);
+  border-radius:12px;padding:10px 15px;font-size:13px;white-space:nowrap
+}
+.hero-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;position:relative;z-index:1}
+.pill{padding:7px 13px;border-radius:30px;font-size:11px;background:rgba(255,255,255,.13);color:#edf7ff}
+.pill.status{background:rgba(217,145,50,.2);color:#ffe0a9}
+.section-title{font-size:16px;font-weight:800;margin:28px 0 14px}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(4,1fr);margin-top:20px}
+.card{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:18px;padding:20px;box-shadow:var(--shadow);
+}
+.kpi-label{font-size:12px;color:var(--muted)}
+.kpi-value{font-size:25px;font-weight:800;margin:9px 0 4px}
+.kpi-foot{font-size:11px;color:var(--muted)}
+.kpi-icon{
+  width:38px;height:38px;border-radius:12px;
+  display:grid;place-items:center;font-size:18px;margin-bottom:12px;
+  background:#edf4fc;color:var(--primary)
+}
+.content-grid{grid-template-columns:1.15fr .85fr}
+.two-col{grid-template-columns:1fr 1fr}
+.chart-card{min-height:260px}
+.progress-wrap{display:flex;align-items:center;gap:26px;padding:12px 0}
+.circle{
+  width:145px;height:145px;border-radius:50%;
+  background:conic-gradient(var(--teal) 0 18deg,#eaf0f6 18deg 360deg);
+  display:grid;place-items:center;flex-shrink:0;position:relative;
+}
+.circle:before{content:"";position:absolute;inset:12px;background:white;border-radius:50%}
+.circle-inner{position:relative;text-align:center}
+.circle-inner strong{font-size:28px;display:block}
+.circle-inner span{font-size:11px;color:var(--muted)}
+.progress-text{font-size:12px;color:var(--muted);line-height:2}
+.bar-row{margin:16px 0}
+.bar-head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px}
+.bar{height:9px;background:#edf1f6;border-radius:20px;overflow:hidden}
+.bar span{display:block;height:100%;border-radius:20px;background:var(--blue)}
+.info-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-item{background:#f7f9fc;border:1px solid var(--line);padding:13px;border-radius:12px}
+.info-item small{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}
+.info-item strong{font-size:13px}
+.timeline{position:relative;padding-right:24px}
+.timeline:before{content:"";position:absolute;right:6px;top:8px;bottom:8px;width:2px;background:#e4ebf3}
+.step{position:relative;padding:0 15px 22px 0}
+.step:before{
+  content:"";position:absolute;right:-23px;top:5px;width:11px;height:11px;
+  border-radius:50%;background:#fff;border:3px solid var(--blue)
+}
+.step strong{font-size:12px}
+.step p{font-size:11px;color:var(--muted);margin:5px 0 0;line-height:1.8}
+.map-box{
+  min-height:270px;border-radius:14px;overflow:hidden;
+  background:linear-gradient(145deg,#eaf2ee,#e2edf5);
+  position:relative;display:grid;place-items:center;
+}
+.map-box svg{width:100%;height:270px}
+.map-caption{
+  position:absolute;bottom:12px;right:12px;background:#fff;
+  border-radius:9px;padding:8px 12px;font-size:10px;box-shadow:var(--shadow)
+}
+.notice{
+  border:1px solid #f0dfbd;background:#fff9ed;
+  border-radius:16px;padding:18px;margin-top:16px;
+}
+.notice h3{margin:0 0 8px;font-size:14px;color:#95611d}
+.notice p{margin:0;font-size:12px;line-height:2.1;color:#725b38}
+.tag{display:inline-block;border-radius:20px;padding:5px 10px;font-size:10px;background:#edf4fc;color:#28629b}
+.footer{text-align:center;color:#98a4b5;font-size:10px;padding:25px 0 5px}
+@media(max-width:900px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .content-grid,.two-col{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .container{padding:14px}
+  .hero{padding:22px}
+  .hero-top{flex-direction:column}
+  .hero h1{font-size:20px}
+  .kpis{grid-template-columns:1fr 1fr;gap:9px}
+  .card{padding:15px}
+  .kpi-value{font-size:20px}
+  .progress-wrap{flex-direction:column;align-items:flex-start}
+  .info-list{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="eyebrow">DARALOO SMART ATLAS | CSR INTELLIGENCE</div>
+        <h1>توانمندسازی اقتصادی خانوارهای سرمشک</h1>
+        <p>
+          برنامه آموزش مهارت، ارتقای ظرفیت اقتصادی و توسعه فرصت‌های اشتغال
+          برای خانوارهای محدوده سرمشک، با رویکرد تقویت معیشت پایدار و
+          افزایش توان اقتصادی جامعه محلی.
+        </p>
+      </div>
+      <div class="code">PRJ-005</div>
+    </div>
+    <div class="hero-meta">
+      <span class="pill status">● برنامه‌ریزی</span>
+      <span class="pill">اشتغال و توانمندسازی</span>
+      <span class="pill">منطقه: REG-005</span>
+      <span class="pill">نسخه نمایشی داشبورد پروژه</span>
+    </div>
+  </header>
+
+  <section class="grid kpis">
+    <div class="card">
+      <div class="kpi-icon">◷</div>
+      <div class="kpi-label">پیشرفت برنامه</div>
+      <div class="kpi-value">۵٪</div>
+      <div class="kpi-foot">مرحله برنامه‌ریزی و آماده‌سازی</div>
+    </div>
+    <div class="card">
+      <div class="kpi-icon">◇</div>
+      <div class="kpi-label">بودجه مصوب / پیش‌بینی‌شده</div>
+      <div class="kpi-value">۳ میلیارد</div>
+      <div class="kpi-foot">تومان</div>
+    </div>
+    <div class="card">
+      <div class="kpi-icon">⌂</div>
+      <div class="kpi-label">شاخص اول پروژه</div>
+      <div class="kpi-value">۱۲۰</div>
+      <div class="kpi-foot">واحد شاخص در داده ورودی مشخص نشده است</div>
+    </div>
+    <div class="card">
+      <div class="kpi-icon">♧</div>
+      <div class="kpi-label">شاخص دوم پروژه</div>
+      <div class="kpi-value">۱٬۲۰۰</div>
+      <div class="kpi-foot">واحد شاخص در داده ورودی مشخص نشده است</div>
+    </div>
+  </section>
+
+  <h2 class="section-title">پایش وضعیت و عملکرد پروژه</h2>
+  <section class="grid content-grid">
+    <div class="card chart-card">
+      <h3 style="font-size:14px;margin:0">نمای کلی پیشرفت</h3>
+      <div class="progress-wrap">
+        <div class="circle">
+          <div class="circle-inner">
+            <strong>۵٪</strong>
+            <span>پیشرفت کل</span>
+          </div>
+        </div>
+        <div class="progress-text">
+          <strong style="color:var(--ink)">وضعیت فعلی: برنامه‌ریزی</strong><br>
+          پروژه در مرحله آماده‌سازی و برنامه‌ریزی اولیه قرار دارد.
+          تکمیل برنامه اجرایی، تعیین گروه‌های هدف و طراحی سازوکار
+          آموزش از محورهای اصلی این مرحله است.
+        </div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-head"><span>پیشرفت ثبت‌شده</span><strong>۵٪</strong></div>
+        <div class="bar"><span style="width:5%;background:var(--teal)"></span></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-head"><span>باقی‌مانده تا تکمیل</span><strong>۹۵٪</strong></div>
+        <div class="bar"><span style="width:95%;background:#dce6f1"></span></div>
+      </div>
+    </div>
+
+    <div class="card chart-card">
+      <h3 style="font-size:14px;margin:0 0 18px">مشخصات اجرایی</h3>
+      <div class="info-list">
+        <div class="info-item">
+          <small>کد پروژه</small><strong>PRJ-005</strong>
+        </div>
+        <div class="info-item">
+          <small>کد منطقه</small><strong>REG-005</strong>
+        </div>
+        <div class="info-item">
+          <small>دسته‌بندی</small><strong>اشتغال و توانمندسازی</strong>
+        </div>
+        <div class="info-item">
+          <small>وضعیت</small><strong>برنامه‌ریزی</strong>
+        </div>
+        <div class="info-item">
+          <small>تاریخ شروع</small><strong>۱۴۰۵/۰۹/۰۱</strong>
+        </div>
+        <div class="info-item">
+          <small>تاریخ پایان</small><strong>۱۴۰۶/۰۳/۳۱</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <h2 class="section-title">زمان‌بندی و موقعیت مکانی</h2>
+  <section class="grid two-col">
+    <div class="card">
+      <h3 style="font-size:14px;margin:0 0 20px">چرخه زمانی پروژه</h3>
+      <div class="timeline">
+        <div class="step">
+          <strong>۱۴۰۵/۰۹/۰۱ | آغاز برنامه</strong>
+          <p>شروع مرحله برنامه‌ریزی، نیازسنجی و تعیین گروه‌های هدف</p>
+        </div>
+        <div class="step">
+          <strong>مرحله طراحی و آماده‌سازی</strong>
+          <p>تدوین بسته‌های آموزشی، شناسایی ظرفیت‌های اقتصادی و طراحی مسیر اجرا</p>
+        </div>
+        <div class="step">
+          <strong>مرحله اجرا و توانمندسازی</strong>
+          <p>اجرای آموزش‌های مهارتی و پیگیری مسیرهای اشتغال و فعالیت اقتصادی</p>
+        </div>
+        <div class="step">
+          <strong>۱۴۰۶/۰۳/۳۱ | پایان برنامه</strong>
+          <p>ارزیابی نتایج، بررسی اثربخشی و جمع‌بندی عملکرد پروژه</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:14px;margin:0 0 14px">محدوده جغرافیایی پروژه</h3>
+      <div class="map-box">
+        <svg viewBox="0 0 500 270" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1" fill="#b7c9c4"/>
+            </pattern>
+          </defs>
+          <rect width="500" height="270" fill="url(#dots)"/>
+          <path d="M0 190 Q100 145 170 175 T330 155 T500 175" fill="none" stroke="#c4d8d0" stroke-width="2"/>
+          <path d="M0 90 Q100 120 190 80 T370 95 T500 70" fill="none" stroke="#c4d8d0" stroke-width="2"/>
+          <path d="M115 165 L205 105 L315 125 L350 190 L270 220 L155 205 Z"
+            fill="rgba(57,133,214,.18)" stroke="#2879be" stroke-width="3" stroke-dasharray="7 4"/>
+          <circle cx="245" cy="165" r="7" fill="#159b91" stroke="white" stroke-width="3"/>
+          <circle cx="245" cy="165" r="17" fill="none" stroke="#159b91" stroke-opacity=".35" stroke-width="2"/>
+          <text x="265" y="155" font-size="13" fill="#234a6a" font-weight="bold">سرمشک</text>
+          <text x="250" y="250" text-anchor="middle" font-size="10" fill="#657d8d">نمای شماتیک محدوده؛ نه نقشه پیمایشی</text>
+        </svg>
+        <div class="map-caption">محدوده ثبت‌شده پروژه PRJ-005</div>
+      </div>
+      <div class="info-list" style="margin-top:13px">
+        <div class="info-item">
+          <small>عرض جغرافیایی</small><strong>29.3509</strong>
+        </div>
+        <div class="info-item">
+          <small>طول جغرافیایی</small><strong>57.1848</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <h2 class="section-title">شرح و ملاحظات مدیریتی</h2>
+  <section class="card">
+    <h3 style="font-size:14px;margin:0 0 10px">معرفی پروژه</h3>
+    <p style="font-size:12px;line-height:2.2;color:var(--muted);margin:0">
+      آموزش مهارت و توانمندسازی اقتصادی خانوارها با هدف ارتقای ظرفیت‌های
+      فردی و محلی، توسعه فرصت‌های درآمدزایی و کمک به شکل‌گیری فعالیت‌های
+      اقتصادی پایدار در محدوده سرمشک.
+    </p>
+
+    <div class="notice">
+      <h3>نکته مدیریتی | همپوشانی مکانی با پروژه PRJ-003</h3>
+      <p>
+        محدوده جغرافیایی این پروژه عمداً با محدوده پروژه
+        <strong>PRJ-003 – تجهیز فضای آموزشی محدوده سرمشک</strong>
+        همپوشانی دارد. این همپوشانی به‌خودی‌خود به معنای تعارض اجرایی
+        یا تداخل منابع نیست؛ با این حال، پیش از تصویب نهایی برنامه اجرایی،
+        لازم است گروه‌های هدف، زمان‌بندی فعالیت‌ها، مجریان، محل ارائه خدمات
+        و منابع موردنیاز دو پروژه با یکدیگر تطبیق داده شوند.
+        استفاده مشترک از ظرفیت‌های آموزشی پروژه PRJ-003 می‌تواند در صورت
+        تأیید کارشناسی، به کاهش هزینه‌ها و افزایش اثربخشی مداخله اجتماعی کمک کند.
+      </p>
+    </div>
+  </section>
+
+  <h2 class="section-title">هندسه محدوده ثبت‌شده</h2>
+  <section class="card">
+    <span class="tag">POLYGON | PRJ-005</span>
+    <pre style="white-space:pre-wrap;direction:ltr;text-align:left;font-family:Consolas,monospace;font-size:11px;line-height:1.9;color:#52647a;background:#f7f9fc;padding:14px;border-radius:10px;overflow-wrap:anywhere">POLYGON((
+57.1836 29.3495,
+57.1852 29.3493,
+57.1865 29.3504,
+57.1861 29.3518,
+57.1845 29.3522,
+57.1834 29.3511,
+57.1836 29.3495
+))</pre>
+    <p style="font-size:10px;color:var(--muted);margin:8px 0 0">
+      مختصات و هندسه محدوده بر اساس اطلاعات ورودی رکورد نمایش داده شده‌اند.
+      نقشه بالا صرفاً نمایش شماتیک است.
+    </p>
+  </section>
+
+  <footer class="footer">
+    DARALOO SMART ATLAS · CSR PROJECT INTELLIGENCE · PRJ-005
+    <br>سامانه هوشمند مدیریت راهبردی مسئولیت‌های اجتماعی مجتمع مس درآلو
+  </footer>
+</div>
+</body>
+</html>
